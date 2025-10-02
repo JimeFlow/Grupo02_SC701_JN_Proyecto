@@ -8,7 +8,13 @@ namespace SC701_ProyectoFinal.Controllers
 {
     public class AccountController : Controller
     {
+        private static readonly List<User> _users = new();
 
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View(new User());
+        }
         //private readonly SignInManager<IdentityUser> _signInManager;
         //public AccountController(SignInManager<IdentityUser> signInManager)
         //{
@@ -30,8 +36,8 @@ namespace SC701_ProyectoFinal.Controllers
           //  return View(new User());
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
         //public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         //{
         //    ViewData["ReturnUrl"] = returnUrl;
@@ -57,46 +63,46 @@ namespace SC701_ProyectoFinal.Controllers
         //    return View(model);
         //}
 
-        public IActionResult Login(LoginViewModel model)
-        {
-            if (!ModelState.IsValid)
-                return View(model);
+        //public IActionResult Login(LoginViewModel model)
+        //{
+        //    if (!ModelState.IsValid)
+        //        return View(model);
 
-            bool validCredentials = ValidateUser(model.Email, model.Password);
+        //    bool validCredentials = ValidateUser(model.Email, model.Password);
 
-            if (validCredentials)
-            {
-                HttpContext.Session.SetString("Usuario", model.Email);
-                return RedirectToAction("Index", "Home"); // Redirect to dashboard or home page
-            }
+        //    if (validCredentials)
+        //    {
+        //        HttpContext.Session.SetString("Usuario", model.Email);
+        //        return RedirectToAction("Index", "Home"); // Redirect to dashboard or home page
+        //    }
 
-            ModelState.AddModelError(string.Empty, "Correo o contraseña incorrectos.");
-            return View(model);
+        //    ModelState.AddModelError(string.Empty, "Correo o contraseña incorrectos.");
+        //    return View(model);
 
-        }
+        //}
 
         private bool ValidateUser(string correo, string contrasenna)
         {
             return correo == "admin@correo.com" && contrasenna == "12345"; /*Temporal*/
         }
         
-        public IActionResult Register(User model)
-        {
-            if (ModelState.IsValid)
-                return View(model);
+        //public IActionResult Register(User model)
+        //{
+        //    if (ModelState.IsValid)
+        //        return View(model);
 
-            if (_users.Any(u => u.Email == model.Email))
-            {
-                ModelState.AddModelError(nameof(model.Email), "Este correo ya está registrado.");
-                return View(model);
-            }
+        //    if (_users.Any(u => u.Email == model.Email))
+        //    {
+        //        ModelState.AddModelError(nameof(model.Email), "Este correo ya está registrado.");
+        //        return View(model);
+        //    }
 
-            // Guardar en memoria
-            model.Id = _users.Count + 1;
-            _users.Add(model);
+        //    // Guardar en memoria
+        //    model.Id = _users.Count + 1;
+        //    _users.Add(model);
 
-            TempData["Ok"] = "Usuario registrado correctamente.";
-            return RedirectToAction(nameof(Register));
-        }
+        //    TempData["Ok"] = "Usuario registrado correctamente.";
+        //    return RedirectToAction(nameof(Register));
+        //}
     }
 }

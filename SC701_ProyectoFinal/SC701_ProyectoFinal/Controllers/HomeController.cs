@@ -15,8 +15,7 @@ namespace SC701_ProyectoFinal.Controllers
 
         public IActionResult Index()
         {
-            if (string.IsNullOrEmpty(HttpContext.Session.GetString("Usuario")))
-                return RedirectToAction("Login", "Account");
+           
 
             return View();
         }

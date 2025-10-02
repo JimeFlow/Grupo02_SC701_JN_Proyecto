@@ -22,8 +22,8 @@
                          data-zanim-xs='{"delay":0.5,"animation":"slide-right"}'
                          data-zanim-trigger="scroll">
 
-                        <h3 class="display-4 fs-7">Perfect for Startups,<br />freelancers &amp; companies.</h3>
-                        <h6 class="text-danger mt-3">Specially crafted for the people who care about design.</h6>
+                        <h3 class="display-4 fs-7">Registrate para ser parte de nuestra familia.</h3>
+                        <h6 class="text-danger mt-3">Hecho para las personas que les gusta aprender.</h6>
 
                         @if (TempData["Ok"] != null)
                         {
@@ -35,18 +35,18 @@
 
                             <div class="row gy-4 align-items-center mb-4">
                                 <div class="col-12">
-                                    <input asp-for="Nombre" class="form-control bg-light" type="text" placeholder="Your Name" />
+                                    <input asp-for="Nombre" class="form-control bg-light" type="text" placeholder="Tu nombre" />
                                     <span asp-validation-for="Nombre" class="text-danger"></span>
                                 </div>
 
                                 <div class="col-12">
-                                    <input asp-for="Email" class="form-control bg-light" type="email" placeholder="Email Address" />
+                                    <input asp-for="Email" class="form-control bg-light" type="email" placeholder="Tu correo electrónico" />
                                     <span asp-validation-for="Email" class="text-danger"></span>
                                 </div>
 
                                 <div class="col-6">
                                     <div class="input-group">
-                                        <input asp-for="Contraseña" class="form-control bg-light" id="pwd" type="password" placeholder="Password" autocomplete="new-password" />
+                                        <input asp-for="Contraseña" class="form-control bg-light" id="pwd" type="password" placeholder="Contraseña" autocomplete="new-password" />
                                         <button type="button" class="btn btn-outline-secondary" id="togglePwd" aria-label="Mostrar/Ocultar">
                                             <i id="eyeIcon" class="fas fa-eye"></i>
                                         </button>
@@ -56,18 +56,18 @@
                                 </div>
 
                                 <div class="col-6">
-                                    <input type="password" class="form-control bg-light" id="ConfirmPassword" placeholder="Confirmation" autocomplete="new-password" />
+                                    <input type="password" class="form-control bg-light" id="ConfirmPassword" placeholder="Confirmación" autocomplete="new-password" />
                                     <div id="ConfirmPasswordMsg" class="text-danger"></div>
                                 </div>
                             </div>
 
                             <div class="row mb-4 align-items-center">
                                 <div class="col-auto d-grid">
-                                    <button class="btn btn-dark" type="submit">Create an Account</button>
+                                    <button class="btn btn-dark" type="submit">Crear una cuenta</button>
                                 </div>
                                 <div class="col-sm">
                                     <p class="fs-10 text-body mb-0 font-secondary mt-2 mt-lg-0">
-                                        By signing up, you agree to the <a class="text-black" href="#!">terms and conditions.</a>
+                                        Registrandote aceptas nuestros <a class="text-black" href="#!">términos y condiciones.</a>
                                     </p>
                                 </div>
                             </div>

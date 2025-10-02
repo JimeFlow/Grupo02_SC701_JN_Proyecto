@@ -1,0 +1,66 @@
+﻿@model SC701_ProyectoFinal.Models.LoginViewModel
+@{
+    ViewData["Title"] = "Iniciar sesión"; 
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="py-0">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Imagen lateral -->
+            <div class="col-lg-6 px-0">
+                <div class="sticky-top vh-lg-100 py-9">
+                    <div class="bg-holder" style="background-image:url(/lib/img/signin.jpg);"></div>
+                </div>
+            </div>
+
+            <!-- Formulario -->
+            <div class="col-lg-6 py-6">
+                <div class="row h-100 align-items-center justify-content-center">
+                    <div class="col-sm-8 col-md-6 col-lg-10 col-xl-8">
+                        <h3 class="display-4 fs-7">Bienvenido</h3>
+                        <h6 class="text-danger mt-3">Accede con tus credenciales institucionales</h6>
+
+                        <form asp-action="Login" method="post" class="mt-5">
+                            <div class="mb-3">
+                                <input asp-for="Email" class="form-control bg-light" placeholder="Correo electrónico" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-0">
+                                <input asp-for="Password" class="form-control bg-light" type="password" placeholder="Contraseña" />
+                                <span asp-validation-for="Password" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3 d-grid">
+                                <button class="btn btn-dark mt-3" type="submit">Iniciar sesión</button>
+                            </div>
+
+                            <div class="text-danger">
+                                @Html.ValidationSummary()
+                            </div>
+                        </form>
+
+                        <div class="mb-3 w-100 position-relative text-center mt-4">
+                            <hr class="text-body-secondary text-opacity-25" />
+                            <div class="absolute-centered px-3 font-secondary fs-10 text-body-tertiary">o inicia sesión con</div>
+                        </div>
+
+                        <div class="row gx-2">
+                            <div class="col-6 d-grid">
+                                <a class="btn btn-outline-danger btn-sm mt-2" href="#"><span class="fab fa-google-plus-g me-2"></span> Google</a>
+                            </div>
+                            <div class="col-6 d-grid">
+                                <a class="btn btn-outline-primary btn-sm mt-2" href="#"><span class="fab fa-facebook me-2"></span> Facebook</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

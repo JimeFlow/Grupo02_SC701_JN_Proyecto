@@ -103,6 +103,11 @@
           </li>
           <li class="fancynav-item"><a class="fancynav-link" href="../pages/portfolio.html"><span class="fancynav-link-content">portfolio</span></a></li>
           <li class="fancynav-item"><a class="fancynav-link" href="../pages/contact.html"><span class="fancynav-link-content">contact</span></a></li>
+                <li class="fancynav-item">
+                    <a class="fancynav-link" href="@Url.Action("Register", "Account")">
+                        <span class="fancynav-link-content">Registrarse</span>
+                    </a>
+                </li>
         </ul>
       </div>
     </nav>
@@ -195,6 +200,7 @@
       gtag('config', 'UA-122907869-1');
     </script>
     <script src="~/lib/js/theme.js"></script>
+    @RenderSection("Scripts", required: false)
 
   </body>
 

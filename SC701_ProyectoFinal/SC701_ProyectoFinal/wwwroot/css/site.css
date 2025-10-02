@@ -20,3 +20,28 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+#ConfirmPasswordMsg {
+    font-size: 0.875rem;
+    margin-top: 4px;
+    transition: color 0.2s ease;
+}
+
+    #ConfirmPasswordMsg.error {
+        color: #dc3545; 
+    }
+
+    #ConfirmPasswordMsg.success {
+        color: #28a745; 
+    }
+
+#PasswordStrength {
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-top: 4px;
+    transition: color 0.3s ease;
+}
+
+#eyeIcon {
+    font-size: 1.1rem;
+}

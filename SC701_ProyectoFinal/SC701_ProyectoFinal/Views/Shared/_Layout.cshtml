@@ -46,20 +46,22 @@
 
             <!-- Menú simple -->
             <div class="collapse navbar-collapse" id="mainNavbar">
-                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link" href="~/">Inicio</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="~/Informacion">Información</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="~/Contacto">Contacto</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+            <a class="nav-link" href="~/">Inicio</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="~/Informacion">Información</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="~/Contacto">Contacto</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href='@Url.Action("Register","Account")'>Registrarse</a>
+        </li>
+    </ul>
+</div>
+</nav>
 
     <!-- ===============================================-->
     <!--    Main Content-->
@@ -105,6 +107,7 @@
     <script src="~/lib/js/customEase.js"></script>
     <script src="~/lib/js/drawSVGPlugin.js"></script>
     <script src="~/lib/js/theme.js"></script>
+    @RenderSection("Scripts", required: false)
 
 </body>
 </html>

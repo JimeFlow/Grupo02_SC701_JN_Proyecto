@@ -1,0 +1,132 @@
+﻿@model SC701_ProyectoFinal.Models.User
+@{
+    ViewData["Title"] = "Sign up";
+}
+
+<section class="py-0">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-6 px-0">
+                <div class="sticky-top vh-lg-100 py-9">
+                    <div class="bg-holder"
+                         style="background-image:url('@Url.Content("~/lib/img/signup.jpg")');"
+                         data-zanim-trigger="scroll"
+                         data-zanim-lg='{"animation":"zoom-out-slide-right","delay":0.4}'>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 py-6">
+                <div class="row h-100 align-items-center justify-content-center">
+                    <div class="col-sm-8 col-md-6 col-lg-10 col-xl-8"
+                         data-zanim-xs='{"delay":0.5,"animation":"slide-right"}'
+                         data-zanim-trigger="scroll">
+
+                        <h3 class="display-4 fs-7">Perfect for Startups,<br />freelancers &amp; companies.</h3>
+                        <h6 class="text-danger mt-3">Specially crafted for the people who care about design.</h6>
+
+                        @if (TempData["Ok"] != null)
+                        {
+                            <div class="alert alert-success mt-3">@TempData["Ok"]</div>
+                        }
+
+                        <form class="mt-5" asp-controller="Account" asp-action="Register" method="post" novalidate>
+                            @Html.AntiForgeryToken()
+
+                            <div class="row gy-4 align-items-center mb-4">
+                                <div class="col-12">
+                                    <input asp-for="Nombre" class="form-control bg-light" type="text" placeholder="Your Name" />
+                                    <span asp-validation-for="Nombre" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-12">
+                                    <input asp-for="Email" class="form-control bg-light" type="email" placeholder="Email Address" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-6">
+                                    <div class="input-group">
+                                        <input asp-for="Contraseña" class="form-control bg-light" id="pwd" type="password" placeholder="Password" autocomplete="new-password" />
+                                        <button type="button" class="btn btn-outline-secondary" id="togglePwd" aria-label="Mostrar/Ocultar">
+                                            <i id="eyeIcon" class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                    <div id="PasswordStrength" class="mt-1 small"></div>
+                                    <span asp-validation-for="Contraseña" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-6">
+                                    <input type="password" class="form-control bg-light" id="ConfirmPassword" placeholder="Confirmation" autocomplete="new-password" />
+                                    <div id="ConfirmPasswordMsg" class="text-danger"></div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-4 align-items-center">
+                                <div class="col-auto d-grid">
+                                    <button class="btn btn-dark" type="submit">Create an Account</button>
+                                </div>
+                                <div class="col-sm">
+                                    <p class="fs-10 text-body mb-0 font-secondary mt-2 mt-lg-0">
+                                        By signing up, you agree to the <a class="text-black" href="#!">terms and conditions.</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        const pwd = document.getElementById('pwd');
+        const confirmPwd = document.getElementById('ConfirmPassword');
+        const msg = document.getElementById('ConfirmPasswordMsg');
+        const toggle = document.getElementById('togglePwd');
+        const eye = document.getElementById('eyeIcon');
+        const strengthMsg = document.getElementById('PasswordStrength');
+
+        toggle.addEventListener('click', () => {
+          if (pwd.type === 'password') {
+            pwd.type = 'text';
+            eye.classList.remove('fa-eye'); eye.classList.add('fa-eye-slash');
+          } else {
+            pwd.type = 'password';
+            eye.classList.remove('fa-eye-slash'); eye.classList.add('fa-eye');
+          }
+        });
+
+
+        function checkMatch() {
+          if (confirmPwd.value && confirmPwd.value !== pwd.value) {
+            msg.textContent = 'Las contraseñas no coinciden';
+            msg.classList.add('error'); msg.classList.remove('success');
+          } else if (confirmPwd.value && confirmPwd.value === pwd.value) {
+            msg.textContent = 'Las contraseñas coinciden';
+            msg.classList.add('success'); msg.classList.remove('error');
+          } else {
+            msg.textContent = '';
+            msg.classList.remove('error','success');
+          }
+        }
+        pwd.addEventListener('input', checkMatch);
+        confirmPwd.addEventListener('input', checkMatch);
+
+
+        pwd.addEventListener('input', () => {
+          const v = pwd.value;
+          let label = '', color = 'text-muted';
+          if (!v) { label = ''; color = 'text-muted'; }
+          else if (v.length < 6) { label = 'Muy débil'; color = 'text-danger'; }
+          else if (/[A-Z]/.test(v) && /\d/.test(v) && v.length >= 8) { label = 'Fuerte'; color = 'text-success'; }
+          else { label = 'Media'; color = 'text-warning'; }
+          strengthMsg.textContent = label;
+          strengthMsg.className = `mt-1 small ${color}`;
+        });
+    </script>
+}

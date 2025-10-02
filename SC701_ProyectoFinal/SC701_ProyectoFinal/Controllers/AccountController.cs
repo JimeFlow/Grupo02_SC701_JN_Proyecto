@@ -1,11 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+
 using Microsoft.AspNetCore.Identity;
+
 using SC701_ProyectoFinal.Models;
 
 namespace SC701_ProyectoFinal.Controllers
 {
     public class AccountController : Controller
     {
+
         //private readonly SignInManager<IdentityUser> _signInManager;
         //public AccountController(SignInManager<IdentityUser> signInManager)
         //{
@@ -17,6 +20,14 @@ namespace SC701_ProyectoFinal.Controllers
         {
             //ViewData["ReturnUrl"] = returnUrl;
             return View();
+
+
+        //private static readonly List<User> _users = new();
+
+        //[HttpGet]
+        //public IActionResult Register()
+        //{
+          //  return View(new User());
         }
 
         [HttpPost]
@@ -67,6 +78,25 @@ namespace SC701_ProyectoFinal.Controllers
         private bool ValidateUser(string correo, string contrasenna)
         {
             return correo == "admin@correo.com" && contrasenna == "12345"; /*Temporal*/
+        }
+        
+        public IActionResult Register(User model)
+        {
+            if (ModelState.IsValid)
+                return View(model);
+
+            if (_users.Any(u => u.Email == model.Email))
+            {
+                ModelState.AddModelError(nameof(model.Email), "Este correo ya está registrado.");
+                return View(model);
+            }
+
+            // Guardar en memoria
+            model.Id = _users.Count + 1;
+            _users.Add(model);
+
+            TempData["Ok"] = "Usuario registrado correctamente.";
+            return RedirectToAction(nameof(Register));
         }
     }
 }

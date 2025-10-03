@@ -1,4 +1,4 @@
-# ** Proyecto Final - Librería JN **
+# **Proyecto Final - Librería JN**
 
 ## **Universidad Fidélitas**  
 **Curso:** SC-701 - Programación Avanzada en Web

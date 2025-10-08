@@ -1,4 +1,4 @@
-# **Proyecto Final - Librería JN**
+# **Proyecto Final - Sistema de Gestión y Control de Inventario y Activos de la Biblioteca Solaris**
 
 ## **Universidad Fidélitas**  
 **Curso:** SC-701 - Programación Avanzada en Web

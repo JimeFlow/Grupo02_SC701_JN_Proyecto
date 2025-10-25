@@ -8,101 +8,107 @@ namespace SC701_ProyectoFinal.Controllers
 {
     public class AccountController : Controller
     {
-        private static readonly List<User> _users = new();
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IConfiguration _configuration;
+
+        public AccountController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+        {
+            _httpClientFactory = httpClientFactory;
+            _configuration = configuration;
+        }
+
+        #region Iniciar Sesión
+
+        [HttpGet]
+        public IActionResult Login()
+        {
+            
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Login(UsuarioModel usuario)
+        {
+            using (var context = _httpClientFactory.CreateClient())
+            {
+                var urlApi = _configuration["Valores:UrlAPI"] + "Account/IniciarSesion";
+                var respuesta = context.PostAsJsonAsync(urlApi, usuario).Result;
+
+                if (respuesta.IsSuccessStatusCode)
+                {
+                    var datosApi = respuesta.Content.ReadFromJsonAsync<UsuarioModel>().Result;
+
+                    if (datosApi != null)
+                    {
+                        HttpContext.Session.SetString("NombreUsuario", datosApi.Nombre);
+                        HttpContext.Session.SetString("NombreRol", datosApi.Tipo_Rol);
+                        return RedirectToAction("Index", "Home");
+                    }
+                }
+                var errorMessage = respuesta.Content.ReadAsStringAsync().Result;
+                var errorObj = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(errorMessage);
+                if(errorObj != null && errorObj.ContainsKey("mensaje"))
+                {
+                    ViewBag.Mensaje = errorObj["mensaje"];
+                }
+                else
+                {
+                    ViewBag.Mensaje = "Error desconocido en el proceso...";
+                }
+                return View();
+
+            }
+        }
+
+        #endregion
+
+        #region Registro
 
         [HttpGet]
         public IActionResult Register()
         {
-            return View(new User());
-        }
-        //private readonly SignInManager<IdentityUser> _signInManager;
-        //public AccountController(SignInManager<IdentityUser> signInManager)
-        //{
-        //    _signInManager = signInManager;
-        //}
-
-        [HttpGet]
-        public IActionResult Login(/*string returnUrl = null*/)
-        {
-            //ViewData["ReturnUrl"] = returnUrl;
             return View();
-
-
-        //private static readonly List<User> _users = new();
-
-        //[HttpGet]
-        //public IActionResult Register()
-        //{
-          //  return View(new User());
         }
 
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
-        //{
-        //    ViewData["ReturnUrl"] = returnUrl;
-        //    if (ModelState.IsValid)
-        //    {
-        //        var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
-        //        if (result.Succeeded)
-        //        {
-        //            if (Url.IsLocalUrl(returnUrl))
-        //            {
-        //                return Redirect(returnUrl);
-        //            }
-        //            else
-        //            {
-        //                return RedirectToAction("Index", "Home");
-        //            }
-        //        }
-        //        else
-        //        {
-        //            ModelState.AddModelError(string.Empty, "Correo o contraseña incorrectos.");
-        //        }
-        //    }
-        //    return View(model);
-        //}
-
-        //public IActionResult Login(LoginViewModel model)
-        //{
-        //    if (!ModelState.IsValid)
-        //        return View(model);
-
-        //    bool validCredentials = ValidateUser(model.Email, model.Password);
-
-        //    if (validCredentials)
-        //    {
-        //        HttpContext.Session.SetString("Usuario", model.Email);
-        //        return RedirectToAction("Index", "Home"); // Redirect to dashboard or home page
-        //    }
-
-        //    ModelState.AddModelError(string.Empty, "Correo o contraseña incorrectos.");
-        //    return View(model);
-
-        //}
-
-        private bool ValidateUser(string correo, string contrasenna)
+        [HttpPost]
+        public IActionResult Register(UsuarioModel usuario)
         {
-            return correo == "admin@correo.com" && contrasenna == "12345"; /*Temporal*/
+            using (var context = _httpClientFactory.CreateClient())
+            {
+                var urlApi = _configuration["Valores:UrlAPI"] + "Account/Registrarse";
+                var respuesta = context.PostAsJsonAsync(urlApi, usuario).Result;
+
+                if (respuesta.IsSuccessStatusCode)
+                {
+                    var datosApi = respuesta.Content.ReadFromJsonAsync<int>().Result;
+
+                    if (datosApi > 0)
+                    {
+                        return RedirectToAction("Login");
+                    }
+                }
+                var errorMessage = respuesta.Content.ReadAsStringAsync().Result;
+                var errorObj = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(errorMessage);
+                if (errorObj != null && errorObj.ContainsKey("mensaje"))
+                {
+                    ViewBag.Mensaje = errorObj["mensaje"];
+                }
+                else
+                {
+                    ViewBag.Mensaje = "Error desconocido en el proceso...";
+                }
+                return View();
+
+            }
         }
-        
-        //public IActionResult Register(User model)
-        //{
-        //    if (ModelState.IsValid)
-        //        return View(model);
 
-        //    if (_users.Any(u => u.Email == model.Email))
-        //    {
-        //        ModelState.AddModelError(nameof(model.Email), "Este correo ya está registrado.");
-        //        return View(model);
-        //    }
+        #endregion
 
-        //    // Guardar en memoria
-        //    model.Id = _users.Count + 1;
-        //    _users.Add(model);
 
-        //    TempData["Ok"] = "Usuario registrado correctamente.";
-        //    return RedirectToAction(nameof(Register));
-        //}
+
+
+
+
+
     }
 }

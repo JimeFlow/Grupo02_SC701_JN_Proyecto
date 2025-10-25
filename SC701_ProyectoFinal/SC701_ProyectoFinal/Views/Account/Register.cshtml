@@ -1,4 +1,4 @@
-﻿@model SC701_ProyectoFinal.Models.User
+﻿@model SC701_ProyectoFinal.Models.UsuarioModel
 @{
     ViewData["Title"] = "Sign up";
 }
@@ -25,38 +25,54 @@
                         <h3 class="display-4 fs-7">Registrate para ser parte de nuestra familia.</h3>
                         <h6 class="text-danger mt-3">Hecho para las personas que les gusta aprender.</h6>
 
-                        @if (TempData["Ok"] != null)
+                        @if (ViewBag.Mensaje != null)
                         {
-                            <div class="alert alert-success mt-3">@TempData["Ok"]</div>
+                            <div class="alert alert-warning text-center">
+                                @ViewBag.Mensaje
+                            </div>
                         }
 
-                        <form class="mt-5" asp-controller="Account" asp-action="Register" method="post" novalidate>
+                        <form id="formRegister" class="mt-5" asp-controller="Account" asp-action="Register" method="post" novalidate>
                             @Html.AntiForgeryToken()
 
                             <div class="row gy-4 align-items-center mb-4">
+
                                 <div class="col-12">
-                                    <input asp-for="Nombre" class="form-control bg-light" type="text" placeholder="Tu nombre" />
-                                    <span asp-validation-for="Nombre" class="text-danger"></span>
+                                    <label asp-for="Nombre" class="form-label">Nombre</label>
+                                    <input name="nombre" asp-for="Nombre" class="form-control bg-light" type="text" placeholder="Nombre" />
                                 </div>
 
                                 <div class="col-12">
-                                    <input asp-for="Email" class="form-control bg-light" type="email" placeholder="Tu correo electrónico" />
-                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                    <label asp-for="Apellidos" class="form-label">Apellidos</label>
+                                    <input name="apellidos" asp-for="Apellidos" class="form-control bg-light" type="text" placeholder="Apellidos" />
+                                </div>
+
+                                <div class="col-12">
+                                    <label asp-for="Identificacion" class="form-label">Identificación</label>
+                                    <input name="identificacion" asp-for="Identificacion" class="form-control bg-light" type="text" placeholder="Identificación" />
+                                </div>
+
+                                <div class="col-12">
+                                    <label asp-for="Correo" class="form-label">Correo</label>
+                                    <input name="correo" asp-for="Correo" class="form-control bg-light" type="email" placeholder="Tu correo electrónico" />
+                                </div>
+
+                                <div class="col-12">
+                                    <label asp-for="Telefono" class="form-label">Teléfono</label>
+                                    <input name="telefono" asp-for="Telefono" class="form-control bg-light" type="text" placeholder="Teléfono" />
                                 </div>
 
                                 <div class="col-6">
-                                    <div class="input-group">
-                                        <input asp-for="Contraseña" class="form-control bg-light" id="pwd" type="password" placeholder="Contraseña" autocomplete="new-password" />
-                                        <button type="button" class="btn btn-outline-secondary" id="togglePwd" aria-label="Mostrar/Ocultar">
+                                    
+                                        <input name="contrasena" asp-for="Contrasena" class="form-control bg-light" id="pwd" type="password" placeholder="Contraseña" autocomplete="new-password" />
+                                        @* <button type="button" class="btn btn-outline-secondary" id="togglePwd" aria-label="Mostrar/Ocultar">
                                             <i id="eyeIcon" class="fas fa-eye"></i>
-                                        </button>
-                                    </div>
+                                        </button> *@
                                     <div id="PasswordStrength" class="mt-1 small"></div>
-                                    <span asp-validation-for="Contraseña" class="text-danger"></span>
                                 </div>
 
                                 <div class="col-6">
-                                    <input type="password" class="form-control bg-light" id="ConfirmPassword" placeholder="Confirmación" autocomplete="new-password" />
+                                    <input type="password" class="form-control bg-light" id="ConfirmPassword" name="confirmPassword" placeholder="Confirmación" autocomplete="new-password" />
                                     <div id="ConfirmPasswordMsg" class="text-danger"></div>
                                 </div>
                             </div>
@@ -82,6 +98,7 @@
 </section>
 
 @section Scripts {
+    <script src="~/js/Registro.js" asp-append-version="true"></script>
     <partial name="_ValidationScriptsPartial" />
     <script>
         const pwd = document.getElementById('pwd');
@@ -101,7 +118,6 @@
           }
         });
 
-
         function checkMatch() {
           if (confirmPwd.value && confirmPwd.value !== pwd.value) {
             msg.textContent = 'Las contraseñas no coinciden';
@@ -116,7 +132,6 @@
         }
         pwd.addEventListener('input', checkMatch);
         confirmPwd.addEventListener('input', checkMatch);
-
 
         pwd.addEventListener('input', () => {
           const v = pwd.value;

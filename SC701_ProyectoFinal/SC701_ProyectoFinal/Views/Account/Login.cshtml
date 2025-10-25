@@ -1,4 +1,4 @@
-﻿@model SC701_ProyectoFinal.Models.LoginViewModel
+﻿@model SC701_ProyectoFinal.Models.UsuarioModel
 @{
     ViewData["Title"] = "Iniciar sesión"; 
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -19,17 +19,17 @@
                 <div class="row h-100 align-items-center justify-content-center">
                     <div class="col-sm-8 col-md-6 col-lg-10 col-xl-8">
                         <h3 class="display-4 fs-7">Bienvenido</h3>
-                        <h6 class="text-danger mt-3">Accede con tus credenciales institucionales</h6>
+                        <h6 class="text-danger mt-3">Accede con tus credenciales institucionales</h6>                        
 
-                        <form asp-action="Login" method="post" class="mt-5">
+                        <form id="FormInicioSesion" asp-action="Login" asp-controller="Account" class="mt-5">
                             <div class="mb-3">
-                                <input asp-for="Email" class="form-control bg-light" placeholder="Correo electrónico" />
-                                <span asp-validation-for="Email" class="text-danger"></span>
+                                <label asp-for="Correo" class="form-label">Correo</label>
+                                <input name="correo" asp-for="Correo" class="form-control bg-light" placeholder="Correo electrónico" />
                             </div>
 
                             <div class="mb-0">
-                                <input asp-for="Password" class="form-control bg-light" type="password" placeholder="Contraseña" />
-                                <span asp-validation-for="Password" class="text-danger"></span>
+                                <label asp-for="Contrasena" class="form-label">Marca</label>
+                                <input name="contrasena" asp-for="Contrasena" class="form-control bg-light" type="password" placeholder="Contraseña" />                                
                             </div>
 
                             <div class="mb-3 d-grid">
@@ -40,8 +40,16 @@
                                 @Html.ValidationSummary()
                             </div>
                         </form>
+                        @if (ViewBag.Mensaje != null)
+                        {
+                            <div class="alert alert-warning text-center">
+                                @ViewBag.Mensaje
+                            </div>
+                        }
 
-                        <div class="mb-3 w-100 position-relative text-center mt-4">
+                        @* HAY QUE REVISAR SI IMPLEMENTAREMOS LOGIN CON GOOGLE *@
+
+                        @* <div class="mb-3 w-100 position-relative text-center mt-4">
                             <hr class="text-body-secondary text-opacity-25" />
                             <div class="absolute-centered px-3 font-secondary fs-10 text-body-tertiary">o inicia sesión con</div>
                         </div>
@@ -53,7 +61,7 @@
                             <div class="col-6 d-grid">
                                 <a class="btn btn-outline-primary btn-sm mt-2" href="#"><span class="fab fa-facebook me-2"></span> Facebook</a>
                             </div>
-                        </div>
+                        </div> *@
                     </div>
                 </div>
             </div>
@@ -62,5 +70,6 @@
 </section>
 
 @section Scripts {
+    <script src="~/js/InicioSesion.js" asp-append-version="true"></script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

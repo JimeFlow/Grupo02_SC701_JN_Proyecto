@@ -1,0 +1,128 @@
+﻿@{
+	var nombreUsuario = (Context.Session.GetString("Nombre") != null ? Context.Session.GetString("Nombre") : "");
+	var nombreRol = (Context.Session.GetString("Tipo_Rol") != null ? Context.Session.GetString("Tipo_Rol") : "");
+	var consecutivoUsuario = (Context.Session.GetInt32("Id_Usuario") != null ? Context.Session.GetInt32("Id_Usuario") : 0);
+	var id_Rol = (Context.Session.GetInt32("Id_Rol") != null ? Context.Session.GetInt32("Id_Rol") : 0);
+}
+<!DOCTYPE html>
+<html class="has-sidemenu has-fancynav-top" lang="en-US" dir="ltr">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Librería | Proyecto</title>
+
+	<!-- Favicons -->
+	<link rel="apple-touch-icon" sizes="180x180" href="~/lib/favicons/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="~/lib/favicons/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="~/lib/favicons/favicon-16x16.png">
+	<link rel="shortcut icon" type="image/x-icon" href="~/lib/favicons/favicon.ico">
+	<meta name="msapplication-TileImage" content="~/lib/favicons/mstile-150x150.png">
+	<meta name="theme-color" content="#ffffff">
+
+	<!-- Stylesheets -->
+	<link href="~/lib/css/swiper-bundle.min.css" rel="stylesheet">
+	<link href="~/lib/css/loaders.min.css" rel="stylesheet" type="text/css">
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css?family=PT+Mono%7cPT+Serif:400,400i%7cLato:100,300,400,700,800,900" rel="stylesheet">
+	<link href="~/lib/css/theme.css" rel="stylesheet" />
+	<link href="~/lib/css/user.css" rel="stylesheet" />
+</head>
+
+<body class="overflow-hidden-x">
+
+	<!-- ===============================================-->
+	<!--    Navbar Librería -->
+	<!-- ===============================================-->
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+		<div class="container-fluid">
+			<!-- Logo -->
+			<a class="navbar-brand d-flex align-items-center" asp-action="Index" asp-controller="Home">
+				<img src="~/lib/img/libros.png" alt="Logo Librería" width="40" height="40" class="me-2">
+				Librería
+			</a>
+
+			<!-- Botón hamburguesa -->
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+					aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+
+			<!-- Menú simple -->
+			<div class="collapse navbar-collapse" id="mainNavbar">
+
+				<ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+					<li class="nav-item">
+						<a class="nav-link" href="@Url.Action("Index", "Home")">Inicio</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="~/Informacion">Información</a>
+					</li>
+					@if (id_Rol == 1)
+					{
+						<li class="nav-item">
+							<a class="nav-link" asp-action="Index" asp-controller="Usuario">Usuarios</a>
+						</li>
+					}
+					<li class="nav-item">
+						<a class="nav-link" href="~/Contacto">Contacto</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="@Url.Action("CerrarSesion", "Account")">Cerrar sesión</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+
+	<!-- ===============================================-->
+	<!--    Main Content-->
+	<!-- ===============================================-->
+	<main class="main min-vh-100" id="top">
+		@RenderBody();
+	</main>
+
+	<!-- ===============================================-->
+	<!--    Footer-->
+	<!-- ===============================================-->
+	<footer class="footer bg-black text-body-secondary py-4 font-secondary text-center overflow-hidden">
+		<div class="container">
+			<div class="row align-items-center">
+				<div class="col-lg-4 order-lg-2 position-relative">
+					<a class="indicator indicator-up" href="#top">
+						<span class="indicator-arrow indicator-arrow-one"></span>
+						<span class="indicator-arrow indicator-arrow-two"></span>
+					</a>
+				</div>
+				<div class="col-lg-4 text-lg-start mt-4 mt-lg-0">
+					<p class="fs-10 text-uppercase ls fw-bold mb-0">
+						Copyright &copy; 2025 Grupo #2 Programación Avanzada Web.
+					</p>
+				</div>
+			</div>
+		</div>
+	</footer>
+
+	<!-- ===============================================-->
+	<!--    JavaScripts-->
+	<!-- ===============================================-->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+	<script src="~/lib/js/popper.min.js"></script>
+	<script src="~/lib/js/bootstrap.min.js"></script>
+	<script src="~/lib/js/anchor.min.js"></script>
+	<script src="~/lib/js/is.min.js"></script>
+	<script src="~/lib/js/swiper-bundle.min.js"></script>
+	<script src="~/lib/js/BigPicture.js"></script>
+	<script src="~/lib/js/all.min.js"></script>
+	<script src="~/lib/js/lodash.min.js"></script>
+	<script src="~/lib/js/imagesloaded.pkgd.js"></script>
+	<script src="~/lib/js/gsap.js"></script>
+	<script src="~/lib/js/customEase.js"></script>
+	<script src="~/lib/js/drawSVGPlugin.js"></script>
+	<script src="~/lib/js/theme.js"></script>
+	@RenderSection("Scripts", required: false)
+
+</body>
+</html>

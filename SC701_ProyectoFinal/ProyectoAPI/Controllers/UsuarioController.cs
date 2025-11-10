@@ -56,7 +56,21 @@ namespace ProyectoAPI.Controllers
         [Route("EditarUsuario")]
         public IActionResult EditarUsuarioAdmin(EditarUsuarioRequestModel usuario)
         {
-            return Ok();
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
+            {
+                var parametros = new DynamicParameters();
+                parametros.Add("Id_Usuario", usuario.Id_Usuario);
+                parametros.Add("Nombre", usuario.Nombre);
+                parametros.Add("Apellidos", usuario.Apellidos);
+                parametros.Add("Identificacion", usuario.Identificacion);
+                parametros.Add("Correo", usuario.Correo);
+                parametros.Add("Telefono", usuario.Telefono);
+                parametros.Add("Id_Rol", usuario.Id_Rol);
+                parametros.Add("Estado", usuario.Estado);
+
+                var resultado = context.Execute("ActualizarUsuarioAdmin", parametros);
+                return Ok(resultado);
+            }
         }
     }
 }

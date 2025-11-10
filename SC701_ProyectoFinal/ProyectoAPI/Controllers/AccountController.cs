@@ -1,5 +1,9 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using System.ComponentModel.DataAnnotations;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+using System.Net.Mail;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using Dapper;
 using Microsoft.AspNetCore.Authorization;
@@ -11,20 +15,24 @@ using ProyectoAPI.Models;
 
 namespace ProyectoAPI.Controllers
 {
-    [AllowAnonymous]
+    
     [Route("api/[controller]")]
     [ApiController]
     public class AccountController : ControllerBase
     {
         private readonly IConfiguration _configuration;
+        private readonly IHostEnvironment _environment;
 
-        public AccountController(IConfiguration configuration)
+        public AccountController(IConfiguration configuration, IHostEnvironment environment)
         {
             _configuration = configuration;
+            _environment = environment;
         }
 
+        #region LOGIN
         [HttpPost]
         [Route("IniciarSesion")]
+        [AllowAnonymous]
         public IActionResult IniciarSesion(InicioSesionRequestModel user)
         {
             using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
@@ -48,9 +56,13 @@ namespace ProyectoAPI.Controllers
 
             }
         }
+        #endregion
+
+        #region REGISTER
 
         [HttpPost]
         [Route("Registrarse")]
+        [AllowAnonymous]
         public IActionResult Registrarse(RegistroUsuarioRequestModel user)
         {
             using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
@@ -70,6 +82,144 @@ namespace ProyectoAPI.Controllers
 
                 return Ok(resultado);
             }
+        }
+        #endregion
+
+        #region RECUPERAR ACCESO
+
+        [HttpGet]
+        [Route("RecuperarAcceso")]
+        [AllowAnonymous]
+        public IActionResult ValidarUsuario([Required] string Correo)
+        {
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
+            {
+                var parametros = new DynamicParameters();
+                parametros.Add("@Correo", Correo);
+
+                var user = context.QueryFirstOrDefault<DatosUsuarioResponseModel>("ValidarUsuario", parametros);
+
+                if (user != null)
+                {
+                    var contrasennaGenerada = GenerarContrasena();
+
+                    var contrasennaCifrada = BCrypt.Net.BCrypt.HashPassword(contrasennaGenerada);
+
+                    var parametrosActualizar = new DynamicParameters();
+                    parametrosActualizar.Add("@Id_Usuario", user.Id_Usuario);
+                    parametrosActualizar.Add("@Contrasena", contrasennaCifrada);
+
+                    var resultadoActualizar = context.Execute("ActualizarContrasena", parametrosActualizar);
+
+                    if (resultadoActualizar > 0)
+                    {
+
+                        var ruta = Path.Combine(_environment.ContentRootPath, "PlantillaCorreo.html");
+                        var html = System.IO.File.ReadAllText(ruta, UTF8Encoding.UTF8);
+
+                        html = html.Replace("{{Nombre}}", user.Nombre);
+                        html = html.Replace("{{Contrasenna}}", contrasennaGenerada);
+
+                        EnviarCorreo("Recuperar Acceso", html, user.Correo);
+
+                        return Ok(user);
+                    }
+                }
+
+                return NotFound();
+            }
+        }
+        #endregion
+
+        #region ACTUALIZAR SEGURIDAD
+
+        [HttpPut]
+        [Route("ActualizarSeguridad")]
+        [Authorize]
+        public IActionResult ActualizarSeguridad(SeguridadRequestModel usuario)
+        {
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
+            {
+                var parametros = new DynamicParameters();
+                parametros.Add("Id_Usuario", usuario.Id_Usuario);
+                parametros.Add("Contrasena", usuario.Contrasena);
+
+                var resultado = context.Execute("ActualizarContrasena", parametros);
+                return Ok(resultado);
+            }
+        }
+        #endregion
+
+        #region ACTUALIZAR PERFIL
+
+        [HttpPut]
+        [Route("ActualizarPerfil")]
+        [Authorize]
+        public IActionResult ActualizarPerfil(PerfilRequestModel usuario)
+        {
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
+            {
+                var parametros = new DynamicParameters();
+                parametros.Add("Id_Usuario", usuario.Id_Usuario);
+                parametros.Add("Nombre", usuario.Nombre);
+                parametros.Add("Apellidos", usuario.Apellidos);
+                parametros.Add("Identificacion", usuario.Identificacion);
+                parametros.Add("Correo", usuario.Correo);
+                parametros.Add("Telefono", usuario.Telefono);
+
+                var resultado = context.Execute("ActualizarPerfil", parametros);
+                return Ok(resultado);
+            }
+        }
+        #endregion
+
+        #region METODOS PRIVADOS
+
+        private string GenerarContrasena()
+        {
+            int longitud = 8;
+            const string caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            StringBuilder resultado = new();
+
+            using var rng = RandomNumberGenerator.Create();
+            byte[] buffer = new byte[1];
+
+            while (resultado.Length < longitud)
+            {
+                rng.GetBytes(buffer);
+                int valor = buffer[0] % caracteres.Length;
+                resultado.Append(caracteres[valor]);
+            }
+
+            return resultado.ToString();
+        }
+
+        private void EnviarCorreo(string subject, string body, string destinatario)
+        {
+            var correoSMTP = _configuration["Valores:CorreoSMTP"]!;
+            var contrasennaSMTP = _configuration["Valores:ContrasenaSMTP"]!;
+
+            if (string.IsNullOrEmpty(contrasennaSMTP))
+                return;
+
+            var mensaje = new MailMessage
+            {
+                From = new MailAddress(correoSMTP),
+                Subject = subject,
+                Body = body,
+                IsBodyHtml = true
+            };
+
+            mensaje.To.Add(destinatario);
+
+            using var smtp = new SmtpClient("smtp.office365.com")
+            {
+                Port = 587,
+                Credentials = new NetworkCredential(correoSMTP, contrasennaSMTP),
+                EnableSsl = true
+            };
+
+            smtp.Send(mensaje);
         }
 
         //generar token JWT
@@ -95,5 +245,6 @@ namespace ProyectoAPI.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+        #endregion
     }
 }

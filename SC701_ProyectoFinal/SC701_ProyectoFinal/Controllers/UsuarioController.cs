@@ -37,6 +37,7 @@ namespace SC701_ProyectoFinal.Controllers
             }
         }
 
+        #region Registro de usuarios admin
         [HttpGet]
         public IActionResult RegistrarUsuarioAdmin()
         {
@@ -66,6 +67,43 @@ namespace SC701_ProyectoFinal.Controllers
                 return View();
             }
         }
+        #endregion
+
+        #region ActualizarUsuario
+
+        [HttpGet]
+        public IActionResult EditarUsuario()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult EditarUsuario(UsuarioModel usuario)
+        {
+            ViewBag.Mensaje = "La información no se ha actualizado correctamente";
+            usuario.Id_Usuario = (int)HttpContext.Session.GetInt32("Id_Usuario")!;
+
+            using (var context = _http.CreateClient())
+            {
+                var urlApi = _configuration["Valores:UrlAPI"] + "Usuario/EditarUsuario";
+                context.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
+                var respuesta = context.PutAsJsonAsync(urlApi, usuario).Result;
+
+                if (respuesta.IsSuccessStatusCode)
+                {
+                    var datosApi = respuesta.Content.ReadFromJsonAsync<int>().Result;
+
+                    if (datosApi > 0)
+                    {
+                        ViewBag.Mensaje = "La información se ha actualizado correctamente";
+                    }
+                }
+
+                return View();
+            }
+        }
+
+        #endregion
 
 
     }

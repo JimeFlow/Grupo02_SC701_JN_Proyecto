@@ -2,7 +2,7 @@
 
 namespace ProyectoAPI.Models
 {
-    public class EditarUsuarioRequestModel
+    public class PerfilRequestModel
     {
         [Required]
         public int Id_Usuario { get; set; }
@@ -19,10 +19,5 @@ namespace ProyectoAPI.Models
 
         [Required]
         public string Telefono { get; set; } = String.Empty;
-
-        [Required]
-        public int Id_Rol { get; set; }
-        [Required]
-        public bool Estado { get; set; }
     }
 }

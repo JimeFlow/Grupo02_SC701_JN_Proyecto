@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
+﻿using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Identity;
-
+using Microsoft.AspNetCore.Mvc;
 using SC701_ProyectoFinal.Models;
+using static System.Net.WebRequestMethods;
 
 namespace SC701_ProyectoFinal.Controllers
 {
@@ -104,6 +104,114 @@ namespace SC701_ProyectoFinal.Controllers
             }
         }
 
+        #endregion
+
+        #region Recuperar Acceso
+
+        [HttpPost]
+        public IActionResult RecuperarAcceso(UsuarioModel usuario)
+        {
+            using (var context = _httpClientFactory.CreateClient())
+            {
+                var urlApi = _configuration["Valores:UrlAPI"] +
+                             "Account/ValidarUsuario?Correo=" + usuario.Correo;
+
+                var respuesta = context.GetAsync(urlApi).Result;
+
+                if (respuesta.IsSuccessStatusCode)
+                {
+                    var datosApi = respuesta.Content.ReadFromJsonAsync<UsuarioModel>().Result;
+
+                    if (datosApi != null)
+                        return RedirectToAction("Login", "Account");
+                }
+
+                ViewBag.Mensaje = "No se ha recuperado el acceso";
+                return View();
+            }
+        }
+
+        [HttpGet]
+        public IActionResult RecuperarAcceso()
+        {
+            return View();
+        }
+
+        #endregion
+
+
+        #region EditarPerfil
+        [Seguridad]
+        [HttpGet]
+        public IActionResult EditarPerfil()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [Seguridad]
+        public IActionResult EditarPerfil(UsuarioModel usuario)
+        {
+            ViewBag.Mensaje = "La información no se ha actualizado correctamente";
+            usuario.Id_Usuario = (int)HttpContext.Session.GetInt32("Id_Usuario")!;
+
+            using (var context = _httpClientFactory.CreateClient())
+            {
+                var urlApi = _configuration["Valores:UrlAPI"] + "Usuario/ActualizarPerfil";
+                context.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
+                var respuesta = context.PutAsJsonAsync(urlApi, usuario).Result;
+
+                if (respuesta.IsSuccessStatusCode)
+                {
+                    var datosApi = respuesta.Content.ReadFromJsonAsync<int>().Result;
+
+                    if (datosApi > 0)
+                    {
+                        ViewBag.Mensaje = "La información se ha actualizado correctamente";
+                        //setear las sessions si hacen falta (todas) cuando se tenga la vista lista
+                        HttpContext.Session.SetString("NombreUsuario", usuario.Nombre);
+                    }
+                }
+
+                return View();
+            }
+        }
+
+        #endregion
+
+
+        //pasar a account
+        #region ActualizarSeguridad
+        [HttpGet]
+        [Seguridad]
+        public IActionResult ActualizarSeguridad()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [Seguridad]
+        public IActionResult ActualizarSeguridad(UsuarioModel usuario)
+        {
+            ViewBag.Mensaje = "La información no se ha actualizado correctamente";
+            usuario.Id_Usuario = (int)HttpContext.Session.GetInt32("Id_Usuario")!;
+            using (var context = _httpClientFactory.CreateClient())
+            {
+                var urlApi = _configuration["Valores:UrlAPI"] + "Usuario/ActualizarSeguridad";
+                context.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
+                var respuesta = context.PutAsJsonAsync(urlApi, usuario).Result;
+
+                if (respuesta.IsSuccessStatusCode)
+                {
+                    var datosApi = respuesta.Content.ReadFromJsonAsync<int>().Result;
+
+                    if (datosApi > 0)
+                        ViewBag.Mensaje = "La información se ha actualizado correctamente";
+                }
+
+                return View();
+            }
+        }
         #endregion
 
         //cerrar sesion

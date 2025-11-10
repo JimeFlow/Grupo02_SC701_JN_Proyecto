@@ -1,11 +1,17 @@
-﻿using Dapper;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using Dapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using Microsoft.IdentityModel.Tokens;
 using ProyectoAPI.Models;
 
 namespace ProyectoAPI.Controllers
 {
+    [AllowAnonymous]
     [Route("api/[controller]")]
     [ApiController]
     public class AccountController : ControllerBase
@@ -37,7 +43,7 @@ namespace ProyectoAPI.Controllers
 
                 if (!validPassword) return Unauthorized(new { mensaje = "Contraseña incorrecta" });
 
-
+                resultado.Token = GenerarToken(resultado.Id_Usuario, resultado.Nombre, resultado.Id_Rol);
                 return Ok(resultado);                
 
             }
@@ -64,6 +70,30 @@ namespace ProyectoAPI.Controllers
 
                 return Ok(resultado);
             }
+        }
+
+        //generar token JWT
+        private string GenerarToken(int usuarioId, string nombre, int rol)
+        {
+            var key = _configuration["Valores:KeyJWT"]!;
+
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var claims = new[]
+            {
+                new Claim("id", usuarioId.ToString()),
+                new Claim("nombre", nombre),
+                new Claim("rol", rol.ToString())
+            };
+
+            var token = new JwtSecurityToken(
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(30),
+                signingCredentials: credentials
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }

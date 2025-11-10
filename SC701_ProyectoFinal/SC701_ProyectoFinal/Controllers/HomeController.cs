@@ -5,6 +5,7 @@ using static System.Net.WebRequestMethods;
 
 namespace SC701_ProyectoFinal.Controllers
 {
+    [Seguridad]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -18,23 +19,23 @@ namespace SC701_ProyectoFinal.Controllers
             _configuration = configuration;
         }
 
-        public IActionResult Index()
+        public IActionResult Index() //HAY QUE AGREGAR UN GET DE LIBROS PARA MOSTRAR EN EL INDEX
         {
+            return View();
+            //using (var context = _http.CreateClient())
+            //{
+            //    var urlApi = _configuration["Valores:UrlAPI"] + "WeatherForecast";
+            //    var respuesta = context.GetAsync(urlApi).Result;
 
-            using (var context = _http.CreateClient())
-            {
-                var urlApi = _configuration["Valores:UrlAPI"] + "WeatherForecast";
-                var respuesta = context.GetAsync(urlApi).Result;
+            //    if (respuesta.IsSuccessStatusCode)
+            //    {
+            //        var datosApi = respuesta.Content.ReadAsStringAsync().Result;
+            //        return View(datosApi);
+            //    }
 
-                if (respuesta.IsSuccessStatusCode)
-                {
-                    var datosApi = respuesta.Content.ReadAsStringAsync().Result;
-                    return View(datosApi);
-                }
-
-                ViewBag.Mensaje = "No hay Vehiculos registrados";
-                return View();
-            }
+            //    ViewBag.Mensaje = "No hay productos registrados";
+            //    return View();
+            //}
         }
 
         public IActionResult Privacy()

@@ -40,8 +40,10 @@ namespace SC701_ProyectoFinal.Controllers
 
                     if (datosApi != null)
                     {
-                        HttpContext.Session.SetString("NombreUsuario", datosApi.Nombre);
-                        HttpContext.Session.SetString("NombreRol", datosApi.Tipo_Rol);
+                        HttpContext.Session.SetString("Nombre", datosApi.Nombre);
+                        HttpContext.Session.SetString("Tipo_Rol", datosApi.Tipo_Rol);
+                        HttpContext.Session.SetInt32("Id_Usuario", datosApi.Id_Usuario);
+                        HttpContext.Session.SetInt32("Id_Rol", datosApi.Id_Rol);
                         return RedirectToAction("Index", "Home");
                     }
                 }
@@ -104,9 +106,13 @@ namespace SC701_ProyectoFinal.Controllers
 
         #endregion
 
-
-
-
+        //cerrar sesion
+        [HttpGet]
+        public IActionResult CerrarSesion()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Login");
+        }
 
 
 

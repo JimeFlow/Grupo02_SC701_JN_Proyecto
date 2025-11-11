@@ -17,7 +17,8 @@
                 required: true
             },
             confirmPassword: {
-                required: true
+                required: true,
+                equalTo: "#Contrasena"
             },
             telefono: {
                 required: true
@@ -40,11 +41,14 @@
                 required: "* Requerido"
             },
             confirmPassword: {
-                required: "* Requerido"
+                required: "* Requerido",
+                equalTo: "* La confirmación no coincide"
             },
             telefono: {
                 required: "* Requerido"
             }
-        }
+        },
+        errorClass: "text-danger",
+        errorElement: "span"
     });
 });

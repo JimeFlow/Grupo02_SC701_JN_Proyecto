@@ -28,6 +28,8 @@
 	<link href="https://fonts.googleapis.com/css?family=PT+Mono%7cPT+Serif:400,400i%7cLato:100,300,400,700,800,900" rel="stylesheet">
 	<link href="~/lib/css/theme.css" rel="stylesheet" />
 	<link href="~/lib/css/user.css" rel="stylesheet" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
 </head>
 
 <body class="overflow-hidden-x">
@@ -67,6 +69,9 @@
 					}
 					<li class="nav-item">
 						<a class="nav-link" href="~/Contacto">Contacto</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" asp-action="EditarPerfil" asp-controller="Account">@nombreUsuario</a>
 					</li>
 					<li class="nav-item">
 						<a class="nav-link" href="@Url.Action("CerrarSesion", "Account")">Cerrar sesión</a>
@@ -109,6 +114,7 @@
 	<!-- ===============================================-->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<script src="~/lib/js/popper.min.js"></script>
 	<script src="~/lib/js/bootstrap.min.js"></script>
 	<script src="~/lib/js/anchor.min.js"></script>

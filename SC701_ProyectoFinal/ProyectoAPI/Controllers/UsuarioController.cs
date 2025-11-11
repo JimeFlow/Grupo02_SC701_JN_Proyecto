@@ -30,7 +30,6 @@ namespace ProyectoAPI.Controllers
                 parametros.Add("@Apellidos", usuario.Apellidos);
                 parametros.Add("@Identificacion", usuario.Identificacion);
                 parametros.Add("@Correo", usuario.Correo);
-                parametros.Add("@Contrasena", usuario.Contrasena);
                 parametros.Add("@Telefono", usuario.Telefono);
                 parametros.Add("@Id_Rol", usuario.Id_Rol);
 
@@ -56,7 +55,62 @@ namespace ProyectoAPI.Controllers
         [Route("EditarUsuario")]
         public IActionResult EditarUsuarioAdmin(EditarUsuarioRequestModel usuario)
         {
-            return Ok();
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
+            {
+                var parametros = new DynamicParameters();
+                parametros.Add("Id_Usuario", usuario.Id_Usuario);
+                parametros.Add("Nombre", usuario.Nombre);
+                parametros.Add("Apellidos", usuario.Apellidos);
+                parametros.Add("Identificacion", usuario.Identificacion);
+                parametros.Add("Correo", usuario.Correo);
+                parametros.Add("Telefono", usuario.Telefono);
+                parametros.Add("Id_Rol", usuario.Id_Rol);
+                parametros.Add("Estado", usuario.Estado);
+
+                var resultado = context.Execute("ActualizarUsuarioAdmin", parametros);
+                return Ok(resultado);
+            }
+        }
+
+        [HttpDelete]
+        [Route("EliminarUsuario/{userId}")]
+        public IActionResult EliminarUsuario(int userId)
+        {
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
+            {
+                var parametros = new DynamicParameters();
+                parametros.Add("Id_Usuario", userId);
+
+                var resultado = context.Execute("EliminarUsuario", parametros);
+                return Ok(resultado);
+            }
+        }
+
+        [HttpGet]
+        [Route("ObtenerUsuario/{id}")]
+        public IActionResult ObtenerUsuario(int id)
+        {
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
+            {
+                var parametros = new DynamicParameters();
+                parametros.Add("Id_Usuario", id);
+
+                var resultado = context.QueryFirstOrDefault<DatosUsuarioResponseModel>("ObtenerUsuarioPorId", parametros);
+                return Ok(resultado);
+            }
+        }
+
+        [HttpGet]
+        [Route("ListarRoles")]
+        public IActionResult ListarRoles()
+        {
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
+            {
+                var parametros = new DynamicParameters();
+
+                var resultado = context.Query<RolResponseModel>("ListarRoles", parametros);
+                return Ok(resultado);
+            }
         }
     }
 }

@@ -1,0 +1,82 @@
+﻿@model UsuarioModel
+@{
+    ViewData["Title"] = "Editar Usuario";
+    Layout = "~/Views/Shared/_LayoutInterno.cshtml";
+    var roles = ViewBag.Roles as List<RolModel>;
+}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4 text-primary">
+        <i class="bi bi-pencil-square"></i> Editar Usuario
+    </h2>
+    @if (ViewBag.Mensaje != null)
+    {
+        <div class="my-2 alert alert-primary text-center">
+            @ViewBag.Mensaje
+        </div>
+    }
+
+    <form asp-action="EditarUsuario" id="FormEditarUsuario" class="shadow p-4 rounded bg-white">
+
+        <input type="hidden" asp-for="Id_Usuario" />
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Nombre</label>
+                <input id="Nombre" name="Nombre" asp-for="Nombre" class="form-control" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Apellidos</label>
+                <input asp-for="Apellidos" class="form-control" />
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Identificación</label>
+                <input asp-for="Identificacion" class="form-control" />
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Correo</label>
+                <input asp-for="Correo" class="form-control" />
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Teléfono</label>
+            <input asp-for="Telefono" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Rol</label>
+            <select asp-for="Id_Rol" class="form-select" asp-items="ViewBag.Roles"></select>
+        </div>
+
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Estado</label>
+            <select asp-for="Estado" class="form-select">
+                <option value="true" selected="@(Model.Estado)">Activo</option>
+                <option value="false" selected="@(!Model.Estado)">Inactivo</option>
+            </select>
+
+        </div>
+
+        <button type="submit" class="btn btn-primary px-4">
+            <i class="bi bi-save"></i> Guardar Cambios
+        </button>
+
+        <a asp-action="Index" class="btn btn-secondary px-4 ms-2">Volver</a>
+
+    </form>
+</div>
+
+@section Scripts {
+    <script src="~/js/EditarUsuarioAdmin.js"></script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

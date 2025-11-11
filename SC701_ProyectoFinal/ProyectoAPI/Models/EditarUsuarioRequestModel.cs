@@ -5,6 +5,8 @@ namespace ProyectoAPI.Models
     public class EditarUsuarioRequestModel
     {
         [Required]
+        public int Id_Usuario { get; set; }
+        [Required]
         public string Nombre { get; set; } = String.Empty;
         [Required]
         public string Apellidos { get; set; } = String.Empty;
@@ -20,5 +22,7 @@ namespace ProyectoAPI.Models
 
         [Required]
         public int Id_Rol { get; set; }
+        [Required]
+        public bool Estado { get; set; }
     }
 }

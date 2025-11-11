@@ -1,0 +1,112 @@
+﻿@model UsuarioModel
+@{
+    Layout = "_LayoutInterno";
+}
+
+<style>
+    .security-card {
+        max-width: 850px;
+        margin: 40px auto;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        border: none;
+    }
+
+    .security-card .card-header {
+        background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+        color: white;
+        font-size: 1.3rem;
+        font-weight: 600;
+        padding: 20px 0;
+        border-radius: 12px 12px 0 0 !important;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: #333;
+    }
+
+    .form-control {
+        border-radius: 10px;
+        padding: 10px 14px;
+    }
+
+    .btn-submit {
+        border-radius: 10px;
+        padding: 10px;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .alert-custom {
+
+        max-width: 850px;
+        margin: 20px auto;
+    }
+</style>
+
+@if (ViewBag.Mensaje != null)
+{
+    <div class="alert alert-primary text-center alert-custom">
+        @ViewBag.Mensaje
+    </div>
+}
+<div class="card security-card">
+
+    <h4 class="card-header text-center">Cambiar Contraseña</h4>
+
+    <div class="card-body px-4 py-4">
+
+        <form id="FormSeguridad" asp-action="ActualizarSeguridad" asp-controller="Account">
+
+            <div class="mb-3">
+                <label class="form-label">Contraseña Nueva</label>
+                <input type="password" class="form-control" asp-for="Contrasena" id="Contrasena" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Confirmar Contraseña</label>
+                <input type="password" class="form-control" asp-for="ConfirmarContrasena" />
+            </div>
+
+            <div class="d-flex justify-content-end">
+                <button class="btn btn-primary btn-submit w-50" type="submit">Guardar Cambios</button>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/EditarUsuarioAdmin.js"></script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+	<script>
+			$(function () {
+			$("#FormSeguridad").validate({
+				rules: {
+					Contrasena: {
+						required: true
+					},
+                    ConfirmarContrasena: {
+						required: true,
+						equalTo: "#Contrasena"
+					}
+				},
+				messages: {
+					Contrasena: {
+						required: "* Requerido"
+					},
+                    ConfirmarContrasena: {
+						required: "* Requerido",
+						equalTo: "* La confirmación no coincide"
+					}
+				},
+                errorClass: "text-danger",
+                validClass: "is-valid"
+			});
+		});
+	</script>
+}

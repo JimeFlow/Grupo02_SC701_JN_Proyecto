@@ -16,9 +16,6 @@ namespace ProyectoAPI.Models
         public string Correo { get; set; } = String.Empty;
 
         [Required]
-        public string Contrasena { get; set; } = String.Empty;
-
-        [Required]
         public string Telefono { get; set; } = String.Empty;
         [Required]
         public int Id_Rol { get; set; }

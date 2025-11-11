@@ -214,16 +214,23 @@ CREATE PROCEDURE RegistroUsuario
 AS
 BEGIN
 	
-	DECLARE @Id_Rol INT = 2 --REVISAR SI ES 1 O 2 CLIENTE
+	IF EXISTS (SELECT 1 FROM Usuario WHERE Correo = @Correo OR Telefono = @Telefono)
+	BEGIN
+	SELECT 0 AS Resultado
+	RETURN
+	END
+	
+	DECLARE @Id_Rol INT = 2
 	DECLARE @Estado BIT = 1
 
 	INSERT INTO dbo.Usuario(Nombre, Apellidos, Identificacion, Correo, Contrasena, Telefono, Id_Rol, Estado)
 	VALUES (@Nombre, @Apellidos, @Identificacion, @Correo, @Contrasena, @Telefono, @Id_Rol, @Estado)
+	SELECT 1 AS Resultado
 END
 
 
 ----------------------------------TABLA PARA REGISTRAR ERRORES DESDE EL API---------------------------------------
-USE BiblioSolaris;
+
 CREATE TABLE Error(
 	ConsecutivoError INT PRIMARY KEY NOT NULL,
 	Id_Usuario INT NOT NULL,
@@ -259,7 +266,7 @@ AS
 BEGIN
 	
 	DECLARE @Estado BIT = 1
-	IF NOT EXISTS(SELECT 1 FROM Usuario WHERE Correo = @Correo OR Identificacion = @Identificacion)
+	IF NOT EXISTS(SELECT 1 FROM Usuario WHERE Correo = @Correo OR Identificacion = @Identificacion OR Telefono = @Telefono)
 	BEGIN
 		INSERT INTO dbo.Usuario(Nombre, Apellidos, Identificacion, Correo, Contrasena, Telefono, Id_Rol, Estado)
 		VALUES (@Nombre, @Apellidos, @Identificacion, @Correo, @Contrasena, @Telefono, @Id_Rol, @Estado)
@@ -358,13 +365,51 @@ CREATE PROCEDURE ActualizarPerfil
 	@Telefono VARCHAR(15)
 AS
 BEGIN
-	UPDATE Usuario
-	SET Identificacion= @Identificacion,
-	Nombre = @Nombre,
-	Apellidos = @Apellidos,
-	Correo = @Correo,
-	Telefono = @Telefono
-	WHERE Id_Usuario = @Id_Usuario
+
+	IF EXISTS(SELECT 1 FROM Usuario WHERE Id_Usuario <> @Id_Usuario AND(Identificacion = @Identificacion OR Correo = @Correo 
+	OR Telefono = @Telefono))
+	BEGIN
+		SELECT 0 AS Resultado
+		RETURN
+	END
+		UPDATE Usuario
+		SET Identificacion= @Identificacion,
+		Nombre = @Nombre,
+		Apellidos = @Apellidos,
+		Correo = @Correo,
+		Telefono = @Telefono
+		WHERE Id_Usuario = @Id_Usuario
+	
+		SELECT 1 AS Resultado
+END
+
+---------------------------------------------------------------------------------------------------------------------
+
+------------------------------------------LISTAR ROLES---------------------------------------------------------------
+
+CREATE PROCEDURE ListarRoles
+AS
+BEGIN
+	SELECT Id_Rol, Tipo_Rol
+	FROM Rol 
+END
+
+------------------------------------------ELIMINAR USUARIO ADMIN-----------------------------------------------------
+
+CREATE PROCEDURE EliminarUsuario
+	@Id_Usuario INT
+AS
+BEGIN
+	DELETE FROM Usuario WHERE Id_Usuario = @Id_Usuario
+END
+------------------------------------------OBTENER USUARIO X ID ------------------------------------------------------
+
+CREATE PROCEDURE ObtenerUsuarioPorId
+	@Id_Usuario INT
+AS
+BEGIN
+	SELECT Id_Usuario, Nombre, Apellidos, Correo, Telefono, U.Id_Rol, R.Tipo_Rol, Estado, Identificacion 
+	FROM Usuario U INNER JOIN Rol R ON U.Id_Rol = R.Id_Rol WHERE Id_Usuario = @Id_Usuario
 END
 
 ---------------------------------------------------------------------------------------------------------------------

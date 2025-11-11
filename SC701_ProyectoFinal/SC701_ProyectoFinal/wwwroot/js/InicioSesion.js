@@ -15,6 +15,8 @@
             contrasena: {
                 required: "* Requerido"
             }
-        }
+        },
+        errorClass: "text-danger",
+        errorElement: "span"
     });
 });

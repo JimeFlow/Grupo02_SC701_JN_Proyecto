@@ -1,11 +1,12 @@
 ﻿using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using SC701_ProyectoFinal.Models;
 using static System.Net.WebRequestMethods;
 
 namespace SC701_ProyectoFinal.Controllers
 {
-    [Seguridad]
+    [SeguridadPorRol]
     public class UsuarioController : Controller
     {
 
@@ -39,14 +40,20 @@ namespace SC701_ProyectoFinal.Controllers
 
         #region Registro de usuarios admin
         [HttpGet]
-        public IActionResult RegistrarUsuarioAdmin()
+        public async Task<IActionResult>RegistrarUsuarioAdmin()
         {
+            ViewBag.Roles = await ObtenerRoles();
             return View();
         }
 
         [HttpPost]
-        public IActionResult RegistrarUsuarioAdmin(UsuarioModel usuario)
+        public async Task<IActionResult> RegistrarUsuarioAdmin(UsuarioModel usuario)
         {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Roles = await ObtenerRoles();
+                return View(usuario);
+            }
             using (var context = _http.CreateClient())
             {                
                 var urlApi = _configuration["Valores:UrlAPI"] + "Usuario/RegistrarUsuario";
@@ -59,12 +66,13 @@ namespace SC701_ProyectoFinal.Controllers
 
                     if (datosApi > 0)
                     {
-                        return RedirectToAction("ConsultarProductos", "Producto");
+                        return RedirectToAction("Index");
                     }
                 }
 
                 ViewBag.Mensaje = "No se ha registrado la información" + respuesta;
-                return View();
+                ViewBag.Roles = await ObtenerRoles();
+                return View(usuario);
             }
         }
         #endregion
@@ -72,16 +80,36 @@ namespace SC701_ProyectoFinal.Controllers
         #region ActualizarUsuario
 
         [HttpGet]
-        public IActionResult EditarUsuario()
+        public async Task<IActionResult> EditarUsuario(int id)
         {
-            return View();
+            using (var context = _http.CreateClient())
+            {
+                var urlApi = _configuration["Valores:UrlAPI"] + "Usuario/ObtenerUsuario/" + id;
+
+                context.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
+
+                var respuesta = await context.GetAsync(urlApi);
+
+                if (!respuesta.IsSuccessStatusCode)
+                    return RedirectToAction("Index");
+
+                var usuario = await respuesta.Content.ReadFromJsonAsync<UsuarioModel>();
+
+                ViewBag.Roles = await ObtenerRoles();
+
+                return View("EditarUsuario", usuario);
+            }
         }
 
         [HttpPost]
-        public IActionResult EditarUsuario(UsuarioModel usuario)
+        public async Task<IActionResult> EditarUsuario(UsuarioModel usuario)
         {
-            ViewBag.Mensaje = "La información no se ha actualizado correctamente";
-            usuario.Id_Usuario = (int)HttpContext.Session.GetInt32("Id_Usuario")!;
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Roles = await ObtenerRoles();
+                return View("EditarUsuario", usuario);
+            }
 
             using (var context = _http.CreateClient())
             {
@@ -97,11 +125,62 @@ namespace SC701_ProyectoFinal.Controllers
                     {
                         ViewBag.Mensaje = "La información se ha actualizado correctamente";
                     }
-                }
-
-                return View();
+                    else
+                    {
+                        ViewBag.Mensaje = "La información no se ha actualizado correctamente";
+                    }
+                }                
+                ViewBag.Roles = await ObtenerRoles();
+                return View("EditarUsuario", usuario);
             }
         }
+
+        #endregion
+
+        #region Eliminar usuario admin
+
+        [HttpGet]
+        public IActionResult EliminarUsuario(int id)
+        {
+            using (var context = _http.CreateClient())
+            {
+                var urlApi = $"{ _configuration["Valores:UrlAPI"]}Usuario/EliminarUsuario/{id}";
+                context.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
+                var respuesta = context.DeleteAsync(urlApi).Result;
+
+                if (respuesta.IsSuccessStatusCode)
+                {                   
+                    RedirectToAction("Index");                    
+                }
+                ViewBag.Mensaje = "Error al eliminar el usuario";
+                return RedirectToAction("Index");
+            }
+        }
+
+        #endregion
+
+
+        #region Obtener Roles
+        private async Task<SelectList> ObtenerRoles()
+        {
+            using (var context = _http.CreateClient())
+            {
+                var urlApi = _configuration["Valores:UrlAPI"] + "Usuario/ListarRoles";
+
+                context.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
+
+                var respuesta = await context.GetAsync(urlApi);
+
+                if (!respuesta.IsSuccessStatusCode)
+                    return new SelectList(new List<RolModel>(), "Id_Rol", "Tipo_Rol");
+
+                var datos = await respuesta.Content.ReadFromJsonAsync<List<RolModel>>();
+
+                return new SelectList(datos, "Id_Rol", "Tipo_Rol");
+            }
+        }
+
 
         #endregion
 

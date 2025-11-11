@@ -78,9 +78,10 @@ namespace ProyectoAPI.Controllers
                 parametros.Add("@Contrasena", hashPassword);
                 parametros.Add("@Telefono", user.Telefono);
 
-                var resultado = context.Execute("RegistroUsuario", parametros);
+                var resultado = context.QueryFirst<int>("RegistroUsuario", parametros);
+                if (resultado == 0) return BadRequest("El correo o el número de teléfono ya existe");
 
-                return Ok(resultado);
+                return Ok("Usuario registrado con éxito");
             }
         }
         #endregion
@@ -167,8 +168,12 @@ namespace ProyectoAPI.Controllers
                 parametros.Add("Correo", usuario.Correo);
                 parametros.Add("Telefono", usuario.Telefono);
 
-                var resultado = context.Execute("ActualizarPerfil", parametros);
-                return Ok(resultado);
+                var resultado = context.QueryFirst<int>("ActualizarPerfil", parametros);
+                if(resultado == 0)
+                {
+                    return BadRequest("Ya existe un usuario con el correo, número de teléfono o identificación");
+                }
+                return Ok("Perfil actualizado correctamente");
             }
         }
         #endregion

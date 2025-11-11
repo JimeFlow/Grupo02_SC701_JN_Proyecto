@@ -168,9 +168,9 @@ namespace SC701_ProyectoFinal.Controllers
 
             using (var context = _httpClientFactory.CreateClient())
             {
-                var urlApi = _configuration["Valores:UrlAPI"] + "Usuario/ActualizarPerfil";
+                var urlApi = _configuration["Valores:UrlAPI"] + "Account/ActualizarPerfil";
                 context.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
-                var respuesta = context.PutAsJsonAsync(urlApi, usuario).Result;
+                var respuesta = context.PutAsJsonAsync(urlApi, usuario).Result; //404
 
                 if (respuesta.IsSuccessStatusCode)
                 {                    
@@ -184,7 +184,14 @@ namespace SC701_ProyectoFinal.Controllers
                 else
                 {
                     var error = respuesta.Content.ReadAsStringAsync().Result;
-                    ViewBag.Mensaje = error;
+                    if(error != "")
+                    {
+                        ViewBag.Mensaje = error;
+                    }
+                    else
+                    {
+                        ViewBag.Mensaje = "Error desconocido";
+                    }
                 }
             }
             return View(usuario);
@@ -210,7 +217,7 @@ namespace SC701_ProyectoFinal.Controllers
             usuario.Id_Usuario = (int)HttpContext.Session.GetInt32("Id_Usuario")!;
             using (var context = _httpClientFactory.CreateClient())
             {
-                var urlApi = _configuration["Valores:UrlAPI"] + "Usuario/ActualizarSeguridad";
+                var urlApi = _configuration["Valores:UrlAPI"] + "Account/ActualizarSeguridad";
                 context.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
                 var respuesta = context.PutAsJsonAsync(urlApi, usuario).Result;
 
@@ -221,7 +228,7 @@ namespace SC701_ProyectoFinal.Controllers
                     if (datosApi > 0)
                         ViewBag.Mensaje = "La información se ha actualizado correctamente";
                 }
-
+                
                 return View();
             }
         }

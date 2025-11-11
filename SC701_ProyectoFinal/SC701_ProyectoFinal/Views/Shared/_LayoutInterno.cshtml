@@ -70,11 +70,46 @@
 					<li class="nav-item">
 						<a class="nav-link" href="~/Contacto">Contacto</a>
 					</li>
-					<li class="nav-item">
-						<a class="nav-link" asp-action="EditarPerfil" asp-controller="Account">@nombreUsuario</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="@Url.Action("CerrarSesion", "Account")">Cerrar sesión</a>
+
+					<li class="nav-item navbar-dropdown dropdown-user dropdown">
+						<a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
+							@nombreUsuario
+						</a>
+						<ul class="dropdown-menu dropdown-menu-end">
+							<li>
+								<a class="dropdown-item" href="#">
+									<div class="d-flex">
+										<div class="flex-grow-1 text-center">
+											<span class="fw-semibold d-block">@nombreUsuario</span>
+										</div>
+									</div>
+								</a>
+							</li>
+							<li>
+								<div class="dropdown-divider"></div>
+							</li>
+							<li>
+								<a class="dropdown-item" asp-action="EditarPerfil" asp-controller="Account">
+									<i class="bx bx-user me-2"></i>
+									<span class="align-middle">Perfil</span>
+								</a>
+							</li>
+							<li>
+								<a class="dropdown-item" asp-action="ActualizarSeguridad" asp-controller="Account">
+									<i class="bx bx-cog me-2"></i>
+									<span class="align-middle">Seguridad</span>
+								</a>
+							</li>
+							<li>
+								<div class="dropdown-divider"></div>
+							</li>
+							<li>
+								<a class="dropdown-item" asp-action="CerrarSesion" asp-controller="Account">
+									<i class="bx bx-power-off me-2"></i>
+									<span class="align-middle">Cerrar Sesión</span>
+								</a>
+							</li>
+						</ul>
 					</li>
 				</ul>
 			</div>
@@ -128,6 +163,13 @@
 	<script src="~/lib/js/customEase.js"></script>
 	<script src="~/lib/js/drawSVGPlugin.js"></script>
 	<script src="~/lib/js/theme.js"></script>
+	<script>
+		window.addEventListener("pageshow", function(event){
+			if(event.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward"){
+				window.location.reload(true);
+			}
+		});
+	</script>
 	@RenderSection("Scripts", required: false)
 
 </body>

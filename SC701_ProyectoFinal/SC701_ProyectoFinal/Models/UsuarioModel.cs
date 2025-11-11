@@ -13,5 +13,6 @@
         public int Id_Rol { get; set; }
         public string Tipo_Rol { get; set; } = string.Empty;
         public string Token { get; set; } = string.Empty;
+        public string ConfirmarContrasena { get; set; } = string.Empty;
     }
 }

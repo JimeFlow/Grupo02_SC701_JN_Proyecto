@@ -141,9 +141,10 @@ namespace ProyectoAPI.Controllers
         {
             using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
+                string hashPassword = BCrypt.Net.BCrypt.HashPassword(usuario.Contrasena);
                 var parametros = new DynamicParameters();
                 parametros.Add("Id_Usuario", usuario.Id_Usuario);
-                parametros.Add("Contrasena", usuario.Contrasena);
+                parametros.Add("Contrasena", hashPassword);
 
                 var resultado = context.Execute("ActualizarContrasena", parametros);
                 return Ok(resultado);

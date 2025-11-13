@@ -1,0 +1,65 @@
+﻿@model SC701_ProyectoFinal.Models.LibroModel
+
+@{
+    ViewData["Title"] = "Registrar Libro";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">📖 Registrar Nuevo Libro</h2>
+
+    <div class="card shadow-lg">
+        <div class="card-body">
+            <form asp-action="Create" method="post">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="Titulo" class="form-label fw-bold">Título</label>
+                        <input asp-for="Titulo" class="form-control" placeholder="Ingrese el título del libro" />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Autor" class="form-label fw-bold">Autor</label>
+                        <input asp-for="Autor" class="form-control" placeholder="Nombre del autor" />
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label asp-for="ISBN" class="form-label fw-bold">ISBN</label>
+                        <input asp-for="ISBN" class="form-control" placeholder="Ejemplo: 978-84-376-0494-7" />
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="Anio" class="form-label fw-bold">Año de Publicación</label>
+                        <input asp-for="Anio" class="form-control" type="number" min="1900" max="2100" />
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="Estado_Libro" class="form-label fw-bold">Estado</label>
+                        <select asp-for="Estado_Libro" class="form-select">
+                            <option value="Disponible">Disponible</option>
+                            <option value="Prestado">Prestado</option>
+                            <option value="Dañado">Dañado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Imagen_URL" class="form-label fw-bold">URL de la Imagen</label>
+                    <input asp-for="Imagen_URL" class="form-control" placeholder="https://..." />
+                    <small class="text-muted">Si no tiene imagen, puede dejarlo vacío.</small>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Id_Estado" class="form-label fw-bold">ID Estado (FK)</label>
+                    <input asp-for="Id_Estado" class="form-control" type="number" min="1" placeholder="Ej: 1" />
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary px-4">💾 Guardar</button>
+                    <a asp-action="Index" class="btn btn-secondary px-4">↩️ Volver</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

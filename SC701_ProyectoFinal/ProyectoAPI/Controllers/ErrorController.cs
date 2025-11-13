@@ -15,8 +15,7 @@ namespace ProyectoAPI.Controllers
         {
             _configuration = configuration;
         }
-
-        [Route("RegistrarError")]
+        [HttpPost("RegistrarError")]
         public IActionResult RegistrarError()
         {
             var exception = HttpContext.Features.Get<IExceptionHandlerFeature>();

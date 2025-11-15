@@ -49,14 +49,24 @@ namespace SC701_ProyectoFinal.Controllers
 
         public async Task<IActionResult> Delete(int id)
         {
-            var response = await _httpClient.DeleteAsync($"Libro/{id}");
-            return RedirectToAction(nameof(Index));
+            var response = await _httpClient.GetAsync("Libro");
+            if (!response.IsSuccessStatusCode)
+                return RedirectToAction(nameof(Index));
+
+            var json = await response.Content.ReadAsStringAsync();
+            var libros = JsonConvert.DeserializeObject<List<LibroModel>>(json);
+            var libro = libros.FirstOrDefault(x => x.Id_Libro == id);
+
+            if (libro == null)
+                return RedirectToAction(nameof(Index));
+
+            return View(libro);
         }
 
         [HttpPost]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var response = await _httpClient.DeleteAsync($"Libro/{id}");
+            var response = await _httpClient.DeleteAsync($"Libro/EliminarLibro/{id}");
 
             if (response.IsSuccessStatusCode)
                 return RedirectToAction(nameof(Index));
@@ -64,6 +74,7 @@ namespace SC701_ProyectoFinal.Controllers
             ModelState.AddModelError("", "No se pudo eliminar el libro.");
             return View();
         }
+
 
         public async Task<IActionResult> Edit(int id)
         {

@@ -1,0 +1,52 @@
+﻿@model IEnumerable<SC701_ProyectoFinal.Models.EjemplarModel>
+
+@{
+    ViewData["Title"] = "Catálogo de Ejemplares";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">📘 Catálogo de Ejemplares</h2>
+
+    <div class="text-end mb-3">
+        <a asp-action="Create" class="btn btn-success">➕ Agregar Ejemplar</a>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <table class="table table-bordered table-striped shadow-sm align-middle">
+            <thead class="table-primary text-center">
+                <tr>
+                    <th>ID</th>
+                    <th>Código</th>
+                    <th>Estado</th>
+                    <th>Ubicación</th>
+                    <th>Fecha Registro</th>
+                    <th>Libro</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var e in Model)
+                {
+                    <tr>
+                        <td class="text-center">@e.Id_Ejemplar</td>
+                        <td>@e.CodigoEjemplar</td>
+                        <td>@e.Estado</td>
+                        <td>@e.Ubicacion</td>
+                        <td class="text-center">@e.Fecha_Registro.ToString("dd/MM/yyyy")</td>
+                        <td>@e.TituloLibro</td>
+
+                        <td class="text-center">
+                            <a asp-action="Edit" asp-route-id="@e.Id_Ejemplar" class="btn btn-warning btn-sm">✏️ Editar</a>
+                            <a asp-action="Delete" asp-route-id="@e.Id_Ejemplar" class="btn btn-danger btn-sm">🗑️ Eliminar</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-info text-center">No hay ejemplares registrados.</div>
+    }
+</div>

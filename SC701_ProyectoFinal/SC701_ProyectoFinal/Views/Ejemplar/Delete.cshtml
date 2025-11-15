@@ -1,0 +1,41 @@
+﻿@model SC701_ProyectoFinal.Models.EjemplarModel
+
+@{
+    ViewData["Title"] = "Eliminar Ejemplar";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4 text-danger">🗑️ Eliminar Ejemplar</h2>
+
+    <div class="alert alert-warning text-center shadow-sm">
+        <strong>Atención:</strong> Estás por eliminar este ejemplar de forma permanente.
+        <br />Esta acción no se puede deshacer.
+    </div>
+
+    <div class="card shadow-lg p-4">
+
+        <dl class="row">
+            <dt class="col-sm-3">Código:</dt>
+            <dd class="col-sm-9">@Model.CodigoEjemplar</dd>
+
+            <dt class="col-sm-3">Estado:</dt>
+            <dd class="col-sm-9">@Model.Estado</dd>
+
+            <dt class="col-sm-3">Ubicación:</dt>
+            <dd class="col-sm-9">@Model.Ubicacion</dd>
+
+            <dt class="col-sm-3">Libro:</dt>
+            <dd class="col-sm-9">@Model.TituloLibro</dd>
+        </dl>
+
+        <form asp-action="DeleteConfirmed" method="post">
+            <input type="hidden" asp-for="Id_Ejemplar" />
+
+            <div class="text-center">
+                <button class="btn btn-danger px-4" type="submit">Eliminar definitivamente</button>
+                <a asp-action="Index" class="btn btn-secondary px-4">Cancelar</a>
+            </div>
+        </form>
+
+    </div>
+</div>

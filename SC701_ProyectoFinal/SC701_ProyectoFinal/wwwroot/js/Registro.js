@@ -18,7 +18,7 @@
             },
             confirmPassword: {
                 required: true,
-                equalTo: "#Contrasena"
+                equalTo: "#pwd"
             },
             telefono: {
                 required: true

@@ -34,7 +34,19 @@ namespace SC701_ProyectoFinal.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(LibroModel libro)
         {
-            var json = JsonConvert.SerializeObject(libro);
+            Console.WriteLine("Entró Create Libro POST");
+            var request = new LibroRequestModel
+            {
+                ISBN = libro.ISBN,
+                Estado_Libro = libro.Estado_Libro,
+                Titulo = libro.Titulo,
+                Autor = libro.Autor,
+                Anio = libro.Anio,
+                Imagen_URL = libro.Imagen_URL,
+                Id_Estado = libro.Id_Estado
+            };
+
+            var json = JsonConvert.SerializeObject(request);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await _httpClient.PostAsync("Libro/RegistrarLibro", content);
@@ -71,8 +83,19 @@ namespace SC701_ProyectoFinal.Controllers
             if (response.IsSuccessStatusCode)
                 return RedirectToAction(nameof(Index));
 
+            var listResponse = await _httpClient.GetAsync("Libro");
+            LibroModel libro = null;
+
+            if (listResponse.IsSuccessStatusCode)
+            {
+                var jsonList = await listResponse.Content.ReadAsStringAsync();
+                var lista = JsonConvert.DeserializeObject<List<LibroModel>>(jsonList);
+
+                libro = lista.FirstOrDefault(x => x.Id_Libro == id);
+            }
+
             ModelState.AddModelError("", "No se pudo eliminar el libro.");
-            return View();
+            return View("Delete",libro);
         }
 
 

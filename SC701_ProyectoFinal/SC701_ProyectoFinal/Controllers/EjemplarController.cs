@@ -57,6 +57,7 @@ namespace SC701_ProyectoFinal.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(EjemplarModel ejemplar)
         {
+            Console.WriteLine("Entró Create Ejemplar POST");
             if (!ModelState.IsValid)
             {
                 await CargarLibros();
@@ -147,7 +148,7 @@ namespace SC701_ProyectoFinal.Controllers
             if (ejemplar == null)
                 return NotFound();
 
-            return View(ejemplar);
+            return View("Delete");
         }
 
         [HttpPost]
@@ -158,8 +159,18 @@ namespace SC701_ProyectoFinal.Controllers
             if (response.IsSuccessStatusCode)
                 return RedirectToAction(nameof(Index));
 
+            var getResponse = await _httpClient.GetAsync($"Ejemplar/{id}");
+            EjemplarModel ejemplar = null;
+
+            if (getResponse.IsSuccessStatusCode)
+
+            {
+                var getJson = await getResponse.Content.ReadAsStringAsync();
+                ejemplar = JsonConvert.DeserializeObject<EjemplarModel>(getJson);
+            }
+
             ModelState.AddModelError("", "⚠️ No se pudo eliminar el ejemplar.");
-            return View();
+            return View("Delete", ejemplar);
         }
     }
 }

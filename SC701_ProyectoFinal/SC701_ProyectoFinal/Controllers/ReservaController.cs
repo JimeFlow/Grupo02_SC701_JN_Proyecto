@@ -30,7 +30,7 @@ namespace SC701_ProyectoFinal.Controllers
                 EstadoReserva = 1
             };
 
-            // ← ← ← USANDO EL CLIENTE API
+            // Using the API client to create the reservation
             var context = _httpClientFactory.CreateClient("API");
             var respuesta = await context.PostAsJsonAsync("reservas/crear", reserva);
 
@@ -49,7 +49,7 @@ namespace SC701_ProyectoFinal.Controllers
             if (IdUsuario == null)
                 return RedirectToAction("Login", "Account");
 
-            // ← ← ← USANDO EL CLIENTE API
+            // Using the API client to get the user's reservations
             var context = _httpClientFactory.CreateClient("API");
             var respuesta = await context.GetAsync($"reservas/usuario/{IdUsuario.Value}");
 

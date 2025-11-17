@@ -121,7 +121,7 @@ CREATE TABLE Usuario(
     Telefono VARCHAR(15) UNIQUE,
     Id_Rol INT,
     Estado BIT, -- Estado Activo o Inactivo
-    FOREIGN KEY (Id_Rol) REFERENCES Rol(Id_Rol),
+    FOREIGN KEY (Id_Rol) REFERENCES Rol(Id_Rol)
 );
 
 CREATE TABLE Comentario(
@@ -176,6 +176,10 @@ INSERT INTO Rol(Tipo_Rol) VALUES
 ('Administrador'), ('Cliente');
 --------------------------------------------------------------------------------------------------
 
+-----------------------------INSERT DE ESTADO --------------------------------------------------
+
+INSERT INTO Estado (Estado)
+VALUES ('Disponible'), ('Inactivo'), ('Prestado'), ('Pendiente');
 --------------------------------------------------------------------------------------------------
 
 ----------------------------HACER MAS GRANDE LAS CONTRASENAS--------------------------------------
@@ -238,7 +242,7 @@ END
 ----------------------------------TABLA PARA REGISTRAR ERRORES DESDE EL API---------------------------------------
 
 CREATE TABLE Error(
-	ConsecutivoError INT PRIMARY KEY NOT NULL,
+	ConsecutivoError INT IDENTITY(1,1) PRIMARY KEY NOT NULL,
 	Id_Usuario INT NOT NULL,
 	Mensaje VARCHAR(MAX) NOT NULL,
 	Origen VARCHAR(80) NOT NULL,

@@ -78,8 +78,18 @@
 						</li>
 					}
 					<li class="nav-item">
+						<a class="nav-link" href="@Url.Action("DetalleLibro", "Libro")">Libros</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="@Url.Action("MisReservas", "Reserva")">Reservaciones</a>
+					</li>
+					<li class="nav-item">
 						<a class="nav-link" href="~/Contacto">Contacto</a>
 					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="@Url.Action("Index", "Faqs")">Preguntas Frecuentes</a>
+					</li>
+
 
 					<li class="nav-item navbar-dropdown dropdown-user dropdown">
 						<a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
@@ -102,6 +112,12 @@
 								<a class="dropdown-item" asp-action="EditarPerfil" asp-controller="Account">
 									<i class="bx bx-user me-2"></i>
 									<span class="align-middle">Perfil</span>
+								</a>
+							</li>
+							<li>
+								<a class="dropdown-item" asp-action="MisReservas" asp-controller="Reserva">
+									<i class="bx bx-user me-2"></i>
+									<span class="align-middle">Mis Reservaciones</span>
 								</a>
 							</li>
 							<li>
@@ -130,7 +146,7 @@
 	<!--    Main Content-->
 	<!-- ===============================================-->
 	<main class="main min-vh-100" id="top">
-		@RenderBody();
+		@RenderBody()
 	</main>
 
 	<!-- ===============================================-->

@@ -1,0 +1,100 @@
+﻿@model SC701_ProyectoFinal.Models.LibroViewModel
+
+@{
+    ViewData["Title"] = "Detalle del Libro";
+    Layout = "~/Views/Shared/_LayoutInterno.cshtml";
+}
+
+<h2>@Model.Titulo</h2>
+
+<div>
+    <p><strong>Autor:</strong> @Model.Autor</p>
+    <p><strong>Año:</strong> @Model.AnioPublicacion</p>
+    <p><strong>Descripción:</strong> @Model.Descripcion</p>
+    <p><strong>Estado:</strong> @Model.Estado</p>
+</div>
+
+<hr />
+
+@* Boton de Reserva *@
+<form asp-action="CrearReserva" method="post">
+    <input type="hidden" name="idLibro" value="@Model.LibroId" />
+    <button type="submit" class="btn btn-primary">Reservar</button>
+</form>
+
+<hr />
+
+<h3>Comentarios y Calificaciones</h3>
+@if (TempData["MensajeComentario"] != null)
+{
+    <div class="alert alert-info alert-success">
+        @TempData["MensajeComentario"]
+    </div>
+}
+@if (TempData["ErrorComentario"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorComentario"]
+    </div>
+}
+
+@* Agregar comentario *@
+<form asp-action="AgregarComentario" method="post" asp-controller="Libro">
+    <input type="hidden" name="idLibro" value="@Model.LibroId" />
+    <div class="form-group">
+        <label for="comentario">Comentario:</label>
+        <textarea class="form-control" id="comentario" name="comentario" rows="3" required></textarea>
+    </div>
+    <div class="form-group">
+        <label for="calificacion">Calificación:</label>
+        <select class="form-control" id="calificacion" name="calificacion" required>
+            <option value="">Seleccione una calificación</option>
+            @for (int i = 1; i <= 5; i++)
+            {
+                <option value="@i">@i</option>
+            }
+        </select>
+    </div>
+    @* Rating por estrellas
+    <div class="form-group">
+        <label for="Rating" class="form-label">Calificación</label>
+        <select name="Rating" class="form-select" required>
+            <option value="1">★☆☆☆☆</option>
+            <option value="2">★★☆☆☆</option>
+            <option value="3">★★★☆☆</option>
+            <option value="4">★★★★☆</option>
+            <option value="5">★★★★★</option>
+        </select>
+    </div> *@ 
+
+    <input type="hidden" name="LibroId" value="@Model.LibroId"/>
+    <button type="submit" class="btn btn-success">Agregar Comentario</button>
+</form>
+
+<hr />
+
+@if (Model.Comentarios != null && Model.Comentarios.Any())
+{
+    foreach (var ComentarioModel in Model.Comentarios)
+    {
+        <div class="card mb-2">
+            <div class="card-body">
+                <strong>
+                    @ComentarioModel.NombreUsuario
+                </strong> - @ComentarioModel.FechaCreacion.ToShortDateString()<br />
+                <span>
+                    @ComentarioModel.Comentario
+                </span>
+                <span>
+                    Calificación: @ComentarioModel.Rating ★
+                </span>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <p>Este libro aún no tiene comentarios. </p>
+}
+
+<a asp-action="Index" class="btn btn-secondary">Volver a la lista de libros</a>

@@ -1,0 +1,54 @@
+﻿@model SC701_ProyectoFinal.Models.LibroModel
+
+@{
+    ViewData["Title"] = "Eliminar Libro";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4 text-danger">🗑️ Eliminar Libro</h2>
+
+    <div class="alert alert-warning text-center shadow-sm">
+        <strong>Atención:</strong> Estás a punto de eliminar este libro de forma permanente.
+        <br />Esta acción no se puede deshacer.
+    </div>
+
+    <div class="card shadow-lg p-4">
+        <dl class="row">
+            <dt class="col-sm-3">Título:</dt>
+            <dd class="col-sm-9">@Model.Titulo</dd>
+
+            <dt class="col-sm-3">Autor:</dt>
+            <dd class="col-sm-9">@Model.Autor</dd>
+
+            <dt class="col-sm-3">ISBN:</dt>
+            <dd class="col-sm-9">@Model.ISBN</dd>
+
+            <dt class="col-sm-3">Año:</dt>
+            <dd class="col-sm-9">@Model.Anio</dd>
+
+            <dt class="col-sm-3">Estado:</dt>
+            <dd class="col-sm-9">@Model.Estado_Libro</dd>
+
+            <dt class="col-sm-3">Imagen:</dt>
+            <dd class="col-sm-9">
+                @if (!string.IsNullOrEmpty(Model.Imagen_URL))
+                {
+                    <img src="@Model.Imagen_URL" alt="Portada" width="90" height="120" class="rounded shadow-sm" />
+                }
+                else
+                {
+                    <span class="text-muted">Sin imagen</span>
+                }
+            </dd>
+        </dl>
+
+        <form asp-action="DeleteConfirmed" method="post">
+            <input type="hidden" asp-for="Id_Libro" />
+
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-danger px-4">Eliminar definitivamente</button>
+                <a asp-action="Index" class="btn btn-secondary px-4">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>

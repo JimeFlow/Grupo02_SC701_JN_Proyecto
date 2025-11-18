@@ -1,0 +1,54 @@
+﻿@model SC701_ProyectoFinal.Models.EjemplarModel
+
+@{
+    ViewData["Title"] = "Registrar Ejemplar";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">📘 Registrar Nuevo Ejemplar</h2>
+
+    <div class="card shadow-lg">
+        <div class="card-body">
+
+            <form asp-action="Create" method="post">
+
+                <div class="mb-3">
+                    <label asp-for="CodigoEjemplar" class="form-label fw-bold">Código del Ejemplar</label>
+                    <input asp-for="CodigoEjemplar" class="form-control" placeholder="Ej: LIB001-A" />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Id_Libro" class="form-label fw-bold">Libro</label>
+                    <select asp-for="Id_Libro" asp-items="ViewBag.Libros"class="form-select">
+						<option value="">-- Seleccione un libro --</option>
+                    </select>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="Estado" class="form-label fw-bold">Estado</label>
+                        <select asp-for="Estado" class="form-select">
+                            <option value="Disponible">Disponible</option>
+                            <option value="Prestado">Prestado</option>
+                            <option value="Dañado">Dañado</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Ubicacion" class="form-label fw-bold">Ubicación</label>
+                        <input asp-for="Ubicacion" class="form-control" placeholder="Ej: Estante B2" />
+                    </div>
+                </div>
+
+                <div asp-validation-summary="All" class="text-danger"></div>
+
+                <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-primary px-4">💾 Guardar</button>
+                    <a asp-action="Index" class="btn btn-secondary px-4">↩️ Volver</a>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>

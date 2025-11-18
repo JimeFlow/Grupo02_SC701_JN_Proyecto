@@ -61,8 +61,18 @@
 					<li class="nav-item">
 						<a class="nav-link" href="~/Informacion">Información</a>
 					</li>
+
 					@if (id_Rol == 1)
 					{
+
+						<li class="nav-item">
+							<a class="nav-link" asp-controller="Libro" asp-action="Index">Libros</a>
+						</li>
+
+						<li class="nav-item">
+							<a class="nav-link" asp-controller="Ejemplar" asp-action="Index">Ejemplares</a>
+						</li>
+
 						<li class="nav-item">
 							<a class="nav-link" asp-action="Index" asp-controller="Usuario">Usuarios</a>
 						</li>
@@ -154,7 +164,7 @@
 				<div class="col-lg-4 text-lg-start mt-4 mt-lg-0">
 					<p class="fs-10 text-uppercase ls fw-bold mb-0">
 						Copyright &copy; 2025 Grupo #2 Programación Avanzada Web.
-					</p>
+					</p><a href="c:\users\amanda valverde mora\documents\universidad fidelitas\proyecto final progra\grupo02_sc701_jn_proyecto\sc701_proyectofinal\sc701_proyectofinal\models\librorequestmodel.cs">c:\users\amanda valverde mora\documents\universidad fidelitas\proyecto final progra\grupo02_sc701_jn_proyecto\sc701_proyectofinal\sc701_proyectofinal\models\librorequestmodel.cs</a>
 				</div>
 			</div>
 		</div>

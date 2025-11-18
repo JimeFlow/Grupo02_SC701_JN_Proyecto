@@ -1,0 +1,31 @@
+﻿@model IEnumerable<SC701_ProyectoFinal.Models.ReservaViewModel>
+@* @model List<SC701_ProyectoFinal.Models.ReservaViewModel> *@
+
+@{
+    ViewData["Title"] = "MisReservas";
+    Layout = "~/Views/Shared/_LayoutInterno.cshtml";
+}
+
+<h2>Mis Reservas</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Libro</th>
+            <th>Fecha Reserva</th>
+            <th>Expira</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var reserva in Model)
+        {
+            <tr>
+                <td>@reserva.Libro</td>
+                <td>@reserva.FechaReserva.ToShortDateString()</td>
+                <td>@reserva.FechaVencimiento.ToShortDateString()</td>
+                <td>@reserva.EstadoReserva</td>
+            </tr>
+        }
+    </tbody>
+</table>
+

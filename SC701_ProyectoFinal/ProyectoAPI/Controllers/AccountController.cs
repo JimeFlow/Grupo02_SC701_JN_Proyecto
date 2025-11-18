@@ -115,7 +115,7 @@ namespace ProyectoAPI.Controllers
                     if (resultadoActualizar > 0)
                     {
 
-                        var ruta = Path.Combine(_environment.ContentRootPath, "PlantillaCorreo.html");
+                        var ruta = Path.Combine(_environment.ContentRootPath, "PlantillasCorreo", "Recuperacion.html");
                         var html = System.IO.File.ReadAllText(ruta, UTF8Encoding.UTF8);
 
                         html = html.Replace("{{Nombre}}", user.Nombre);

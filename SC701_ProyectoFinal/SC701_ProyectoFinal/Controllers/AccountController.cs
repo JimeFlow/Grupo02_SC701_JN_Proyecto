@@ -32,7 +32,7 @@ namespace SC701_ProyectoFinal.Controllers
             using (var context = _httpClientFactory.CreateClient())
             {
                 var urlApi = _configuration["Valores:UrlAPI"] + "Account/IniciarSesion";
-                var respuesta = context.PostAsJsonAsync(urlApi, usuario).Result;
+                var respuesta = context.PostAsJsonAsync(urlApi, usuario).Result; // ERROR 1
 
                 if (respuesta.IsSuccessStatusCode)
                 {

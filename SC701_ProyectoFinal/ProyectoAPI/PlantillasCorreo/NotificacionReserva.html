@@ -1,0 +1,64 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Notificación de Reserva</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f7;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 30px auto;
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            font-size: 18px;
+            font-weight: bold;
+            color: #004aad;
+            margin-bottom: 15px;
+        }
+
+        .content {
+            font-size: 14px;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        .footer {
+            font-size: 12px;
+            color: #777;
+            margin-top: 20px;
+        }
+
+        .date {
+            font-weight: bold;
+            color: #0066ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">Confirmación de Reserva</div>
+        <div class="content">
+            <p>Saludos estimado(a) {{Usuario}},</p>
+            <p>Tu reserva del libro <strong>{{Libro}}</strong> ha sido confirmada exitosamente el día {{FechaReserva}}.</p>
+            <p>La fecha de vencimiento de tu reserva es: <span class="date"><strong>{{FechaVencimiento}}</strong></span>.</p>
+            <p>Por favor, retire el libro lo más pronto posible para que puedas disfrutar de su lectura, y entregarlo antes de esa fecha. </p>
+            <p>¡Muchas gracias por usar el sistema de Biblioteca Solaris!</p>
+        </div>
+        <div class="footer">
+            Este correo fue generado automáticamente, por favor no responder.
+            &copy; 2025 Biblioteca Solaris
+        </div>
+    </div>
+</body>
+</html>

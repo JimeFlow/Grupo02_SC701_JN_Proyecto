@@ -1,0 +1,54 @@
+﻿@model SC701_ProyectoFinal.Models.ReservaViewModel
+
+@{
+    ViewData["Title"] = "Reservar Libro";
+    Layout = "~/Views/Shared/_LayoutInterno.cshtml";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">📌 Reservar Libro</h2>
+
+    ```
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger text-center">@TempData["ErrorMessage"]</div>
+    }
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success text-center">@TempData["SuccessMessage"]</div>
+    }
+
+    <div class="card shadow-sm mx-auto" style="max-width: 500px;">
+        <div class="card-body">
+            <h5 class="card-title text-center">@Model.Titulo</h5>
+
+            <form asp-action="Reservar" method="post">
+                <input type="hidden" asp-for="Id_Libro" />
+                <input type="hidden" asp-for="Id_Usuario" />
+
+                <div class="mb-3">
+                    <label asp-for="FechaInicio" class="form-label">Fecha de inicio</label>
+                    <input asp-for="FechaInicio" type="date" class="form-control" />
+                    <span asp-validation-for="FechaInicio" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="FechaFin" class="form-label">Fecha de vencimiento</label>
+                    <input asp-for="FechaFin" type="date" class="form-control" />
+                    <span asp-validation-for="FechaFin" class="text-danger"></span>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-success">Confirmar Reserva</button>
+                    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    ```
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

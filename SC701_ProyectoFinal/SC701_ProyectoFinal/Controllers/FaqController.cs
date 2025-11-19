@@ -5,6 +5,7 @@ namespace SC701_ProyectoFinal.Controllers
 {
     public class FaqController : Controller
     {
+
         public IActionResult Index()
         {
             var faqs = new List<Models.FaqViewModel>

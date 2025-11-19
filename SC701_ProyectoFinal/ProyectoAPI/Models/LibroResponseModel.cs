@@ -9,6 +9,6 @@
         public string Autor { get; set; }
         public short Anio { get; set; }
         public string Imagen_URL { get; set; }
-        public string Estado { get; set; } 
+        public int Id_Estado { get; set; }
     }
 }

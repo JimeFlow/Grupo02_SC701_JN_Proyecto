@@ -12,7 +12,7 @@
         <tr>
             <th>Libro</th>
             <th>Fecha Reserva</th>
-            <th>Expira</th>
+            <th>Fecha de Expiración</th>
             <th>Estado</th>
         </tr>
     </thead>
@@ -20,10 +20,10 @@
         @foreach (var reserva in Model)
         {
             <tr>
-                <td>@reserva.Libro</td>
-                <td>@reserva.FechaReserva.ToShortDateString()</td>
-                <td>@reserva.FechaVencimiento.ToShortDateString()</td>
-                <td>@reserva.EstadoReserva</td>
+                <td>@reserva.Titulo</td>
+                <td>@reserva.FechaInicio.ToShortDateString()</td>
+                <td>@reserva.FechaFin.ToShortDateString()</td>
+                <td>@reserva.Estado_Libro</td>
             </tr>
         }
     </tbody>

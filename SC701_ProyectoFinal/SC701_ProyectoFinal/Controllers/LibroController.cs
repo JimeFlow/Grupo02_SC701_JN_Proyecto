@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-﻿using System.Text;
-using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using SC701_ProyectoFinal.Models;
+using System.Text;
 
 namespace SC701_ProyectoFinal.Controllers
 {
@@ -10,27 +9,178 @@ namespace SC701_ProyectoFinal.Controllers
     {
         private readonly IHttpClientFactory _httpClientFactory;
 
-        public LibroController(IHttpClientFactory httpClientFactory)
+    public LibroController(IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory;
         }
 
+        // Lista de libros
+        public async Task<IActionResult> Index()
+        {
+            var client = _httpClientFactory.CreateClient("ProyectoAPI");
+            var response = await client.GetAsync("Libro");
+
+            if (!response.IsSuccessStatusCode)
+                return View(new List<LibroModel>());
+
+            var json = await response.Content.ReadAsStringAsync();
+            var libros = JsonConvert.DeserializeObject<List<LibroModel>>(json);
+            return View(libros);
+        }
+
+        // Crear libro - GET
+        public async Task<IActionResult> Create()
+        {
+            ViewBag.Estados = await ObtenerEstadosAsync();
+            return View();
+        }
+
+        // Crear libro - POST
+        [HttpPost]
+        public async Task<IActionResult> Create(LibroModel libro)
+        {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Estados = await ObtenerEstadosAsync();
+                return View(libro);
+            }
+
+            // Llenar Estado_Libro según Id_Estado
+            var estados = await ObtenerEstadosAsync();
+            var estadoSeleccionado = estados.FirstOrDefault(e => e.Id_Estado == libro.Id_Estado);
+            libro.Estado_Libro = estadoSeleccionado?.Estado;
+
+            var client = _httpClientFactory.CreateClient("ProyectoAPI");
+
+            var request = new LibroRequestModel
+            {
+                ISBN = libro.ISBN,
+                Titulo = libro.Titulo,
+                Autor = libro.Autor,
+                Anio = libro.Anio,
+                Imagen_URL = libro.Imagen_URL,
+                Id_Estado = libro.Id_Estado,
+                Estado_Libro = libro.Estado_Libro
+            };
+
+            var json = JsonConvert.SerializeObject(request);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await client.PostAsync("Libro/RegistrarLibro", content);
+
+            if (response.IsSuccessStatusCode)
+                return RedirectToAction(nameof(Index));
+
+            ModelState.AddModelError("", "No se pudo registrar el libro");
+            ViewBag.Estados = await ObtenerEstadosAsync();
+            return View(libro);
+        }
+
+        // Editar libro - GET
+        public async Task<IActionResult> Edit(int id)
+        {
+            var client = _httpClientFactory.CreateClient("ProyectoAPI");
+            var response = await client.GetAsync($"Libro/{id}");
+
+            if (!response.IsSuccessStatusCode)
+                return RedirectToAction(nameof(Index));
+
+            var json = await response.Content.ReadAsStringAsync();
+            var libro = JsonConvert.DeserializeObject<LibroModel>(json);
+
+            if (libro == null)
+                return NotFound();
+
+            ViewBag.Estados = await ObtenerEstadosAsync();
+            return View(libro);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(int id, LibroModel libro)
+        {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Estados = await ObtenerEstadosAsync();
+                return View(libro);
+            }
+
+            // Llenar Estado_Libro según Id_Estado
+            var estados = await ObtenerEstadosAsync();
+            var estadoSeleccionado = estados.FirstOrDefault(e => e.Id_Estado == libro.Id_Estado);
+            libro.Estado_Libro = estadoSeleccionado?.Estado;
+
+            var client = _httpClientFactory.CreateClient("ProyectoAPI");
+
+            var json = JsonConvert.SerializeObject(new LibroRequestModel
+            {
+                ISBN = libro.ISBN,
+                Titulo = libro.Titulo,
+                Autor = libro.Autor,
+                Anio = libro.Anio,
+                Imagen_URL = libro.Imagen_URL,
+                Id_Estado = libro.Id_Estado,
+                Estado_Libro = libro.Estado_Libro
+            });
+
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await client.PutAsync($"Libro/ActualizarLibro/{id}", content);
+
+            if (response.IsSuccessStatusCode)
+                return RedirectToAction(nameof(Index));
+
+            ModelState.AddModelError("", "No se pudo actualizar el libro");
+            ViewBag.Estados = await ObtenerEstadosAsync();
+            return View(libro);
+        }
+
+        // Eliminar libro - GET (confirmación)
+        public async Task<IActionResult> Delete(int id)
+        {
+            var client = _httpClientFactory.CreateClient("ProyectoAPI");
+            var response = await client.GetAsync($"Libro/{id}");
+
+            if (!response.IsSuccessStatusCode)
+                return RedirectToAction(nameof(Index));
+
+            var json = await response.Content.ReadAsStringAsync();
+            var libro = JsonConvert.DeserializeObject<LibroModel>(json);
+
+            if (libro == null)
+                return RedirectToAction(nameof(Index));
+
+            return View(libro);
+        }
+
+        // Eliminar libro - POST
+        [HttpPost]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var client = _httpClientFactory.CreateClient("ProyectoAPI");
+            var response = await client.DeleteAsync($"Libro/EliminarLibro/{id}");
+
+            if (response.IsSuccessStatusCode)
+                return RedirectToAction(nameof(Index));
+
+            ModelState.AddModelError("", "No se pudo eliminar el libro.");
+            return RedirectToAction(nameof(Delete), new { id });
+        }
+
+        // Vista detalle libro con comentarios
         [HttpGet]
         public async Task<IActionResult> DetalleLibro(int id)
         {
             var client = _httpClientFactory.CreateClient("ProyectoAPI");
 
-            // Llamar a la API para obtener los detalles del libro
             var response = await client.GetAsync($"/api/Libro/{id}");
-            if (response.IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode)
             {
                 TempData["ErrorMessage"] = "No se puede cargar el libro.";
-                return RedirectToAction("Index", "Home");   
+                return RedirectToAction("Index", "Libro");
             }
-            
+
             var libro = await response.Content.ReadFromJsonAsync<LibroViewModel>();
 
-            // Llamar a la API para obtener los comentarios del libro
             var comentariosResponse = await client.GetAsync($"/api/Comentarios/Libro/{id}");
             var comentarios = new List<ComentarioViewModel>();
 
@@ -40,81 +190,17 @@ namespace SC701_ProyectoFinal.Controllers
             }
 
             libro.Comentarios = comentarios;
-        private readonly HttpClient _httpClient;
-
-        public LibroController()
-        {
-            _httpClient = new HttpClient();
-            _httpClient.BaseAddress = new Uri("https://localhost:7028/api/"); 
-        }
-
-        public async Task<IActionResult> Index()
-        {
-            var response = await _httpClient.GetAsync("Libro");
-            if (!response.IsSuccessStatusCode)
-                return View(new List<LibroModel>());
-
-            var json = await response.Content.ReadAsStringAsync();
-            var libros = JsonConvert.DeserializeObject<List<LibroModel>>(json);
-            return View(libros);
-        }
-
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Create(LibroModel libro)
-        {
-            Console.WriteLine("Entró Create Libro POST");
-            var request = new LibroRequestModel
-            {
-                ISBN = libro.ISBN,
-                Estado_Libro = libro.Estado_Libro,
-                Titulo = libro.Titulo,
-                Autor = libro.Autor,
-                Anio = libro.Anio,
-                Imagen_URL = libro.Imagen_URL,
-                Id_Estado = libro.Id_Estado
-            };
-
-            var json = JsonConvert.SerializeObject(request);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-            var response = await _httpClient.PostAsync("Libro/RegistrarLibro", content);
-
-            if (response.IsSuccessStatusCode)
-                return RedirectToAction(nameof(Index));
-            else
-                ModelState.AddModelError("", "No se pudo registrar el libro");
-
             return View(libro);
         }
 
-        public async Task<IActionResult> Delete(int id)
-        {
-            var response = await _httpClient.GetAsync("Libro");
-            if (!response.IsSuccessStatusCode)
-                return RedirectToAction(nameof(Index));
-
-            var json = await response.Content.ReadAsStringAsync();
-            var libros = JsonConvert.DeserializeObject<List<LibroModel>>(json);
-            var libro = libros.FirstOrDefault(x => x.Id_Libro == id);
-
-            if (libro == null)
-                return RedirectToAction(nameof(Index));
-
-            return View(libro);
-        }
-
+        // Enviar comentario
         [HttpPost]
         public async Task<IActionResult> EnviarComentario(ComentarioModel comentario)
         {
             var UsuarioId = HttpContext.Session.GetInt32("UsuarioId");
             if (UsuarioId == null)
             {
-                return RedirectToAction("DetallesLibro", new { id = comentario.LibroId });
+                return RedirectToAction("DetalleLibro", new { id = comentario.LibroId });
             }
 
             comentario.UsuarioId = UsuarioId.Value;
@@ -123,70 +209,92 @@ namespace SC701_ProyectoFinal.Controllers
             var response = await client.PostAsJsonAsync("/api/Comentarios/Crear", comentario);
 
             if (response.IsSuccessStatusCode)
-            {
                 TempData["SuccessMessage"] = "Comentario enviado exitosamente.";
-            }
             else
-            {
                 TempData["ErrorMessage"] = "Error al enviar el comentario.";
-            }
 
-            return RedirectToAction("DetallesLibro", new { id = comentario.LibroId });
-        }
-    }
-}
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var response = await _httpClient.DeleteAsync($"Libro/EliminarLibro/{id}");
-
-            if (response.IsSuccessStatusCode)
-                return RedirectToAction(nameof(Index));
-
-            var listResponse = await _httpClient.GetAsync("Libro");
-            LibroModel libro = null;
-
-            if (listResponse.IsSuccessStatusCode)
-            {
-                var jsonList = await listResponse.Content.ReadAsStringAsync();
-                var lista = JsonConvert.DeserializeObject<List<LibroModel>>(jsonList);
-
-                libro = lista.FirstOrDefault(x => x.Id_Libro == id);
-            }
-
-            ModelState.AddModelError("", "No se pudo eliminar el libro.");
-            return View("Delete",libro);
+            return RedirectToAction("DetalleLibro", new { id = comentario.LibroId });
         }
 
-
-        public async Task<IActionResult> Edit(int id)
+        // Obtener estados para select
+        private async Task<List<EstadoModel>> ObtenerEstadosAsync()
         {
-            var response = await _httpClient.GetAsync("Libro");
+            var client = _httpClientFactory.CreateClient("ProyectoAPI");
+            var response = await client.GetAsync("Estado");
+
             if (!response.IsSuccessStatusCode)
-                return RedirectToAction(nameof(Index));
+                return new List<EstadoModel>();
 
             var json = await response.Content.ReadAsStringAsync();
-            var libros = JsonConvert.DeserializeObject<List<LibroModel>>(json);
-            var libro = libros.FirstOrDefault(l => l.Id_Libro == id);
-
-            if (libro == null)
-                return NotFound();
-
-            return View(libro);
+            return JsonConvert.DeserializeObject<List<EstadoModel>>(json);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Edit(int id, LibroModel libro)
+        // GET: Mostrar formulario de reserva
+        // Solo abre la vista de reservar
+        public async Task<IActionResult> Reservar(int id)
         {
-            var json = JsonConvert.SerializeObject(libro);
+            var client = _httpClientFactory.CreateClient("ProyectoAPI");
+
+            // Traer los datos del libro desde el API
+            var response = await client.GetAsync($"Libro/{id}");
+            if (!response.IsSuccessStatusCode)
+            {
+                TempData["ErrorMessage"] = "No se pudo cargar el libro.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var libro = await response.Content.ReadFromJsonAsync<LibroModel>();
+
+            // Crear el ViewModel para la vista de reserva
+            var reserva = new ReservaViewModel
+            {
+                Id_Libro = libro.Id_Libro,
+                Titulo = libro.Titulo,
+                Id_Usuario = 1 // Aquí puedes tomar el ID real del usuario logueado
+            };
+
+            return View(reserva); // Abre la vista Reservar.cshtml
+
+        }
+
+
+        // POST: Confirmar reserva
+        [HttpPost]
+        public async Task<IActionResult> Reservar(ReservaViewModel reserva)
+        {
+            if (!ModelState.IsValid)
+                return View(reserva);
+
+            var client = _httpClientFactory.CreateClient("ProyectoAPI");
+
+            // Usuario fijo si no viene
+            if (reserva.Id_Usuario <= 0)
+                reserva.Id_Usuario = 1;
+
+            var request = new ReservaRequestModel
+            {
+                Id_Libro = reserva.Id_Libro,
+                Id_Usuario = reserva.Id_Usuario,
+                Tipo = "RESERVA",
+                Fecha = reserva.FechaInicio,
+                Fecha_Vencimiento = reserva.FechaFin,
+                Estado = 1
+            };
+
+            var json = JsonConvert.SerializeObject(request);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PutAsync($"Libro/ActualizarLibro/{id}", content);
+            var response = await client.PostAsync("Libro/ReservarLibro", content);
 
             if (response.IsSuccessStatusCode)
+            {
+                TempData["SuccessMessage"] = "Reserva creada exitosamente.";
                 return RedirectToAction(nameof(Index));
+            }
 
-            ModelState.AddModelError("", "No se pudo actualizar el libro");
-            return View(libro);
+            TempData["ErrorMessage"] = "No se pudo crear la reserva.";
+            return View(reserva);
         }
     }
+
 }

@@ -49,6 +49,9 @@
                         <td class="text-center">
                             <a asp-action="Edit" asp-route-id="@libro.Id_Libro" class="btn btn-warning btn-sm">✏️ Editar</a>
                             <a asp-action="Delete" asp-route-id="@libro.Id_Libro" class="btn btn-danger btn-sm">🗑️ Eliminar</a>
+                            <br />
+                            @* Ahora solo redirige a la vista de reserva *@
+                            <a asp-action="Reservar" asp-route-id="@libro.Id_Libro" class="btn btn-success btn-sm">ℹ️ Ver detalles</a>
                         </td>
                     </tr>
                 }

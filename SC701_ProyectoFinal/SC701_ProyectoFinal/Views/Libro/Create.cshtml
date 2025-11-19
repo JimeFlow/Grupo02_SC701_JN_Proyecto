@@ -31,12 +31,11 @@
                         <input asp-for="Anio" class="form-control" type="number" min="1900" max="2100" />
                     </div>
                     <div class="col-md-4">
-                        <label asp-for="Estado_Libro" class="form-label fw-bold">Estado</label>
-                        <select asp-for="Estado_Libro" class="form-select">
-                            <option value="Disponible">Disponible</option>
-                            <option value="Prestado">Prestado</option>
-                            <option value="Dañado">Dañado</option>
+                        <label class="form-label fw-bold">Estado</label>
+                        <select id="selectEstado" class="form-select" asp-for="Id_Estado" asp-items="@(new SelectList(ViewBag.Estados, "Id_Estado", "Estado"))">
+                            <option value="">-- Seleccione un estado --</option>
                         </select>
+                        <input type="hidden" asp-for="Estado_Libro" id="Estado_Libro" />
                     </div>
                 </div>
 
@@ -44,11 +43,6 @@
                     <label asp-for="Imagen_URL" class="form-label fw-bold">URL de la Imagen</label>
                     <input asp-for="Imagen_URL" class="form-control" placeholder="https://..." />
                     <small class="text-muted">Si no tiene imagen, puede dejarlo vacío.</small>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="Id_Estado" class="form-label fw-bold">ID Estado (FK)</label>
-                    <input asp-for="Id_Estado" class="form-control" type="number" min="1" placeholder="Ej: 1" />
                 </div>
 
                 <div asp-validation-summary="All" class="text-danger"></div>
@@ -60,8 +54,20 @@
             </form>
         </div>
     </div>
+
+
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        const select = document.getElementById('selectEstado');
+        const hidden = document.getElementById('Estado_Libro');
+
+            // Actualizar el Estado_Libro según la selección
+            select.addEventListener('change', function() {
+                hidden.value = select.options[select.selectedIndex].text;
+            });
+    </script>
+
 }

@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Preguntas Frecuentes";
     Layout = "~/Views/Shared/_LayoutInterno.cshtml";
+    int i = 0; // contador para IDs únicos
 }
 
 <h2 class="mt-4">Preguntas Frecuentes</h2>
@@ -22,5 +23,6 @@
                 </div>
             </div>
         </div>
-     }
+        i++; // incrementa el contador
+    }
 </div>

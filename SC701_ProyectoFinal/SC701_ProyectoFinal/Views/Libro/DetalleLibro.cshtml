@@ -8,8 +8,17 @@
 <h2>@Model.Titulo</h2>
 
 <div>
-    <p><strong>Autor:</strong> @Model.Autor</p>
-    <p><strong>Año:</strong> @Model.AnioPublicacion</p>
+    <p class="text-center">
+        @if (!string.IsNullOrEmpty(Model.Imagen))
+        {
+            <img src="@Model.Imagen" alt="Portada" width="50" height="70" class="rounded shadow-sm" />
+        }
+        else
+        {
+            <span class="text-muted">Sin imagen</span>
+        }
+    </p>
+    <p><strong>Autor:</strong> @Model.Autor || <strong>Año:</strong> @Model.AnioPublicacion  || <strong>ISBN:</strong> @Model.ISBN</p>
     <p><strong>Descripción:</strong> @Model.Descripcion</p>
     <p><strong>Estado:</strong> @Model.Estado</p>
 </div>
@@ -17,7 +26,7 @@
 <hr />
 
 @* Boton de Reserva *@
-<form asp-action="CrearReserva" method="post">
+<form asp-action="Reservar" method="post">
     <input type="hidden" name="idLibro" value="@Model.LibroId" />
     <button type="submit" class="btn btn-primary">Reservar</button>
 </form>

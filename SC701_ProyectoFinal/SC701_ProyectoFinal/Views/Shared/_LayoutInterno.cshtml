@@ -62,9 +62,17 @@
 						<a class="nav-link" href="~/Informacion">Información</a>
 					</li>
 
-					@if (id_Rol == 1)
+					@if (id_Rol == 1 || id_Rol == 2)
 					{
+						<li class="nav-item">
+						<a class="nav-link" asp-controller="Libro" asp-action="Index">Catálogo</a>
+						</li>
 
+					}
+
+					@if (id_Rol == 1)
+						{
+		
 						<li class="nav-item">
 							<a class="nav-link" asp-controller="Libro" asp-action="Index">Libros</a>
 						</li>
@@ -77,10 +85,14 @@
 							<a class="nav-link" asp-action="Index" asp-controller="Usuario">Usuarios</a>
 						</li>
 					}
-				
-					<li class="nav-item">
-						<a class="nav-link" href="@Url.Action("MisReservas", "Reserva")">Reservaciones</a>
-					</li>
+
+					@if (id_Rol == 2)
+
+					{
+						<li class="nav-item">
+							<a class="nav-link" href="@Url.Action("MisReservas", "Reserva")">Reservaciones</a>
+						</li>
+					}
 					<li class="nav-item">
 						<a class="nav-link" href="~/Contacto">Contacto</a>
 					</li>
@@ -112,12 +124,17 @@
 									<span class="align-middle">Perfil</span>
 								</a>
 							</li>
-							<li>
-								<a class="dropdown-item" asp-action="MisReservas" asp-controller="Reserva">
-									<i class="bx bx-user me-2"></i>
-									<span class="align-middle">Mis Reservaciones</span>
-								</a>
-							</li>
+
+							@if (id_Rol == 2)
+							{
+
+								<li>
+									<a class="dropdown-item" asp-action="MisReservas" asp-controller="Reserva">
+										<i class="bx bx-user me-2"></i>
+										<span class="align-middle">Mis Reservaciones</span>
+									</a>
+								</li>
+							}
 							<li>
 								<a class="dropdown-item" asp-action="ActualizarSeguridad" asp-controller="Account">
 									<i class="bx bx-cog me-2"></i>

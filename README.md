@@ -7,8 +7,6 @@
 **Estudiantes:** 
 - Flores Carmona, Jimena
 - Méndez Calderón, Josué
-- Rodríguez Jiménez, Luis Anthony
-- Rodríguez Vargas, Olger Rafael
 - Valverde Mora, Amanda Federica
 
 **Laboratorio:** JN (6PM - 9PM) 
@@ -25,8 +23,6 @@
 |--------------------|-------------|-----------------------------|
 | Jimena Flores      | FH23014559  | jflores00335@ufide.ac.cr    |
 | Josué Mendez       |             | jmendez50979@ufide.ac.cr    |
-| Luis A. Rodríguez  |             | lrodriguez90411@ufide.ac.cr |
-| Olger R. Rodríguez |             | orodriguez60755@ufide.ac.cr |
 | Amanda F. Valverde |             | avalverde50252@ufide.ac.cr  |
 
 ---

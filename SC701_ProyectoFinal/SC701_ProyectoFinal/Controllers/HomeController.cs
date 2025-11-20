@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Mvc;
 using SC701_ProyectoFinal.Models;
 using static System.Net.WebRequestMethods;
@@ -21,21 +23,24 @@ namespace SC701_ProyectoFinal.Controllers
 
         public IActionResult Index() //HAY QUE AGREGAR UN GET DE LIBROS PARA MOSTRAR EN EL INDEX
         {
-            return View();
-            //using (var context = _http.CreateClient())
-            //{
-            //    var urlApi = _configuration["Valores:UrlAPI"] + "WeatherForecast";
-            //    var respuesta = context.GetAsync(urlApi).Result;
+            using (var client = _http.CreateClient())
+            {
+                var urlApi = _configuration["Valores:UrlAPI"] + "Libro/ListarLibros";
 
-            //    if (respuesta.IsSuccessStatusCode)
-            //    {
-            //        var datosApi = respuesta.Content.ReadAsStringAsync().Result;
-            //        return View(datosApi);
-            //    }
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
 
-            //    ViewBag.Mensaje = "No hay productos registrados";
-            //    return View();
-            //}
+                var respuesta = client.GetAsync(urlApi).Result;
+
+                if (respuesta.IsSuccessStatusCode)
+                {
+                    var libros = respuesta.Content.ReadFromJsonAsync<List<LibroModel>>().Result;
+                    return View(libros);
+                }
+
+                ViewBag.Mensaje = "No hay libros registrados";
+                return View(new List<LibroModel>());
+            }
         }
 
         public IActionResult Privacy()

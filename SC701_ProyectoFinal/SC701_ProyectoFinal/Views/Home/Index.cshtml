@@ -1,4 +1,5 @@
-﻿@{
+﻿@model IEnumerable<SC701_ProyectoFinal.Models.LibroModel>
+@{
     Layout = "_LayoutInterno";
 }
 <!-- ============================================-->
@@ -41,126 +42,55 @@
     <div class="container-fluid px-4">
         <div class="row mb-5">
             
-            <div class="col-sm-6 col-md-4 col-lg-3 mt-4">
-                <div class="row g-0">
-                    <div class="col-12 overflow-hidden rounded" data-zanim-timeline='{"delay":0}' data-zanim-trigger="scroll">
-                        <div class="row" data-zanim-xs='{"delay":0.1,"animation":"zoom-in"}'>
-                            <div class="col">
-                                <div class="swiper theme-slider swiper-theme" data-swiper='{"loop":true,"effect":"fade","pagination":{"el":".swiper-pagination","clickable":true,"type":"bullets"}}' data-zanim-lg='{"animation":"zoom-out","delay":0}' data-zanim-trigger="scroll">
-                                    <div class="swiper-wrapper">
-                                        <div class="swiper-slide">
-                                            <a href="../pages/product-single.html"><img class="h-100 w-100" src="~/img/Vinil-PinkFloyd.webp" alt="" /></a>
+            @foreach (var libro in Model.Take(4))
+            {
+                <div class="col-sm-6 col-md-4 col-lg-3 mt-4">
+                    <div class="row g-0">
+
+                        <!-- Imagen -->
+                        <div class="col-12 overflow-hidden rounded">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="swiper theme-slider swiper-theme"
+                                         data-swiper='{"loop":true,"effect":"fade",
+                                             "pagination":{"el":".swiper-pagination","clickable":true,"type":"bullets"}}'>
+
+                                        <div class="swiper-wrapper">
+                                            <div class="swiper-slide">
+                                                <a href="#">
+                                                    <img class="h-100 w-100"
+                                                         src="@libro.Imagen_URL"
+                                                         alt="@libro.Titulo" />
+                                                </a>
+                                            </div>
                                         </div>
-                                        <div class="swiper-slide">
-                                            <a href="../pages/product-single.html"><img class="h-100 w-100" src="~/img/pinkfloyd2.jpg" alt="" /></a>
-                                        </div>
-                                    </div>
-                                    <div class="swiper-pagination"></div>
-                                    <div class="swiper-nav">
-                                        <div class="swiper-button-next me-md-3"></div>
-                                        <div class="swiper-button-prev ms-md-3"> </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div><a class="col-6 mt-2" href="#!">
-                        <h5 class="fs-9">The Dark Side Of The Moon - Pink Floyd</h5>
-                    </a><a class="col-6 mt-2 text-end" href="#!">
-                        <h6 class="fw-normal mb-0 d-inline-block">&#36;30</h6>
-                        
-                    </a>
-                </div>
-            </div>
-            <div class="col-sm-6 col-md-4 col-lg-3 mt-4">
-                <div class="row g-0">
-                    <div class="col-12 overflow-hidden rounded" data-zanim-timeline='{"delay":0.1}' data-zanim-trigger="scroll">
-                        <div class="row" data-zanim-xs='{"delay":0.1,"animation":"zoom-in"}'>
-                            <div class="col">
-                                <div class="swiper theme-slider swiper-theme" data-swiper='{"loop":true,"effect":"fade","pagination":{"el":".swiper-pagination","clickable":true,"type":"bullets"}}' data-zanim-lg='{"animation":"zoom-out","delay":0}' data-zanim-trigger="scroll">
-                                    <div class="swiper-wrapper">
-                                        <div class="swiper-slide">
-                                            <div class="badge badge-rotate bg-warning" data-zanim-xs='{"delay":0.8,"animation":"slide-down"}'><span class='fas fa-star'></span> Best selling</div><a href="../pages/product-single.html"><img class="h-100 w-100" src="~/img/abbeyroad1.jpg" alt="" /></a>
-                                        </div>
-                                        <div class="swiper-slide">
-                                            <div class="badge badge-rotate bg-warning" data-zanim-xs='{"delay":0.8,"animation":"slide-down"}'><span class='fas fa-star'></span> Best selling</div><a href="../pages/product-single.html"><img class="h-100 w-100" src="~/img/abbeyroad2.jpg" alt="" /></a>
-                                        </div>
-                                    </div>
-                                    <div class="swiper-pagination"></div>
-                                    <div class="swiper-nav">
-                                        <div class="swiper-button-next me-md-3"></div>
-                                        <div class="swiper-button-prev ms-md-3"> </div>
+
+                                        
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div><a class="col-6 mt-2" href="#!">
-                        <h5 class="fs-9">Abbey Road - The Beatles</h5>
-                    </a><a class="col-6 mt-2 text-end" href="#!">
-                        <h6 class="fw-normal mb-0 d-inline-block">&#36;50</h6>
-                    </a>
-                </div>
-            </div>
-            <div class="col-sm-6 col-md-4 col-lg-3 mt-4">
-                <div class="row g-0">
-                    <div class="col-12 overflow-hidden rounded" data-zanim-timeline='{"delay":0.2}' data-zanim-trigger="scroll">
-                        <div class="row" data-zanim-xs='{"delay":0.1,"animation":"zoom-in"}'>
-                            <div class="col">
-                                <div class="swiper theme-slider swiper-theme" data-swiper='{"loop":true,"effect":"fade","pagination":{"el":".swiper-pagination","clickable":true,"type":"bullets"}}' data-zanim-lg='{"animation":"zoom-out","delay":0}' data-zanim-trigger="scroll">
-                                    <div class="swiper-wrapper">
-                                        <div class="swiper-slide">
-                                            <a href="../pages/product-single.html"><img class="h-100 w-100" src="~/img/Gnr-UseyourIllusionII.webp" alt="" /></a>
-                                        </div>
-                                        <div class="swiper-slide">
-                                            <a href="../pages/product-single.html"><img class="h-100 w-100" src="~/img/Gnr-UseyourIllusionII-2.jpg" alt="" /></a>
-                                        </div>
-                                    </div>
-                                    <div class="swiper-pagination"></div>
-                                    <div class="swiper-nav">
-                                        <div class="swiper-button-next me-md-3"></div>
-                                        <div class="swiper-button-prev ms-md-3"> </div>
-                                    </div>
-                                </div>
-                            </div>
+
+                        <!-- Texto -->
+                        <a class="col-12 mt-2" href="#">
+                            <h5 class="fs-9">@libro.ISBN - @libro.Titulo</h5>
+                        </a>
+
+                        <div class="col-12">
+                            <h6 class="fw-normal mb-0 d-inline-block">Autor: @libro.Autor</h6>
                         </div>
-                    </div><a class="col-6 mt-2" href="#!">
-                        <h5 class="fs-9">Use Your Illusion II - Guns N' Roses</h5>
-                    </a><a class="col-6 mt-2 text-end" href="#!">
-                        <h6 class="fw-normal mb-0 d-inline-block">&#36;45</h6>
-                        
-                    </a>
+
+                    </div>
                 </div>
-            </div>
-            <div class="col-sm-6 col-md-4 col-lg-3 mt-4">
-                <div class="row g-0">
-                    <div class="col-12 overflow-hidden rounded" data-zanim-timeline='{"delay":0.3}' data-zanim-trigger="scroll">
-                        <div class="row" data-zanim-xs='{"delay":0.1,"animation":"zoom-in"}'>
-                            <div class="col">
-                                <div class="swiper theme-slider swiper-theme" data-swiper='{"loop":true,"effect":"fade","pagination":{"el":".swiper-pagination","clickable":true,"type":"bullets"}}' data-zanim-lg='{"animation":"zoom-out","delay":0}' data-zanim-trigger="scroll">
-                                    <div class="swiper-wrapper">
-                                        <div class="swiper-slide">
-                                            <a href="../pages/product-single.html"><img class="h-100 w-100" src="~/img/cien-anios-de-soledad.webp" alt="" /></a>
-                                        </div>
-                                        <div class="swiper-slide">
-                                            <a href="../pages/product-single.html"><img class="h-100 w-100" src="~/img/cien-anios-de-soledad-segunda.jpeg" alt="" /></a>
-                                        </div>
-                                    </div>
-                                    <div class="swiper-pagination"></div>
-                                    <div class="swiper-nav">
-                                        <div class="swiper-button-next me-md-3"></div>
-                                        <div class="swiper-button-prev ms-md-3"> </div>
-                                    </div>
-                                   
-                                </div>
-                            </div>
-                        </div>
-                    </div><a class="col-6 mt-2" href="#!">
-                        <h5 class="fs-9">Cien años de soledad - Gabriel García Márquez</h5>
-                    </a><a class="col-6 mt-2 text-end" href="#!">
-                        <h6 class="fw-normal mb-0 d-inline-block">&#36;45</h6>
-                        
-                    </a>
+            }
+
+            @if (!Model.Any())
+            {
+                <div class="text-center mt-5">
+                    <h5>No hay libros registrados.</h5>
                 </div>
-            </div>
+            }
+
             <div class="align-items-center justify-content-center d-flex mt-5">
                 <button class="btn btn-light">Ver todos</button>
             </div>

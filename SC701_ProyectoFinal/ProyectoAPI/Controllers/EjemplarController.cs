@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Data;
+using Dapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using ProyectoAPI.Models;
 
@@ -17,39 +19,15 @@ namespace ProyectoAPI.Controllers
         }
 
         [HttpGet]
+        [Route("ObtenerEjemplares")]
         public IActionResult ObtenerEjemplares()
         {
 
-            List<EjemplarModel> lista = new();
-
-            using (SqlConnection con = new(_configuration.GetConnectionString("BDConnection")))
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
-                con.Open();
-                string query = @"SELECT E.Id_Ejemplar, E.CodigoEjemplar, E.Estado, E.Ubicacion, 
-                                 E.Fecha_Registro, E.Id_Libro, L.Titulo
-                                 FROM Ejemplar E 
-                                 INNER JOIN Libro L ON E.Id_Libro = L.Id_Libro";
-
-                SqlCommand cmd = new(query, con);
-                SqlDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    lista.Add(new EjemplarModel
-                    {
-                        Id_Ejemplar = Convert.ToInt32(reader["Id_Ejemplar"]),
-                        CodigoEjemplar = reader["CodigoEjemplar"].ToString(),
-                        Estado = reader["Estado"].ToString(),
-                        Ubicacion = reader["Ubicacion"].ToString(),
-                        Fecha_Registro = Convert.ToDateTime(reader["Fecha_Registro"]),
-
-                        Id_Libro = Convert.ToInt32(reader["Id_Libro"]),
-                        TituloLibro = reader["Titulo"].ToString()
-                    });
-                }
+                var resultado = context.Query<EjemplarModel>("ObtenerEjemplares");
+                return Ok(resultado);
             }
-            
-                return Ok(lista);
         }
 
 
@@ -59,61 +37,40 @@ namespace ProyectoAPI.Controllers
         public IActionResult ObtenerEjemplarPorId(int id)
         {
 
-            EjemplarModel ejemplar = null;
-
-            using (SqlConnection con = new(_configuration.GetConnectionString("BDConnection")))
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
-                con.Open();
-                string query = @"SELECT E.Id_Ejemplar, E.CodigoEjemplar, E.Estado, E.Ubicacion, 
-                                 E.Fecha_Registro, E.Id_Libro, L.Titulo
-                                 FROM Ejemplar E 
-                                 INNER JOIN Libro L ON E.Id_Libro = L.Id_Libro
-                                 WHERE E.Id_Ejemplar = @Id";
+                var parametros = new DynamicParameters();
+                parametros.Add("@Id", id);
 
-                SqlCommand cmd = new(query, con);
-                cmd.Parameters.AddWithValue("@Id", id);
-                SqlDataReader reader = cmd.ExecuteReader();
-                if (reader.Read())
-                {
-                    ejemplar = new EjemplarModel
-                    {
-                        Id_Ejemplar = Convert.ToInt32(reader["Id_Ejemplar"]),
-                        CodigoEjemplar = reader["CodigoEjemplar"].ToString(),
-                        Estado = reader["Estado"].ToString(),
-                        Ubicacion = reader["Ubicacion"].ToString(),
-                        Fecha_Registro = Convert.ToDateTime(reader["Fecha_Registro"]),
+                var ejemplar = context.QueryFirstOrDefault<EjemplarModel>(
+                    "ObtenerEjemplarPorId",
+                    parametros,
+                    commandType: CommandType.StoredProcedure
+                );
 
-                        Id_Libro = Convert.ToInt32(reader["Id_Libro"]),
-                        TituloLibro = reader["Titulo"].ToString()
-                    };
-                }
-            }
-
-            if (ejemplar == null)
-                return NotFound();
+                if (ejemplar == null)
+                    return NotFound();
 
                 return Ok(ejemplar);
+            }
         }
             
           
 
         // POST: api/ejemplar
         [HttpPost]
+        [Route("RegistrarEjemplar")]
         public IActionResult RegistrarEjemplar([FromBody] EjemplarRequestModel ejemplar)
         {
-            using (SqlConnection con = new(_configuration.GetConnectionString("BDConnection")))
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
-                con.Open();
-                string query = @"INSERT INTO Ejemplar (CodigoEjemplar, Id_Libro, Estado, Ubicacion)
-                                 VALUES (@CodigoEjemplar, @Id_Libro, @Estado, @Ubicacion)";
+                var parametros = new DynamicParameters();
+                parametros.Add("@CodigoEjemplar", ejemplar.CodigoEjemplar);
+                parametros.Add("@Id_Libro", ejemplar.Id_Libro);
+                parametros.Add("@Estado", ejemplar.Estado);
+                parametros.Add("@Ubicacion", ejemplar.Ubicacion);
 
-                SqlCommand cmd = new(query, con);
-                cmd.Parameters.AddWithValue("@CodigoEjemplar", ejemplar.CodigoEjemplar);
-                cmd.Parameters.AddWithValue("@Id_Libro", ejemplar.Id_Libro);
-                cmd.Parameters.AddWithValue("@Estado", ejemplar.Estado);
-                cmd.Parameters.AddWithValue("@Ubicacion", ejemplar.Ubicacion ?? (object)DBNull.Value);
-
-                cmd.ExecuteNonQuery();
+                context.Execute("RegistrarEjemplar", parametros);
             }
 
             return Ok(new { mensaje = "Ejemplar registrado correctamente." });
@@ -123,24 +80,16 @@ namespace ProyectoAPI.Controllers
         [HttpPut("{id}")]
         public IActionResult ActualizarEjemplar(int id, [FromBody] EjemplarRequestModel ejemplar)
         {
-            using (SqlConnection con = new(_configuration.GetConnectionString("BDConnection")))
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
-                con.Open();
-                string query = @"UPDATE Ejemplar SET 
-                                CodigoEjemplar=@CodigoEjemplar,
-                                Estado=@Estado,
-                                Ubicacion=@Ubicacion,
-                                Id_Libro=@Id_Libro
-                                WHERE Id_Ejemplar=@Id";
+                var parametros = new DynamicParameters();
+                parametros.Add("@Id", id);
+                parametros.Add("@CodigoEjemplar", ejemplar.CodigoEjemplar);
+                parametros.Add("@Id_Libro", ejemplar.Id_Libro);
+                parametros.Add("@Estado", ejemplar.Estado);
+                parametros.Add("@Ubicacion", ejemplar.Ubicacion);
 
-                SqlCommand cmd = new(query, con);
-                cmd.Parameters.AddWithValue("@Id", id);
-                cmd.Parameters.AddWithValue("@CodigoEjemplar", ejemplar.CodigoEjemplar);
-                cmd.Parameters.AddWithValue("@Id_Libro", ejemplar.Id_Libro);
-                cmd.Parameters.AddWithValue("@Estado", ejemplar.Estado);
-                cmd.Parameters.AddWithValue("@Ubicacion", ejemplar.Ubicacion ?? (object)DBNull.Value);
-
-                cmd.ExecuteNonQuery();
+                context.Execute("ActualizarEjemplar", parametros);
             }
 
             return Ok(new { mensaje = "Ejemplar actualizado correctamente." });
@@ -150,13 +99,12 @@ namespace ProyectoAPI.Controllers
         [HttpDelete("{id}")]
         public IActionResult EliminarEjemplar(int id)
         {
-            using (SqlConnection con = new(_configuration.GetConnectionString("BDConnection")))
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
-                con.Open();
-                string query = "DELETE FROM Ejemplar WHERE Id_Ejemplar = @Id";
-                SqlCommand cmd = new(query, con);
-                cmd.Parameters.AddWithValue("@Id", id);
-                cmd.ExecuteNonQuery();
+                var parametros = new DynamicParameters();
+                parametros.Add("@Id", id);
+
+                context.Execute("EliminarEjemplar", parametros);
             }
 
             return Ok(new { mensaje = "Ejemplar eliminado correctamente." });

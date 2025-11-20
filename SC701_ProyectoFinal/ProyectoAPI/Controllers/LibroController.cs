@@ -1,13 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using ProyectoAPI.Models;
-using Microsoft.Data.SqlClient;
+﻿using System.Data;
 using System.Net.Http;
 using System.Text;
+using Dapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using ProyectoAPI.Models;
 
 namespace ProyectoAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class LibroController : ControllerBase
     {
         private readonly IConfiguration _configuration;
@@ -19,33 +23,16 @@ namespace ProyectoAPI.Controllers
 
         // Lista todos los libros
         [HttpGet]
+        [Route("ListarLibros")]
         public IActionResult ObtenerLibros()
         {
-            List<LibroResponseModel> lista = new List<LibroResponseModel>();
-
-            using (SqlConnection conexion = new SqlConnection(_configuration.GetConnectionString("BDConnection")))
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
-                conexion.Open();
-                string query = "SELECT Id_Libro, ISBN, Estado_Libro, Titulo, Autor, Anio, Imagen_URL FROM Libro";
-                SqlCommand cmd = new SqlCommand(query, conexion);
-                SqlDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    lista.Add(new LibroResponseModel
-                    {
-                        Id_Libro = Convert.ToInt32(reader["Id_Libro"]),
-                        ISBN = reader["ISBN"].ToString(),
-                        Estado_Libro = reader["Estado_Libro"].ToString(),
-                        Titulo = reader["Titulo"].ToString(),
-                        Autor = reader["Autor"].ToString(),
-                        Anio = Convert.ToInt16(reader["Anio"]),
-                        Imagen_URL = reader["Imagen_URL"].ToString()
-                    });
-                }
+                var parametros = new DynamicParameters();
+                var resultado = context.Query<LibroResponseModel>("ListarLibros", parametros, commandType: CommandType.StoredProcedure);
+                return Ok(resultado);
             }
-
-            return Ok(lista);
+            
         }
 
         // Registra nuevo libro
@@ -53,35 +40,22 @@ namespace ProyectoAPI.Controllers
         [Route("RegistrarLibro")]
         public IActionResult RegistrarLibro([FromBody] LibroRequestModel libro)
         {
-            try
+            
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
-                using (SqlConnection conexion = new SqlConnection(_configuration.GetConnectionString("BDConnection")))
-                {
-                    conexion.Open();
+                var parametros = new DynamicParameters();
 
-                    string query = @"INSERT INTO Libro (ISBN, Estado_Libro, Titulo, Autor, Anio, Imagen_URL, Id_Estado)
-                                     VALUES (@ISBN, @Estado_Libro, @Titulo, @Autor, @Anio, @Imagen_URL, @Id_Estado)";
+                parametros.Add("@ISBN", libro.ISBN);
+                parametros.Add("@Estado_Libro", libro.Estado_Libro);
+                parametros.Add("@Titulo", libro.Titulo);
+                parametros.Add("@Autor", libro.Autor);
+                parametros.Add("@Anio", libro.Anio);
+                parametros.Add("@Imagen_URL", libro.Imagen_URL);
+                parametros.Add("@Id_Estado", libro.Id_Estado);
 
-                    SqlCommand cmd = new SqlCommand(query, conexion);
-                    cmd.Parameters.AddWithValue("@ISBN", libro.ISBN);
-                    cmd.Parameters.AddWithValue("@Estado_Libro", libro.Estado_Libro);
-                    cmd.Parameters.AddWithValue("@Titulo", libro.Titulo);
-                    cmd.Parameters.AddWithValue("@Autor", libro.Autor);
-                    cmd.Parameters.AddWithValue("@Anio", libro.Anio);
-                    cmd.Parameters.AddWithValue("@Imagen_URL", libro.Imagen_URL ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Id_Estado", libro.Id_Estado);
+                var resultado = context.Execute("RegistrarLibro", parametros, commandType: CommandType.StoredProcedure);
 
-                    int rows = cmd.ExecuteNonQuery();
-
-                    if (rows > 0)
-                        return Ok(new { mensaje = "Libro registrado exitosamente." });
-                    else
-                        return BadRequest(new { mensaje = "No se pudo registrar el libro." });
-                }
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { mensaje = "Error en el servidor", error = ex.Message });
+                return Ok(new { mensaje = "Libro registrado exitosamente" });
             }
         }
 
@@ -90,43 +64,23 @@ namespace ProyectoAPI.Controllers
         [Route("ActualizarLibro/{id}")]
         public IActionResult ActualizarLibro(int id, [FromBody] LibroRequestModel libro)
         {
-            try
+            
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
-                using (SqlConnection conexion = new SqlConnection(_configuration.GetConnectionString("BDConnection")))
-                {
-                    conexion.Open();
+                var parametros = new DynamicParameters();
 
-                    string query = @"UPDATE Libro
-                                     SET ISBN = @ISBN,
-                                         Estado_Libro = @Estado_Libro,
-                                         Titulo = @Titulo,
-                                         Autor = @Autor,
-                                         Anio = @Anio,
-                                         Imagen_URL = @Imagen_URL,
-                                         Id_Estado = @Id_Estado
-                                     WHERE Id_Libro = @Id_Libro";
+                parametros.Add("@Id_Libro", id);
+                parametros.Add("@ISBN", libro.ISBN);
+                parametros.Add("@Estado_Libro", libro.Estado_Libro);
+                parametros.Add("@Titulo", libro.Titulo);
+                parametros.Add("@Autor", libro.Autor);
+                parametros.Add("@Anio", libro.Anio);
+                parametros.Add("@Imagen_URL", libro.Imagen_URL);
+                parametros.Add("@Id_Estado", libro.Id_Estado);
 
-                    SqlCommand cmd = new SqlCommand(query, conexion);
-                    cmd.Parameters.AddWithValue("@Id_Libro", id);
-                    cmd.Parameters.AddWithValue("@ISBN", libro.ISBN);
-                    cmd.Parameters.AddWithValue("@Estado_Libro", libro.Estado_Libro);
-                    cmd.Parameters.AddWithValue("@Titulo", libro.Titulo);
-                    cmd.Parameters.AddWithValue("@Autor", libro.Autor);
-                    cmd.Parameters.AddWithValue("@Anio", libro.Anio);
-                    cmd.Parameters.AddWithValue("@Imagen_URL", libro.Imagen_URL ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Id_Estado", libro.Id_Estado);
+                var resultado = context.Execute("ActualizarLibro", parametros, commandType: CommandType.StoredProcedure);
 
-                    int rows = cmd.ExecuteNonQuery();
-
-                    if (rows > 0)
-                        return Ok(new { mensaje = "Libro actualizado exitosamente." });
-                    else
-                        return NotFound(new { mensaje = "No se encontró el libro con el ID especificado." });
-                }
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { mensaje = "Error en el servidor", error = ex.Message });
+                return Ok(new { mensaje = "Libro actualizado exitosamente" });
             }
         }
 
@@ -135,25 +89,18 @@ namespace ProyectoAPI.Controllers
         [Route("EliminarLibro/{id}")]
         public IActionResult EliminarLibro(int id)
         {
-            try
+            
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
-                using (SqlConnection conexion = new SqlConnection(_configuration.GetConnectionString("BDConnection")))
-                {
-                    conexion.Open();
-                    string query = "DELETE FROM Libro WHERE Id_Libro = @Id";
-                    SqlCommand cmd = new SqlCommand(query, conexion);
-                    cmd.Parameters.AddWithValue("@Id", id);
-                    int rows = cmd.ExecuteNonQuery();
+                var parametros = new DynamicParameters();
+                parametros.Add("@Id_Libro", id);
 
-                    if (rows > 0)
-                        return Ok(new { mensaje = "Libro eliminado correctamente." });
-                    else
-                        return NotFound(new { mensaje = "No se encontró el libro con el ID especificado." });
-                }
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { mensaje = "Error en el servidor", error = ex.Message });
+                var res = context.Execute("EliminarLibro", parametros, commandType: CommandType.StoredProcedure);
+
+                if (res > 0)
+                    return Ok(new { mensaje = "Libro eliminado correctamente" });
+
+                return NotFound(new { mensaje = "No se encontró el libro con ese ID" });
             }
         }
 
@@ -161,68 +108,47 @@ namespace ProyectoAPI.Controllers
         [HttpGet("{id}")]
         public IActionResult ObtenerLibro(int id)
         {
-            using (SqlConnection conexion = new SqlConnection(_configuration.GetConnectionString("BDConnection")))
+            
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
-                conexion.Open();
-                string query = "SELECT Id_Libro, ISBN, Estado_Libro, Titulo, Autor, Anio, Imagen_URL, Id_Estado FROM Libro WHERE Id_Libro = @Id";
-                SqlCommand cmd = new SqlCommand(query, conexion);
-                cmd.Parameters.AddWithValue("@Id", id);
-                SqlDataReader reader = cmd.ExecuteReader();
+                var parametros = new DynamicParameters();
+                parametros.Add("@Id_Libro", id);
 
-                if (reader.Read())
-                {
-                    var libro = new LibroResponseModel
-                    {
-                        Id_Libro = Convert.ToInt32(reader["Id_Libro"]),
-                        ISBN = reader["ISBN"].ToString(),
-                        Estado_Libro = reader["Estado_Libro"].ToString(),
-                        Titulo = reader["Titulo"].ToString(),
-                        Autor = reader["Autor"].ToString(),
-                        Anio = Convert.ToInt16(reader["Anio"]),
-                        Imagen_URL = reader["Imagen_URL"].ToString(),
-                        Id_Estado = Convert.ToInt32(reader["Id_Estado"])
-                    };
-                    return Ok(libro);
-                }
+                var libro = context.QueryFirstOrDefault<LibroResponseModel>(
+                    "ObtenerLibroPorId",
+                    parametros,
+                    commandType: CommandType.StoredProcedure
+                );
+
+                if (libro == null)
+                    return NotFound(new { mensaje = "No se encontró el libro" });
+
+                return Ok(libro);
             }
-
-            return NotFound(new { mensaje = "No se encontró el libro con el ID especificado." });
         }
 
         [HttpPost]
         [Route("ReservarLibro")]
         public IActionResult ReservarLibro([FromBody] ReservaRequestModel request)
         {
-            using (SqlConnection conexion = new SqlConnection(_configuration.GetConnectionString("BDConnection")))
+            
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
-                conexion.Open();
+                var parametros = new DynamicParameters();
 
-                string check = "SELECT Estado_Libro FROM Libro WHERE Id_Libro = @Id_Libro";
-                SqlCommand cmdCheck = new SqlCommand(check, conexion);
-                cmdCheck.Parameters.AddWithValue("@Id_Libro", request.Id_Libro);
-                var estadoActual = cmdCheck.ExecuteScalar()?.ToString();
+                parametros.Add("@Id_Libro", request.Id_Libro);
+                parametros.Add("@Tipo", request.Tipo);
+                parametros.Add("@Fecha", request.Fecha);
+                parametros.Add("@Fecha_Vencimiento", request.Fecha_Vencimiento);
+                parametros.Add("@Estado", request.Estado);
+                parametros.Add("@Id_Usuario", request.Id_Usuario);
 
-                if (estadoActual != "Disponible")
+                var result = context.QueryFirstOrDefault<int>("ReservarLibro", parametros, commandType: CommandType.StoredProcedure);
+
+                if (result == -1)
                     return BadRequest(new { mensaje = "El libro no está disponible para reservar." });
 
-                string updateLibro = "UPDATE Libro SET Estado_Libro = 'Reservado', Id_Estado = 2 WHERE Id_Libro = @Id_Libro";
-                SqlCommand cmdUpdate = new SqlCommand(updateLibro, conexion);
-                cmdUpdate.Parameters.AddWithValue("@Id_Libro", request.Id_Libro);
-                cmdUpdate.ExecuteNonQuery();
-
-                string insertMovimiento = @"INSERT INTO Movimiento 
-                                   (Tipo, Fecha, Fecha_Vencimiento, Estado, Id_Usuario, Id_Libro) 
-                                   VALUES (@Tipo, @Fecha, @Fecha_Vencimiento, @Estado, @Id_Usuario, @Id_Libro)";
-                SqlCommand cmdInsert = new SqlCommand(insertMovimiento, conexion);
-                cmdInsert.Parameters.AddWithValue("@Tipo", request.Tipo);
-                cmdInsert.Parameters.AddWithValue("@Fecha", request.Fecha);
-                cmdInsert.Parameters.AddWithValue("@Fecha_Vencimiento", request.Fecha_Vencimiento);
-                cmdInsert.Parameters.AddWithValue("@Estado", request.Estado);
-                cmdInsert.Parameters.AddWithValue("@Id_Usuario", request.Id_Usuario);
-                cmdInsert.Parameters.AddWithValue("@Id_Libro", request.Id_Libro);
-                cmdInsert.ExecuteNonQuery();
-
-                return Ok(new { mensaje = "Libro reservado y movimiento registrado" });
+                return Ok(new { mensaje = "Libro reservado correctamente." });
             }
         }
 

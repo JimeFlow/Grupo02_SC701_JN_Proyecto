@@ -458,6 +458,263 @@ BEGIN
 END
 --------------------------------------------------------------------------------------------------------
 
+/*
+*******************************************************************************************************
+****************************************LIBROS SP****************************************************** */
+
+-----------------------------------------LISTAR---------------------------------------------------------
+CREATE PROCEDURE ListarLibros
+AS
+BEGIN
+    SELECT 
+        Id_Libro,
+        ISBN,
+        Estado_Libro,
+        Titulo,
+        Autor,
+        Anio,
+        Imagen_URL,
+        Id_Estado
+    FROM Libro;
+END;
+
+--------------------------------------------REGISTRAR----------------------------------------------
+CREATE PROCEDURE RegistrarLibro
+    @ISBN VARCHAR(20),
+    @Estado_Libro VARCHAR(100),
+    @Titulo VARCHAR(200),
+    @Autor VARCHAR(150),
+    @Anio INT,
+    @Imagen_URL VARCHAR(600),
+    @Id_Estado INT
+AS
+BEGIN
+    INSERT INTO Libro(ISBN, Estado_Libro, Titulo, Autor, Anio, Imagen_URL, Id_Estado)
+    VALUES (@ISBN, @Estado_Libro, @Titulo, @Autor, @Anio, @Imagen_URL, @Id_Estado);
+END;
+
+------------------------------------------ACTUALIZAR----------------------------------------------
+CREATE PROCEDURE ActualizarLibro
+    @Id_Libro INT,
+    @ISBN VARCHAR(20),
+    @Estado_Libro VARCHAR(100),
+    @Titulo VARCHAR(200),
+    @Autor VARCHAR(150),
+    @Anio INT,
+    @Imagen_URL VARCHAR(600),
+    @Id_Estado INT
+AS
+BEGIN
+    UPDATE Libro
+    SET 
+        ISBN = @ISBN,
+        Estado_Libro = @Estado_Libro,
+        Titulo = @Titulo,
+        Autor = @Autor,
+        Anio = @Anio,
+        Imagen_URL = @Imagen_URL,
+        Id_Estado = @Id_Estado
+    WHERE Id_Libro = @Id_Libro;
+END;
+
+--------------------------------------ELIMINAR--------------------------------------------------------------
+CREATE PROCEDURE EliminarLibro
+    @Id_Libro INT
+AS
+BEGIN
+    DELETE FROM Libro
+    WHERE Id_Libro = @Id_Libro;
+END;
+
+----------------------------------------OBTENER LIBRO POR ID -----------------------------------------------
+CREATE PROCEDURE ObtenerLibroPorId
+    @Id_Libro INT
+AS
+BEGIN
+    SELECT 
+        Id_Libro,
+        ISBN,
+        Estado_Libro,
+        Titulo,
+        Autor,
+        Anio,
+        Imagen_URL,
+        Id_Estado
+    FROM Libro
+    WHERE Id_Libro = @Id_Libro;
+END;
+
+--------------------------------------RESERVAR LIBRO----------------------------------------------------------
+CREATE PROCEDURE ReservarLibro
+    @Id_Libro INT,
+    @Tipo VARCHAR(10),
+    @Fecha DATETIME,
+    @Fecha_Vencimiento DATETIME,
+    @Estado INT,
+    @Id_Usuario INT
+AS
+BEGIN
+    DECLARE @EstadoActual VARCHAR(100);
+
+    SELECT @EstadoActual = Estado_Libro
+    FROM Libro
+    WHERE Id_Libro = @Id_Libro;
+
+    IF (@EstadoActual <> 'Disponible')
+    BEGIN
+        SELECT -1 AS Resultado;
+        RETURN;
+    END
+
+    UPDATE Libro
+    SET Estado_Libro = 'Reservado',
+        Id_Estado = 2
+    WHERE Id_Libro = @Id_Libro;
+
+    INSERT INTO Movimiento (Tipo, Fecha, Fecha_Vencimiento, Estado, Id_Usuario, Id_Libro)
+    VALUES (@Tipo, @Fecha, @Fecha_Vencimiento, @Estado, @Id_Usuario, @Id_Libro);
+
+    SELECT 1 AS Resultado;
+END;
+
+/*******************************************RESERVAS**************************************************
+
+CREATE PROCEDURE CrearReserva
+    @Id_Usuario INT,
+    @Id_Libro INT,
+    @Fecha_Reserva DATETIME,
+    @Fecha_Vencimiento DATETIME,
+    @Id_Estado INT
+AS
+BEGIN
+    INSERT INTO Movimiento (Id_Usuario, Id_Libro, Fecha, Fecha_Vencimiento, Tipo, Id_Estado)
+    VALUES (@Id_Usuario, @Id_Libro, @Fecha_Reserva, @Fecha_Vencimiento, 'Reserva', @Id_Estado);
+
+    -- Poner libro como "No disponible"
+    UPDATE Libro SET Id_Estado = 2 WHERE Id_Libro = @Id_Libro;
+END
+
+*/
+
+--------------------------------------OBTENER RESERVAS------------------------------------------------
+CREATE PROCEDURE ObtenerReservasUsuario
+    @Id_Usuario INT
+AS
+BEGIN
+    SELECT 
+        M.Id_Movimiento,
+        M.Fecha,
+        M.Fecha_Vencimiento,
+        L.Id_Libro,
+        L.Titulo,
+        L.Imagen_URL,
+        E.Estado
+    FROM Movimiento M
+    INNER JOIN Libro L ON L.Id_Libro = M.Id_Libro
+    INNER JOIN Estado E ON E.Id_Estado = M.Id_Estado
+    WHERE M.Id_Usuario = @Id_Usuario
+      AND M.Tipo = 'Reserva'
+      AND M.Id_Estado <> 5
+    ORDER BY M.Fecha DESC;
+END
+
+
+CREATE PROCEDURE CancelarReserva
+    @Id_Movimiento INT
+AS
+BEGIN
+
+    UPDATE Movimiento
+    SET Id_Estado = 5
+    WHERE Id_Movimiento = @Id_Movimiento;
+
+    UPDATE Libro
+    SET Id_Estado = 1
+    WHERE Id_Libro = (SELECT Id_Libro FROM Movimiento WHERE Id_Movimiento = @Id_Movimiento);
+END
+
+------------------------------------------EJEMPLARES----------------------------------------------------
+
+CREATE PROCEDURE ObtenerEjemplares
+AS
+BEGIN
+    SELECT 
+        E.Id_Ejemplar,
+        E.CodigoEjemplar,
+        E.Estado,
+        E.Ubicacion,
+        E.Fecha_Registro,
+        E.Id_Libro,
+        L.Titulo
+    FROM Ejemplar E
+    INNER JOIN Libro L ON L.Id_Libro = E.Id_Libro;
+END
+
+
+CREATE PROCEDURE ObtenerEjemplarPorId
+    @Id INT
+AS
+BEGIN
+    SELECT 
+        E.Id_Ejemplar,
+        E.CodigoEjemplar,
+        E.Estado,
+        E.Ubicacion,
+        E.Fecha_Registro,
+        E.Id_Libro,
+        L.Titulo
+    FROM Ejemplar E
+    INNER JOIN Libro L ON L.Id_Libro = E.Id_Libro
+    WHERE E.Id_Ejemplar = @Id;
+END
+
+
+CREATE PROCEDURE RegistrarEjemplar
+    @CodigoEjemplar VARCHAR(20),
+    @Id_Libro INT,
+    @Estado VARCHAR(50),
+    @Ubicacion VARCHAR(100)
+AS
+BEGIN
+    INSERT INTO Ejemplar (CodigoEjemplar, Id_Libro, Estado, Ubicacion, Fecha_Registro)
+    VALUES (@CodigoEjemplar, @Id_Libro, @Estado, @Ubicacion, GETDATE());
+END
+
+CREATE PROCEDURE ActualizarEjemplar
+    @Id INT,
+    @CodigoEjemplar VARCHAR(20),
+    @Estado VARCHAR(50),
+    @Ubicacion VARCHAR(100),
+    @Id_Libro INT
+AS
+BEGIN
+    UPDATE Ejemplar SET 
+        CodigoEjemplar = @CodigoEjemplar,
+        Estado = @Estado,
+        Ubicacion = @Ubicacion,
+        Id_Libro = @Id_Libro
+    WHERE Id_Ejemplar = @Id;
+END
+
+CREATE PROCEDURE EliminarEjemplar
+    @Id INT
+AS
+BEGIN
+    DELETE FROM Ejemplar WHERE Id_Ejemplar = @Id;
+END
+
+---------------------------------ESTADOS SP-----------------------------------------------------------
+CREATE PROCEDURE ObtenerEstados
+AS
+BEGIN
+	SELECT Id_Estado, Estado FROM Estado
+END
+
+
+
+/******************************************************************************************************
+*/
+
 /* ****************************************************************************************************
    ********************************** PROCEDIMIENTOS ALMACENADOS P4 ***********************************
    **************************** RESERVAS, NOTIFICACIONES, COMENTARIOS, FAQ ****************************

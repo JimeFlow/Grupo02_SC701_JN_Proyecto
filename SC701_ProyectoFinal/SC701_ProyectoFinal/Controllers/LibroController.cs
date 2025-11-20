@@ -1,34 +1,49 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using SC701_ProyectoFinal.Models;
-using System.Text;
+using static System.Net.WebRequestMethods;
 
 namespace SC701_ProyectoFinal.Controllers
 {
     public class LibroController : Controller
     {
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IConfiguration _configuration;
 
-    public LibroController(IHttpClientFactory httpClientFactory)
+        public LibroController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory;
+            _configuration = configuration;
         }
 
         // Lista de libros
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var client = _httpClientFactory.CreateClient("ProyectoAPI");
-            var response = await client.GetAsync("Libro");
+            using (var client = _httpClientFactory.CreateClient())
+            {
+                var urlApi = _configuration["Valores:UrlAPI"] + "Libro/ListarLibros";
 
-            if (!response.IsSuccessStatusCode)
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
+
+                var respuesta = client.GetAsync(urlApi).Result;
+
+                if (respuesta.IsSuccessStatusCode)
+                {
+                    var libros = respuesta.Content.ReadFromJsonAsync<List<LibroModel>>().Result;
+                    return View(libros);
+                }
+
+                ViewBag.Mensaje = "No hay libros registrados";
                 return View(new List<LibroModel>());
-
-            var json = await response.Content.ReadAsStringAsync();
-            var libros = JsonConvert.DeserializeObject<List<LibroModel>>(json);
-            return View(libros);
+            }
         }
 
         // Crear libro - GET
+        [HttpGet]
         public async Task<IActionResult> Create()
         {
             ViewBag.Estados = await ObtenerEstadosAsync();
@@ -50,49 +65,54 @@ namespace SC701_ProyectoFinal.Controllers
             var estadoSeleccionado = estados.FirstOrDefault(e => e.Id_Estado == libro.Id_Estado);
             libro.Estado_Libro = estadoSeleccionado?.Estado;
 
-            var client = _httpClientFactory.CreateClient("ProyectoAPI");
-
-            var request = new LibroRequestModel
+            using (var client = _httpClientFactory.CreateClient())
             {
-                ISBN = libro.ISBN,
-                Titulo = libro.Titulo,
-                Autor = libro.Autor,
-                Anio = libro.Anio,
-                Imagen_URL = libro.Imagen_URL,
-                Id_Estado = libro.Id_Estado,
-                Estado_Libro = libro.Estado_Libro
-            };
+                var urlApi = _configuration["Valores:UrlAPI"] + "Libro/RegistrarLibro";
 
-            var json = JsonConvert.SerializeObject(request);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
 
-            var response = await client.PostAsync("Libro/RegistrarLibro", content);
+                var request = new LibroRequestModel
+                {
+                    ISBN = libro.ISBN,
+                    Titulo = libro.Titulo,
+                    Autor = libro.Autor,
+                    Anio = libro.Anio,
+                    Imagen_URL = libro.Imagen_URL,
+                    Id_Estado = libro.Id_Estado,
+                    Estado_Libro = libro.Estado_Libro
+                };
 
-            if (response.IsSuccessStatusCode)
-                return RedirectToAction(nameof(Index));
+                var respuesta = client.PostAsJsonAsync(urlApi, request).Result;
 
-            ModelState.AddModelError("", "No se pudo registrar el libro");
-            ViewBag.Estados = await ObtenerEstadosAsync();
-            return View(libro);
+                if (respuesta.IsSuccessStatusCode)
+                    return RedirectToAction("Index");
+
+                ViewBag.Mensaje = "No se pudo registrar el libro";
+                ViewBag.Estados = await ObtenerEstadosAsync();
+                return View(libro);
+            }
         }
 
         // Editar libro - GET
         public async Task<IActionResult> Edit(int id)
         {
-            var client = _httpClientFactory.CreateClient("ProyectoAPI");
-            var response = await client.GetAsync($"Libro/{id}");
+            using (var client = _httpClientFactory.CreateClient())
+            {
+                var urlApi = _configuration["Valores:UrlAPI"] + $"Libro/{id}";
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
 
-            if (!response.IsSuccessStatusCode)
-                return RedirectToAction(nameof(Index));
+                var respuesta = client.GetAsync(urlApi).Result;
 
-            var json = await response.Content.ReadAsStringAsync();
-            var libro = JsonConvert.DeserializeObject<LibroModel>(json);
+                if (!respuesta.IsSuccessStatusCode)
+                    return RedirectToAction("Index");
 
-            if (libro == null)
-                return NotFound();
+                var libro = respuesta.Content.ReadFromJsonAsync<LibroModel>().Result;
 
-            ViewBag.Estados = await ObtenerEstadosAsync();
-            return View(libro);
+                ViewBag.Estados = await ObtenerEstadosAsync();
+                return View(libro);
+            }
         }
 
         [HttpPost]
@@ -109,61 +129,73 @@ namespace SC701_ProyectoFinal.Controllers
             var estadoSeleccionado = estados.FirstOrDefault(e => e.Id_Estado == libro.Id_Estado);
             libro.Estado_Libro = estadoSeleccionado?.Estado;
 
-            var client = _httpClientFactory.CreateClient("ProyectoAPI");
-
-            var json = JsonConvert.SerializeObject(new LibroRequestModel
+            using (var client = _httpClientFactory.CreateClient())
             {
-                ISBN = libro.ISBN,
-                Titulo = libro.Titulo,
-                Autor = libro.Autor,
-                Anio = libro.Anio,
-                Imagen_URL = libro.Imagen_URL,
-                Id_Estado = libro.Id_Estado,
-                Estado_Libro = libro.Estado_Libro
-            });
+                var urlApi = _configuration["Valores:UrlAPI"] + $"Libro/ActualizarLibro/{id}";
 
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
 
-            var response = await client.PutAsync($"Libro/ActualizarLibro/{id}", content);
+                var request = new LibroRequestModel
+                {
+                    ISBN = libro.ISBN,
+                    Titulo = libro.Titulo,
+                    Autor = libro.Autor,
+                    Anio = libro.Anio,
+                    Imagen_URL = libro.Imagen_URL,
+                    Id_Estado = libro.Id_Estado,
+                    Estado_Libro = libro.Estado_Libro
+                };
 
-            if (response.IsSuccessStatusCode)
-                return RedirectToAction(nameof(Index));
+                var respuesta = client.PutAsJsonAsync(urlApi, request).Result;
 
-            ModelState.AddModelError("", "No se pudo actualizar el libro");
-            ViewBag.Estados = await ObtenerEstadosAsync();
-            return View(libro);
+                if (respuesta.IsSuccessStatusCode)
+                    return RedirectToAction("Index");
+
+                ViewBag.Mensaje = "No se pudo actualizar el libro";
+                ViewBag.Estados = await ObtenerEstadosAsync();
+                return View(libro);
+            }
         }
 
         // Eliminar libro - GET (confirmación)
         public async Task<IActionResult> Delete(int id)
         {
-            var client = _httpClientFactory.CreateClient("ProyectoAPI");
-            var response = await client.GetAsync($"Libro/{id}");
+            using (var client = _httpClientFactory.CreateClient())
+            {
+                var urlApi = _configuration["Valores:UrlAPI"] + $"Libro/{id}";
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
 
-            if (!response.IsSuccessStatusCode)
-                return RedirectToAction(nameof(Index));
+                var respuesta = client.GetAsync(urlApi).Result;
 
-            var json = await response.Content.ReadAsStringAsync();
-            var libro = JsonConvert.DeserializeObject<LibroModel>(json);
+                if (!respuesta.IsSuccessStatusCode)
+                    return RedirectToAction("Index");
 
-            if (libro == null)
-                return RedirectToAction(nameof(Index));
-
-            return View(libro);
+                var libro = respuesta.Content.ReadFromJsonAsync<LibroModel>().Result;
+                return View(libro);
+            }
         }
 
         // Eliminar libro - POST
         [HttpPost]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var client = _httpClientFactory.CreateClient("ProyectoAPI");
-            var response = await client.DeleteAsync($"Libro/EliminarLibro/{id}");
+            using (var client = _httpClientFactory.CreateClient())
+            {
+                var urlApi = _configuration["Valores:UrlAPI"] + $"Libro/EliminarLibro/{id}";
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
 
-            if (response.IsSuccessStatusCode)
-                return RedirectToAction(nameof(Index));
+                var respuesta = client.DeleteAsync(urlApi).Result;
 
-            ModelState.AddModelError("", "No se pudo eliminar el libro.");
-            return RedirectToAction(nameof(Delete), new {id});
+                if (respuesta.IsSuccessStatusCode)
+                    return RedirectToAction("Index");
+
+                TempData["ErrorMessage"] = "No se pudo eliminar el libro";
+                return RedirectToAction("Delete", new { id });
+            }
+
         }
 
         // Vista detalle libro con comentarios
@@ -219,52 +251,55 @@ namespace SC701_ProyectoFinal.Controllers
         // Obtener estados para select
         private async Task<List<EstadoModel>> ObtenerEstadosAsync()
         {
-            var client = _httpClientFactory.CreateClient("ProyectoAPI");
-            var response = await client.GetAsync("Estado");
+            using (var client = _httpClientFactory.CreateClient())
+            {
+                var urlApi = _configuration["Valores:UrlAPI"] + "Estado";
 
-            if (!response.IsSuccessStatusCode)
-                return new List<EstadoModel>();
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
 
-            var json = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<List<EstadoModel>>(json);
+                var respuesta = await client.GetAsync(urlApi);
+
+                if (!respuesta.IsSuccessStatusCode)
+                    return new List<EstadoModel>();
+
+                return await respuesta.Content.ReadFromJsonAsync<List<EstadoModel>>();
+            }
         }
 
-        // GET: Mostrar formulario de reserva
-        // Solo abre la vista de reservar
-        public async Task<IActionResult> Reservar(int id)
+        //get
+        public IActionResult Reservar(int id)
         {
-            var client = _httpClientFactory.CreateClient("ProyectoAPI");
-
-            // Traer los datos del libro desde el API
-            var response = await client.GetAsync($"Libro/{id}");
-            if (!response.IsSuccessStatusCode)
+            using (var client = _httpClientFactory.CreateClient())
             {
-                TempData["ErrorMessage"] = "No se pudo cargar el libro.";
-                return RedirectToAction(nameof(Index));
+                var urlApi = _configuration["Valores:UrlAPI"] + $"Libro/{id}";
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
+
+                var respuesta = client.GetAsync(urlApi).Result;
+
+                if (!respuesta.IsSuccessStatusCode)
+                    return RedirectToAction("Index");
+
+                var libro = respuesta.Content.ReadFromJsonAsync<LibroModel>().Result;
+
+                return View(new ReservaViewModel
+                {
+                    Id = libro.Id_Libro,
+                    Titulo = libro.Titulo
+                });
             }
-
-            var libro = await response.Content.ReadFromJsonAsync<LibroModel>();
-
-            // Crear el ViewModel para la vista de reserva
-            var reserva = new ReservaViewModel
-            {
-                Id = libro.Id_Libro,
-                Titulo = libro.Titulo,
-            };
-
-            return View(reserva); // Abre la vista Reservar.cshtml
 
         }
 
 
         // POST: Confirmar reserva
         [HttpPost]
-        public async Task<IActionResult> Reservar(ReservaViewModel reserva)
+        public IActionResult Reservar(ReservaViewModel reserva)
         {
             if (!ModelState.IsValid)
                 return View(reserva);
 
-            var client = _httpClientFactory.CreateClient("ProyectoAPI");
 
             var idUsuario = HttpContext.Session.GetInt32("Id_Usuario");
             if (idUsuario == null)
@@ -273,29 +308,33 @@ namespace SC701_ProyectoFinal.Controllers
                 return RedirectToAction("Login", "Usuario");
             }
 
-            var request = new ReservaRequestModel
+            using (var client = _httpClientFactory.CreateClient())
             {
-                Id_Libro = reserva.Id,
-                Id_Usuario = idUsuario.Value,
-                Tipo = "RESERVA",
-                Fecha = reserva.FechaReserva,
-                Fecha_Vencimiento = reserva.FechaVencimiento,
-                Estado = 1
-            };
+                var urlApi = _configuration["Valores:UrlAPI"] + "Libro/ReservarLibro";
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
 
-            var json = JsonConvert.SerializeObject(request);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var request = new ReservaRequestModel
+                {
+                    Id_Libro = reserva.Id,
+                    Id_Usuario = idUsuario.Value,
+                    Tipo = "RESERVA",
+                    Fecha = reserva.FechaReserva,
+                    Fecha_Vencimiento = reserva.FechaVencimiento,
+                    Estado = 1
+                };
 
-            var response = await client.PostAsync("Libro/ReservarLibro", content);
+                var respuesta = client.PostAsJsonAsync(urlApi, request).Result;
 
-            if (response.IsSuccessStatusCode)
-            {
-                TempData["SuccessMessage"] = "Reserva creada exitosamente.";
-                return RedirectToAction(nameof(Index));
+                if (respuesta.IsSuccessStatusCode)
+                {
+                    TempData["SuccessMessage"] = "Reserva creada correctamente";
+                    return RedirectToAction("Index");
+                }
+
+                TempData["ErrorMessage"] = "No se pudo completar la reserva";
+                return View(reserva);
             }
-
-            TempData["ErrorMessage"] = "No se pudo crear la reserva.";
-            return View(reserva);
         }
     }
 

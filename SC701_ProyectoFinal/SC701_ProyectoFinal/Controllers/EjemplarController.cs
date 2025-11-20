@@ -1,48 +1,65 @@
-﻿using System.Text;
+﻿using System.Net.Http.Headers;
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 using SC701_ProyectoFinal.Models;
+using static System.Net.WebRequestMethods;
 
 namespace SC701_ProyectoFinal.Controllers
 {
     public class EjemplarController : Controller
     {
 
-        private readonly HttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IConfiguration _configuration;
 
-        public EjemplarController()
+        public EjemplarController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
-            _httpClient = new HttpClient();
-            _httpClient.BaseAddress = new Uri("https://localhost:7028/api/");
+            _httpClientFactory = httpClientFactory;
+            _configuration = configuration;            
         }
+
 
         public async Task<IActionResult> Index()
         {
-            var response = await _httpClient.GetAsync("Ejemplar");
+            using (var client = _httpClientFactory.CreateClient())
+            {
+                var urlApi = _configuration["Valores:UrlAPI"] + "Ejemplar/ObtenerEjemplares";
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
 
-            if (!response.IsSuccessStatusCode)
+                var respuesta = await client.GetAsync(urlApi);
+
+                if (respuesta.IsSuccessStatusCode)
+                {
+                    var datos = await respuesta.Content.ReadFromJsonAsync<List<EjemplarModel>>();
+                    return View(datos);
+                }
+
+                ViewBag.Mensaje = "No se encontraron ejemplares";
                 return View(new List<EjemplarModel>());
-
-            var json = await response.Content.ReadAsStringAsync();
-            var lista = JsonConvert.DeserializeObject<List<EjemplarModel>>(json);
-
-            return View(lista);
+            }
         }
 
 
         private async Task CargarLibros()
         {
-            var response = await _httpClient.GetAsync("Libro");
-            if (response.IsSuccessStatusCode)
+            using (var client = _httpClientFactory.CreateClient())
             {
-                var json = await response.Content.ReadAsStringAsync();
-                var libros = JsonConvert.DeserializeObject<List<LibroModel>>(json);
+                var urlApi = _configuration["Valores:UrlAPI"] + "Libro/ListarLibros";
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
 
-                ViewBag.Libros = new SelectList(libros, "Id_Libro", "Titulo");
-            }
-            else
-            {
+                var respuesta = await client.GetAsync(urlApi);
+
+                if (respuesta.IsSuccessStatusCode)
+                {
+                    var datos = await respuesta.Content.ReadFromJsonAsync<List<LibroModel>>();
+                    ViewBag.Libros = new SelectList(datos, "Id_Libro", "Titulo");
+                    return;
+                }
+
                 ViewBag.Libros = new SelectList(new List<LibroModel>(), "Id_Libro", "Titulo");
             }
         }
@@ -57,120 +74,145 @@ namespace SC701_ProyectoFinal.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(EjemplarModel ejemplar)
         {
-            Console.WriteLine("Entró Create Ejemplar POST");
             if (!ModelState.IsValid)
             {
                 await CargarLibros();
                 return View(ejemplar);
             }
-            var request = new EjemplarRequestModel
+
+            using (var client = _httpClientFactory.CreateClient())
             {
-                CodigoEjemplar = ejemplar.CodigoEjemplar,
-                Id_Libro = ejemplar.Id_Libro,
-                Estado = ejemplar.Estado,
-                Ubicacion = ejemplar.Ubicacion
-            };
+                var urlApi = _configuration["Valores:UrlAPI"] + "Ejemplar/RegistrarEjemplar";
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
 
-            var json = JsonConvert.SerializeObject(request);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var request = new EjemplarRequestModel
+                {
+                    CodigoEjemplar = ejemplar.CodigoEjemplar,
+                    Id_Libro = ejemplar.Id_Libro,
+                    Estado = ejemplar.Estado,
+                    Ubicacion = ejemplar.Ubicacion
+                };
 
-            var response = await _httpClient.PostAsync("Ejemplar", content);
+                var respuesta = await client.PostAsJsonAsync(urlApi, request);
 
-            if (response.IsSuccessStatusCode)
-                return RedirectToAction(nameof(Index));
+                if (respuesta.IsSuccessStatusCode)
+                    return RedirectToAction("Index");
 
-            ModelState.AddModelError("", "No se pudo registrar el ejemplar");
-            await CargarLibros();
-            return View(ejemplar);
+                ModelState.AddModelError("", "No se pudo registrar el ejemplar.");
+                await CargarLibros();
+                return View(ejemplar);
+            }
         }
 
         public async Task<IActionResult> Edit(int id)
         {
-            var response = await _httpClient.GetAsync($"Ejemplar/{id}");
+            using (var client = _httpClientFactory.CreateClient())
+            {
+                var urlApi = _configuration["Valores:UrlAPI"] + "Ejemplar/" + id;
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
 
-            if (!response.IsSuccessStatusCode)
-                return RedirectToAction(nameof(Index));
+                var respuesta = await client.GetAsync(urlApi);
 
-            var json = await response.Content.ReadAsStringAsync();
-            var ejemplar = JsonConvert.DeserializeObject<EjemplarModel>(json);
+                if (!respuesta.IsSuccessStatusCode)
+                    return RedirectToAction("Index");
 
-            if (ejemplar == null)
-                return NotFound();
-            
-            await CargarLibros();
-            return View(ejemplar);
+                var ejemplar = await respuesta.Content.ReadFromJsonAsync<EjemplarModel>();
+
+                if (ejemplar == null)
+                    return NotFound();
+
+                await CargarLibros();
+                return View(ejemplar);
+            }
         }
 
 
         [HttpPost]
         public async Task<IActionResult> Edit(int id, EjemplarModel ejemplar)
 
-        { 
-
+        {
             if (!ModelState.IsValid)
             {
                 await CargarLibros();
                 return View(ejemplar);
             }
 
+            using (var client = _httpClientFactory.CreateClient())
+            {
+                var urlApi = _configuration["Valores:UrlAPI"] + "Ejemplar/" + ejemplar.Id_Ejemplar;
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
+
                 var request = new EjemplarRequestModel
-                {       
+                {
                     CodigoEjemplar = ejemplar.CodigoEjemplar,
                     Id_Libro = ejemplar.Id_Libro,
                     Estado = ejemplar.Estado,
                     Ubicacion = ejemplar.Ubicacion
                 };
-        
-                var json = JsonConvert.SerializeObject(request);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PutAsync($"Ejemplar/{id}", content);
+                var respuesta = await client.PutAsJsonAsync(urlApi, request);
 
-                if (response.IsSuccessStatusCode)
-                    return RedirectToAction(nameof(Index));
+                if (respuesta.IsSuccessStatusCode)
+                    return RedirectToAction("Index");
 
-                ModelState.AddModelError("", "⚠️ No se pudo actualizar el ejemplar.");
+                ModelState.AddModelError("", "No se pudo actualizar el ejemplar.");
                 await CargarLibros();
                 return View(ejemplar);
+            }
         }
 
 
         public async Task<IActionResult> Delete(int id)
         {
-            var response = await _httpClient.GetAsync($"Ejemplar/{id}");
+            using (var client = _httpClientFactory.CreateClient())
+            {
+                var urlApi = _configuration["Valores:UrlAPI"] + "Ejemplar/" + id;
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
 
-            if (!response.IsSuccessStatusCode)
-                return RedirectToAction(nameof(Index));
+                var respuesta = await client.GetAsync(urlApi);
 
-            var json = await response.Content.ReadAsStringAsync();
-            var ejemplar = JsonConvert.DeserializeObject<EjemplarModel>(json);
+                if (!respuesta.IsSuccessStatusCode)
+                    return RedirectToAction("Index");
 
-            if (ejemplar == null)
-                return NotFound();
+                var ejemplar = await respuesta.Content.ReadFromJsonAsync<EjemplarModel>();
 
-            return View("Delete", ejemplar);
+                if (ejemplar == null)
+                    return NotFound();
+
+                return View("Delete", ejemplar);
+            }
         }
 
         [HttpPost]
         public async Task<IActionResult> DeleteConfirmed(int Id_Ejemplar)
         {
-            var response = await _httpClient.DeleteAsync($"Ejemplar/{Id_Ejemplar}");
-
-            if (response.IsSuccessStatusCode)
-                return RedirectToAction(nameof(Index));
-
-            var getResponse = await _httpClient.GetAsync($"Ejemplar/{Id_Ejemplar}");
-            EjemplarModel ejemplar = null;
-
-            if (getResponse.IsSuccessStatusCode)
-
+            using (var client = _httpClientFactory.CreateClient())
             {
-                var getJson = await getResponse.Content.ReadAsStringAsync();
-                ejemplar = JsonConvert.DeserializeObject<EjemplarModel>(getJson);
-            }
+                var urlApi = _configuration["Valores:UrlAPI"] + "Ejemplar/" + Id_Ejemplar;
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
 
-            ModelState.AddModelError("", "⚠️ No se pudo eliminar el ejemplar.");
-            return View("Delete", ejemplar);
+                var respuesta = await client.DeleteAsync(urlApi);
+
+                if (respuesta.IsSuccessStatusCode)
+                    return RedirectToAction("Index");
+
+                // cargar nuevamente el ejemplar para mostrarlo en la vista
+                var getResponse = await client.GetAsync(urlApi);
+                EjemplarModel ejemplar = null;
+
+                if (getResponse.IsSuccessStatusCode)
+                {
+                    ejemplar = await getResponse.Content.ReadFromJsonAsync<EjemplarModel>();
+                }
+
+                ModelState.AddModelError("", "No se pudo eliminar el ejemplar.");
+                return View("Delete", ejemplar);
+            }
         }
     }
 }

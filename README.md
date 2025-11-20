@@ -19,11 +19,11 @@
 
 ## 👥 Integrantes del Grupo 02
 
-| Nombre             | Carné       | Correo / GitHub             |
-|--------------------|-------------|-----------------------------|
-| Jimena Flores      | FH23014559  | jflores00335@ufide.ac.cr    |
-| Josué Mendez       |             | jmendez50979@ufide.ac.cr    |
-| Amanda F. Valverde |             | avalverde50252@ufide.ac.cr  |
+| Nombre           | Carné / Cédula      | Correo / GitHub             |
+|------------------|-------------|-----------------------------|
+| Jimena Flores    | FH23014559  | jflores00335@ufide.ac.cr    |
+| Josué Mendez     | FI23029527  | jmendez50979@ufide.ac.cr    |
+| Amanda Valverde  | 3 0535 0252  | avalverde50252@ufide.ac.cr  |
 
 ---
 

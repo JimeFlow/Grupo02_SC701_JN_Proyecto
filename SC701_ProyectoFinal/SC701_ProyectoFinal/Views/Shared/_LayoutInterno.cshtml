@@ -62,13 +62,7 @@
 						<a class="nav-link" href="~/Informacion">Información</a>
 					</li>
 
-					@if (id_Rol == 1 || id_Rol == 2)
-					{
-						<li class="nav-item">
-						<a class="nav-link" asp-controller="Libro" asp-action="Index">Catálogo</a>
-						</li>
-
-					}
+					
 
 					@if (id_Rol == 1)
 						{
@@ -89,6 +83,9 @@
 					@if (id_Rol == 2)
 
 					{
+						<li class="nav-item">
+							<a class="nav-link" asp-controller="Libro" asp-action="Index">Catálogo</a>
+						</li>
 						<li class="nav-item">
 							<a class="nav-link" href="@Url.Action("MisReservas", "Reserva")">Reservaciones</a>
 						</li>

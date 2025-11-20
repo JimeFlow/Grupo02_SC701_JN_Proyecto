@@ -163,12 +163,12 @@ namespace SC701_ProyectoFinal.Controllers
                 return RedirectToAction(nameof(Index));
 
             ModelState.AddModelError("", "No se pudo eliminar el libro.");
-            return RedirectToAction(nameof(Delete), new { id });
+            return RedirectToAction(nameof(Delete), new {id});
         }
 
         // Vista detalle libro con comentarios
         [HttpGet]
-        public async Task<IActionResult> DetalleLibro(int id)
+        public async Task<IActionResult> Detalle(int id)
         {
             var client = _httpClientFactory.CreateClient("ProyectoAPI");
 
@@ -248,9 +248,8 @@ namespace SC701_ProyectoFinal.Controllers
             // Crear el ViewModel para la vista de reserva
             var reserva = new ReservaViewModel
             {
-                Id_Libro = libro.Id_Libro,
+                Id = libro.Id_Libro,
                 Titulo = libro.Titulo,
-                Id_Usuario = 1 // Aquí puedes tomar el ID real del usuario logueado
             };
 
             return View(reserva); // Abre la vista Reservar.cshtml
@@ -267,17 +266,20 @@ namespace SC701_ProyectoFinal.Controllers
 
             var client = _httpClientFactory.CreateClient("ProyectoAPI");
 
-            // Usuario fijo si no viene
-            if (reserva.Id_Usuario <= 0)
-                reserva.Id_Usuario = 1;
+            var idUsuario = HttpContext.Session.GetInt32("Id_Usuario");
+            if (idUsuario == null)
+            {
+                TempData["ErrorMessage"] = "Debe iniciar sesión para reservar un libro.";
+                return RedirectToAction("Login", "Usuario");
+            }
 
             var request = new ReservaRequestModel
             {
-                Id_Libro = reserva.Id_Libro,
-                Id_Usuario = reserva.Id_Usuario,
+                Id_Libro = reserva.Id,
+                Id_Usuario = idUsuario.Value,
                 Tipo = "RESERVA",
-                Fecha = reserva.FechaInicio,
-                Fecha_Vencimiento = reserva.FechaFin,
+                Fecha = reserva.FechaReserva,
+                Fecha_Vencimiento = reserva.FechaVencimiento,
                 Estado = 1
             };
 

@@ -1,31 +1,72 @@
 ﻿@model IEnumerable<SC701_ProyectoFinal.Models.ReservaViewModel>
-@* @model List<SC701_ProyectoFinal.Models.ReservaViewModel> *@
+
 
 @{
     ViewData["Title"] = "MisReservas";
     Layout = "~/Views/Shared/_LayoutInterno.cshtml";
 }
 
-<h2>Mis Reservas</h2>
-<table class="table">
-    <thead>
+<div class="container mt-4">
+    <h2 class="mb-4 text-center"> 📘 Mis Reservas</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info text-center">
+        No tienes reservas en este momento.
+    </div>
+}
+else
+
+{
+		<table class="table table-hover shadow-sm">
+    <thead class="table-dark text-center">
         <tr>
+            <th>Imagen</th>
             <th>Libro</th>
             <th>Fecha Reserva</th>
-            <th>Fecha de Expiración</th>
+            <th>Fecha Vencimiento</th>
             <th>Estado</th>
+            <th>Acciones</th>
+			
         </tr>
     </thead>
     <tbody>
-        @foreach (var reserva in Model)
+        @foreach (var r in Model)
         {
-            <tr>
-                <td>@reserva.Titulo</td>
-                <td>@reserva.FechaInicio.ToShortDateString()</td>
-                <td>@reserva.FechaFin.ToShortDateString()</td>
-                <td>@reserva.Estado_Libro</td>
+            <tr class="align-middle text-center">
+            <td>
+		                <img src="@r.Imagen" width="50" height="70" class="rounded shadow-sm"/>
+            </td>
+                <td>@r.Titulo</td>
+                <td>@r.FechaReserva.ToShortDateString()</td>
+                <td>@r.FechaVencimiento.ToShortDateString()</td>
+                <td>
+                    <span class="badge bg-primary">@r.Estado</span>
+                </td>
+                        
+             <td>
+                   <a asp-controller="Libro"
+                    asp-action="Detalle"
+                    asp-route-id="@r.LibroId"
+                    class="btn btn-info btn-sm me-1">
+                    Ver libro
+             </a>
+
+
+        
+        @if (r.Estado != "Cancelada")
+        {
+                    <a asp-action="CancelarReserva" 
+                     asp-route-id="@r.Id" 
+                     class="btn btn-danger btn-sm">
+                     Cancelar
+							</a>
+        }
+                </td>
             </tr>
         }
     </tbody>
-</table>
+        </table>
+}
 
+	</div>

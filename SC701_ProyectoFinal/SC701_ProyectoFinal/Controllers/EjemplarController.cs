@@ -148,18 +148,18 @@ namespace SC701_ProyectoFinal.Controllers
             if (ejemplar == null)
                 return NotFound();
 
-            return View("Delete");
+            return View("Delete", ejemplar);
         }
 
         [HttpPost]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int Id_Ejemplar)
         {
-            var response = await _httpClient.DeleteAsync($"Ejemplar/{id}");
+            var response = await _httpClient.DeleteAsync($"Ejemplar/{Id_Ejemplar}");
 
             if (response.IsSuccessStatusCode)
                 return RedirectToAction(nameof(Index));
 
-            var getResponse = await _httpClient.GetAsync($"Ejemplar/{id}");
+            var getResponse = await _httpClient.GetAsync($"Ejemplar/{Id_Ejemplar}");
             EjemplarModel ejemplar = null;
 
             if (getResponse.IsSuccessStatusCode)

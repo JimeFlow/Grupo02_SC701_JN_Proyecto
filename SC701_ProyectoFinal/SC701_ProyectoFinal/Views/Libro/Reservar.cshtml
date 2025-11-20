@@ -8,7 +8,7 @@
 <div class="container mt-5">
     <h2 class="text-center mb-4">📌 Reservar Libro</h2>
 
-    ```
+
     @if (TempData["ErrorMessage"] != null)
     {
         <div class="alert alert-danger text-center">@TempData["ErrorMessage"]</div>
@@ -23,19 +23,18 @@
             <h5 class="card-title text-center">@Model.Titulo</h5>
 
             <form asp-action="Reservar" method="post">
-                <input type="hidden" asp-for="Id_Libro" />
-                <input type="hidden" asp-for="Id_Usuario" />
+                <input type="hidden" asp-for="Id" />
 
                 <div class="mb-3">
-                    <label asp-for="FechaInicio" class="form-label">Fecha de inicio</label>
-                    <input asp-for="FechaInicio" type="date" class="form-control" />
-                    <span asp-validation-for="FechaInicio" class="text-danger"></span>
+                    <label asp-for="FechaReserva" class="form-label">Fecha de inicio</label>
+                    <input asp-for="FechaReserva" type="date" class="form-control" />
+                    <span asp-validation-for="FechaReserva" class="text-danger"></span>
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="FechaFin" class="form-label">Fecha de vencimiento</label>
-                    <input asp-for="FechaFin" type="date" class="form-control" />
-                    <span asp-validation-for="FechaFin" class="text-danger"></span>
+                    <label asp-for="FechaVencimiento" class="form-label">Fecha de vencimiento</label>
+                    <input asp-for="FechaVencimiento" type="date" class="form-control" />
+                    <span asp-validation-for="FechaVencimiento" class="text-danger"></span>
                 </div>
 
                 <div class="d-grid gap-2">

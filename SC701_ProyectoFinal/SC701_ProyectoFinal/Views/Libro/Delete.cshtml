@@ -43,7 +43,7 @@
         </dl>
 
         <form asp-action="DeleteConfirmed" method="post">
-            <input type="hidden" asp-for="Id_Libro" />
+            <input type="hidden" name="id" value="@Model.Id_Libro" />
 
             <div class="text-center mt-4">
                 <button type="submit" class="btn btn-danger px-4">Eliminar definitivamente</button>

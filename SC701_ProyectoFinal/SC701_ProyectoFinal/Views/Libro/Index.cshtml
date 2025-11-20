@@ -2,14 +2,21 @@
 
 @{
     ViewData["Title"] = "Catálogo de Libros";
+    var rol = Context.Session.GetInt32("Id_Rol");
 }
 
 <div class="container mt-5">
     <h2 class="text-center mb-4">📚 Catálogo de Libros</h2>
 
-    <div class="text-end mb-3">
-        <a asp-action="Create" class="btn btn-success">➕ Agregar Libro</a>
-    </div>
+    @* SOLO ADMINISTRADOR *@
+    @if (rol == 1)
+    {
+
+        <div class="text-end mb-3">
+            <a asp-action="Create" class="btn btn-success">➕ Agregar Libro</a>
+        </div>
+
+    }
 
     @if (Model != null && Model.Any())
     {
@@ -47,11 +54,21 @@
                             }
                         </td>
                         <td class="text-center">
+
+                            @* SOLO ADMINISTRADOR *@
+                            @if (rol == 1)
+                            {
                             <a asp-action="Edit" asp-route-id="@libro.Id_Libro" class="btn btn-warning btn-sm">✏️ Editar</a>
                             <a asp-action="Delete" asp-route-id="@libro.Id_Libro" class="btn btn-danger btn-sm">🗑️ Eliminar</a>
-                            <br />
-                            @* Ahora solo redirige a la vista de reserva *@
-                            <a asp-action="Reservar" asp-route-id="@libro.Id_Libro" class="btn btn-success btn-sm">ℹ️ Ver detalles</a>
+                            }
+
+                             @* SOLO CLIENTE *@
+                            @if (rol == 2)
+                            {
+                                <a asp-action="Reservar" asp-route-id="@libro.Id_Libro" class="btn btn-success btn-sm">
+                                    📘 Reservar
+                                </a>
+                            }
                         </td>
                     </tr>
                 }

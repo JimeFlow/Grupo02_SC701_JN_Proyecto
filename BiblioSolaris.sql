@@ -68,9 +68,14 @@ CREATE TABLE Ejemplar (
     Id_Libro INT NOT NULL,
     Estado VARCHAR(50) NOT NULL DEFAULT('Disponible'),
     Ubicacion VARCHAR(100) NULL,
-    Fecha_Registro DATETIME2 DEFAULT(GETDATE()),
-    FOREIGN KEY (Id_Libro) REFERENCES Libro(Id_Libro)
+    Fecha_Registro DATETIME2 DEFAULT(GETDATE())
 );
+
+ALTER TABLE Ejemplar
+ADD CONSTRAINT FK_Ejemplar_Libro
+FOREIGN KEY (Id_Libro)
+REFERENCES Libro(Id_Libro)
+ON DELETE CASCADE;
 -------------------------------------------------------------------------------------------------------
 
 CREATE TABLE Libro_Etiquetas( --- NUEVA

@@ -2,6 +2,12 @@
    *********************************** CREACION DE LA BASE DE DATOS ***********************************
    **************************************************************************************************** */
 
+   /*
+   PARA EL PROFESOR: PARA UTILIZAR LAS FUNCIONALIDADES DE ADMINISTRADOR, SI TIENE QUE REGISTRARSE NORMAL
+   Y CAMBIARSE EL ROL AQUI DESDE LA BD, YA QUE NO SE PUEDE CREAR UN USUARIO AQUI POR EL TEMA DE LA ENCRIPTACION
+   DE LA CONTRASEÑA, SIMPLEMENTE PASAR EL ROL A 1 (ADMIN) EN VEZ DE 2 (CLIENTE Y DEFAULT AL REGISTRARSE)
+   */
+
 -- Eliminación y recreación de la base de datos
 USE master;
 IF DB_ID('BiblioSolaris') IS NOT NULL

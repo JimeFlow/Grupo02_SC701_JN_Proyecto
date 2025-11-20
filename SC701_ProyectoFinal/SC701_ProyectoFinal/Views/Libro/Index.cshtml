@@ -4,76 +4,136 @@
     ViewData["Title"] = "Catálogo de Libros";
     var rol = Context.Session.GetInt32("Id_Rol");
 }
+<style>
+    .card-img-fixed {
+        width: 100%;
+        height: 280px;
+        object-fit: cover;
+        border-radius: 6px;
+    }
+</style>
 
 <div class="container mt-5">
-    <h2 class="text-center mb-4">📚 Catálogo de Libros</h2>
+    <h2 class="text-center mb-4">Catálogo de Libros</h2>
 
     @* SOLO ADMINISTRADOR *@
     @if (rol == 1)
     {
 
         <div class="text-end mb-3">
-            <a asp-action="Create" class="btn btn-success">➕ Agregar Libro</a>
+            <a asp-action="Create" class="btn btn-success">Agregar Libro</a>
         </div>
 
     }
 
     @if (Model != null && Model.Any())
     {
-        <table class="table table-bordered table-striped align-middle shadow-sm">
-            <thead class="table-primary text-center">
-                <tr>
-                    <th>ID</th>
-                    <th>Título</th>
-                    <th>Autor</th>
-                    <th>ISBN</th>
-                    <th>Año</th>
-                    <th>Estado</th>
-                    <th>Imagen</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var libro in Model)
-                {
+        @if (rol == 1)
+        {
+            <table class="table table-bordered table-striped align-middle shadow-sm">
+                <thead class="table-primary text-center">
                     <tr>
-                        <td class="text-center">@libro.Id_Libro</td>
-                        <td>@libro.Titulo</td>
-                        <td>@libro.Autor</td>
-                        <td>@libro.ISBN</td>
-                        <td class="text-center">@libro.Anio</td>
-                        <td>@libro.Estado_Libro</td>
-                        <td class="text-center">
-                            @if (!string.IsNullOrEmpty(libro.Imagen_URL))
-                            {
-                                <img src="@libro.Imagen_URL" alt="Portada" width="50" height="70" class="rounded shadow-sm" />
-                            }
-                            else
-                            {
-                                <span class="text-muted">Sin imagen</span>
-                            }
-                        </td>
-                        <td class="text-center">
-
-                            @* SOLO ADMINISTRADOR *@
-                            @if (rol == 1)
-                            {
-                            <a asp-action="Edit" asp-route-id="@libro.Id_Libro" class="btn btn-warning btn-sm">✏️ Editar</a>
-                            <a asp-action="Delete" asp-route-id="@libro.Id_Libro" class="btn btn-danger btn-sm">🗑️ Eliminar</a>
-                            }
-
-                             @* SOLO CLIENTE *@
-                            @if (rol == 2)
-                            {
-                                <a asp-action="Reservar" asp-route-id="@libro.Id_Libro" class="btn btn-success btn-sm">
-                                    📘 Reservar
-                                </a>
-                            }
-                        </td>
+                        <th>ID</th>
+                        <th>Título</th>
+                        <th>Autor</th>
+                        <th>ISBN</th>
+                        <th>Año</th>
+                        <th>Estado</th>
+                        <th>Imagen</th>
+                        <th>Acciones</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var libro in Model)
+                    {
+                        <tr>
+                            <td class="text-center">@libro.Id_Libro</td>
+                            <td>@libro.Titulo</td>
+                            <td>@libro.Autor</td>
+                            <td>@libro.ISBN</td>
+                            <td class="text-center">@libro.Anio</td>
+                            <td>@libro.Estado_Libro</td>
+                            <td class="text-center">
+                                @if (!string.IsNullOrEmpty(libro.Imagen_URL))
+                                {
+                                    <img src="@libro.Imagen_URL" alt="Portada" width="50" height="70" class="rounded shadow-sm" />
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Sin imagen</span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                <a asp-action="Edit" asp-route-id="@libro.Id_Libro" class="btn btn-warning btn-sm">Editar</a>
+                                <a asp-action="Delete" asp-route-id="@libro.Id_Libro" class="btn btn-danger btn-sm">Eliminar</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <!-- cards cliente = que homepage -->
+            <section class="py-0" id="ecommerceProducts">
+                <div class="container-fluid px-4">
+                    <div class="row mb-5">
+
+                        @foreach (var libro in Model)
+                        {
+                            <div class="col-sm-6 col-md-4 col-lg-3 mt-4">
+                                <div class="row g-0">
+
+                                    
+                                    <div class="col-12 overflow-hidden rounded">
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="swiper theme-slider swiper-theme"
+                                                     data-swiper='{"loop":true,"effect":"fade",
+                                                                     "pagination":{"el":".swiper-pagination","clickable":true,"type":"bullets"}}'>
+
+                                                    <div class="swiper-wrapper">
+                                                        <div class="swiper-slide">
+                                                            <a href="#">
+                                                                <img class="card-img-fixed"
+                                                                     src="@libro.Imagen_URL"
+                                                                     alt="@libro.Titulo" />
+                                                            </a>
+                                                        </div>
+                                                    </div>
+
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    
+                                    <a class="col-12 mt-2">
+                                        <h5 >@libro.ISBN - @libro.Titulo</h5>
+                                    </a>
+
+                                    <div class="col-12">
+                                        <h6 class="fw-normal mb-2">Autor: @libro.Autor</h6>
+                                    </div>
+
+                                    <!-- btn reservar, solo cliente -->
+                                    <div class="col-12 mt-2 text-center">
+                                        <a asp-action="Reservar"
+                                           asp-route-id="@libro.Id_Libro"
+                                           class="btn btn-success btn-sm w-75">
+                                            Reservar
+                                        </a>
+                                    </div>
+
+                                </div>
+                            </div>
+                        }
+
+                    </div>
+                </div>
+            </section>
+        }
     }
     else
     {

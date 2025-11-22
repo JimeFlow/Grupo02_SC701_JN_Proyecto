@@ -53,18 +53,17 @@ CREATE TABLE Categoria(
     Tipo VARCHAR(75) UNIQUE
 );
 
-CREATE TABLE Autor(
-    Id_Autor INT IDENTITY(1,1) PRIMARY KEY,
-    Nombre VARCHAR(100),
-    Apellidos VARCHAR(100),
-    Nacionalidad VARCHAR(50),
-    Fecha_Nacimiento DATE,
-    Id_Estado INT,
-    FOREIGN KEY (Id_Estado) REFERENCES Estado(Id_Estado)
-);
+--CREATE TABLE Autor(
+--    Id_Autor INT IDENTITY(1,1) PRIMARY KEY,
+--    Nombre VARCHAR(100),
+--    Apellidos VARCHAR(100),
+--    Nacionalidad VARCHAR(50),
+--    Fecha_Nacimiento DATE,
+--    Id_Estado INT,
+--    FOREIGN KEY (Id_Estado) REFERENCES Estado(Id_Estado)
+--);
 
 -- Campo para Imagen, ya sea que se guarde en la BD o como URL en el proyecto
--- Se puede normalizar creando una TABLA DE AUTOR y una FK aqui
 CREATE TABLE Libro(
     Id_Libro INT IDENTITY(1,1) PRIMARY KEY,
     ISBN VARCHAR(20) UNIQUE,
@@ -77,11 +76,14 @@ CREATE TABLE Libro(
     FOREIGN KEY (Id_Estado) REFERENCES Estado(Id_Estado)
 );
 
+ALTER TABLE Libro ADD Descripcion VARCHAR(150);
+
 -- EJEMPLAR -- NUEVA
 CREATE TABLE Ejemplar (
     Id_Ejemplar INT IDENTITY(1,1) PRIMARY KEY,
     CodigoEjemplar VARCHAR(20) UNIQUE NOT NULL,
     Id_Libro INT NOT NULL,
+	Cantidad INT, --CANTIDAD
     Estado VARCHAR(50) NOT NULL DEFAULT('Disponible'),
     Ubicacion VARCHAR(100) NULL,
     Fecha_Registro DATETIME2 DEFAULT(GETDATE())
@@ -479,12 +481,13 @@ END
 ****************************************LIBROS SP****************************************************** */
 
 -----------------------------------------LISTAR---------------------------------------------------------
-CREATE PROCEDURE ListarLibros
+ALTER PROCEDURE ListarLibros
 AS
 BEGIN
     SELECT 
         Id_Libro,
         ISBN,
+		Descripcion,
         Estado_Libro,
         Titulo,
         Autor,
@@ -495,9 +498,10 @@ BEGIN
 END;
 
 --------------------------------------------REGISTRAR----------------------------------------------
-CREATE PROCEDURE RegistrarLibro
+ALTER PROCEDURE RegistrarLibro
     @ISBN VARCHAR(20),
     @Estado_Libro VARCHAR(100),
+	@Descripcion VARCHAR(150),
     @Titulo VARCHAR(200),
     @Autor VARCHAR(150),
     @Anio INT,
@@ -505,15 +509,16 @@ CREATE PROCEDURE RegistrarLibro
     @Id_Estado INT
 AS
 BEGIN
-    INSERT INTO Libro(ISBN, Estado_Libro, Titulo, Autor, Anio, Imagen_URL, Id_Estado)
-    VALUES (@ISBN, @Estado_Libro, @Titulo, @Autor, @Anio, @Imagen_URL, @Id_Estado);
+    INSERT INTO Libro(ISBN, Estado_Libro, Titulo, Descripcion, Autor, Anio, Imagen_URL, Id_Estado)
+    VALUES (@ISBN, @Estado_Libro, @Titulo, @Descripcion, @Autor, @Anio, @Imagen_URL, @Id_Estado);
 END;
 
 ------------------------------------------ACTUALIZAR----------------------------------------------
-CREATE PROCEDURE ActualizarLibro
+ALTER PROCEDURE ActualizarLibro
     @Id_Libro INT,
     @ISBN VARCHAR(20),
     @Estado_Libro VARCHAR(100),
+	@Descripcion VARCHAR(150),
     @Titulo VARCHAR(200),
     @Autor VARCHAR(150),
     @Anio INT,
@@ -525,6 +530,7 @@ BEGIN
     SET 
         ISBN = @ISBN,
         Estado_Libro = @Estado_Libro,
+		Descripcion = @Descripcion,
         Titulo = @Titulo,
         Autor = @Autor,
         Anio = @Anio,
@@ -552,6 +558,7 @@ BEGIN
         ISBN,
         Estado_Libro,
         Titulo,
+		Descripcion,
         Autor,
         Anio,
         Imagen_URL,

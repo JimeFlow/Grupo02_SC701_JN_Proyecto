@@ -47,6 +47,7 @@ namespace ProyectoAPI.Controllers
 
                 parametros.Add("@ISBN", libro.ISBN);
                 parametros.Add("@Estado_Libro", libro.Estado_Libro);
+                parametros.Add("@Descripcion", libro.Descripcion);
                 parametros.Add("@Titulo", libro.Titulo);
                 parametros.Add("@Autor", libro.Autor);
                 parametros.Add("@Anio", libro.Anio);
@@ -72,6 +73,7 @@ namespace ProyectoAPI.Controllers
                 parametros.Add("@Id_Libro", id);
                 parametros.Add("@ISBN", libro.ISBN);
                 parametros.Add("@Estado_Libro", libro.Estado_Libro);
+                parametros.Add("@Descripcion", libro.Descripcion);
                 parametros.Add("@Titulo", libro.Titulo);
                 parametros.Add("@Autor", libro.Autor);
                 parametros.Add("@Anio", libro.Anio);

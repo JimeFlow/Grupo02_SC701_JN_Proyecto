@@ -5,20 +5,20 @@
    /*
    PARA EL PROFESOR: PARA UTILIZAR LAS FUNCIONALIDADES DE ADMINISTRADOR, SI TIENE QUE REGISTRARSE NORMAL
    Y CAMBIARSE EL ROL AQUI DESDE LA BD, YA QUE NO SE PUEDE CREAR UN USUARIO AQUI POR EL TEMA DE LA ENCRIPTACION
-   DE LA CONTRASE—A, SIMPLEMENTE PASAR EL ROL A 1 (ADMIN) EN VEZ DE 2 (CLIENTE Y DEFAULT AL REGISTRARSE)
+   DE LA CONTRASE√ëA, SIMPLEMENTE PASAR EL ROL A 1 (ADMIN) EN VEZ DE 2 (CLIENTE Y DEFAULT AL REGISTRARSE)
    */
 
    /*
-   PROFE CONSIDERE QUE ERAMOS 5 INTEGRANTES Y DOS DE ELLOS QUEDARON DEBIENDO Y SE ESPERARON HASTA EL ⁄LTIMO 
-   MOMENTO PARA EMPEZARLO, ESO COMPLICO EL RESULTADO DE ESTE AVANCE EN TEMAS DE RESERVAS, LA GESTI”N COMO TAL DE 
-   PRODUCTOS, Y EL DISE—O, PERO TENGA CERTEZA QUE PARA LA ENTREGA FINAL SE TENDR¡ EL PRODUCTO COMPLETADO 
+   PROFE CONSIDERE QUE ERAMOS 5 INTEGRANTES Y DOS DE ELLOS QUEDARON DEBIENDO Y SE ESPERARON HASTA EL √öLTIMO 
+   MOMENTO PARA EMPEZARLO, ESO COMPLICO EL RESULTADO DE ESTE AVANCE EN TEMAS DE RESERVAS, LA GESTI√ìN COMO TAL DE 
+   PRODUCTOS, Y EL DISE√ëO, PERO TENGA CERTEZA QUE PARA LA ENTREGA FINAL SE TENDR√Å EL PRODUCTO COMPLETADO 
    Y UN MANEJO MUCHO MEJOR, A LO LARGO DE ESTAS SEMANAS NOS ESTAREMOS COMUNICANDO CON USTED PARA MOSTRARLE LAS MEJORAS
    EN LOS RESULTADOS 
    */
 
 
 
--- EliminaciÛn y recreaciÛn de la base de datos
+-- Eliminaci√≥n y recreaci√≥n de la base de datos
 USE master;
 IF DB_ID('BiblioSolaris') IS NOT NULL
 BEGIN
@@ -377,7 +377,7 @@ BEGIN
 	WHERE Id_Usuario = @Id_Usuario
 END
 
--- SP PARA CAMBIAR CONTRASE—A -------------------------------------------------------------------------------------
+-- SP PARA CAMBIAR CONTRASE√ëA -------------------------------------------------------------------------------------
 CREATE PROCEDURE CambiarContrasena
 	@Id_Usuario INT,
 	@Contrasena VARCHAR(100)
@@ -389,7 +389,7 @@ BEGIN
 END
 
 --------------------------------------------------------------------------------------------------------
----------------------------------------- "OLVIDE MI CONTRASE—A" ----------------------------------------
+---------------------------------------- "OLVIDE MI CONTRASE√ëA" ----------------------------------------
 --------------------------------------------------------------------------------------------------------
 -- SP PARA VALIDAR USUARIO ---------------------------------------------------------------------------------
 CREATE PROCEDURE ValidarUsuario
@@ -409,7 +409,7 @@ BEGIN
 			WHERE Correo = @Correo AND Estado = 1
 END
 
--- SP PARA CAMBIAR CONTRASE—A -------------------------------------------------------------------------------------
+-- SP PARA CAMBIAR CONTRASE√ëA -------------------------------------------------------------------------------------
 CREATE PROCEDURE ActualizarContrasena
 	@Id_Usuario INT,
 	@Contrasena VARCHAR(255)
@@ -450,7 +450,6 @@ END
 
 --------------------------------------------------------------------------------------------------------
 -- SP PARA LISTAR ROLES -------------------------------------------------------------------------------------
-
 CREATE PROCEDURE ListarRoles
 AS
 BEGIN
@@ -474,11 +473,9 @@ BEGIN
 	SELECT Id_Usuario, Nombre, Apellidos, Correo, Telefono, U.Id_Rol, R.Tipo_Rol, Estado, Identificacion 
 	FROM Usuario U INNER JOIN Rol R ON U.Id_Rol = R.Id_Rol WHERE Id_Usuario = @Id_Usuario
 END
+
 --------------------------------------------------------------------------------------------------------
 
-/*
-*******************************************************************************************************
-****************************************LIBROS SP****************************************************** */
 
 -----------------------------------------LISTAR---------------------------------------------------------
 ALTER PROCEDURE ListarLibros
@@ -539,7 +536,7 @@ BEGIN
     WHERE Id_Libro = @Id_Libro;
 END;
 
---------------------------------------ELIMINAR--------------------------------------------------------------
+-- ELIMINAR -------------------------------------------------------------------------------------
 CREATE PROCEDURE EliminarLibro
     @Id_Libro INT
 AS
@@ -548,7 +545,7 @@ BEGIN
     WHERE Id_Libro = @Id_Libro;
 END;
 
-----------------------------------------OBTENER LIBRO POR ID -----------------------------------------------
+-- OBTENER LIBRO X ID -------------------------------------------------------------------------------------
 CREATE PROCEDURE ObtenerLibroPorId
     @Id_Libro INT
 AS
@@ -567,7 +564,7 @@ BEGIN
     WHERE Id_Libro = @Id_Libro;
 END;
 
---------------------------------------RESERVAR LIBRO----------------------------------------------------------
+-- RESERVAR LIRBO -------------------------------------------------------------------------------------
 CREATE PROCEDURE ReservarLibro
     @Id_Libro INT,
     @Tipo VARCHAR(10),
@@ -600,7 +597,8 @@ BEGIN
     SELECT 1 AS Resultado;
 END;
 
-/*******************************************RESERVAS**************************************************
+
+/******************************************* RESERVAS *******************************************
 
 CREATE PROCEDURE CrearReserva
     @Id_Usuario INT,
@@ -619,7 +617,7 @@ END
 
 */
 
---------------------------------------OBTENER RESERVAS------------------------------------------------
+---------------------------------------- OBTENER RESERVAS ----------------------------------------
 CREATE PROCEDURE ObtenerReservasUsuario
     @Id_Usuario INT
 AS
@@ -641,7 +639,7 @@ BEGIN
     ORDER BY M.Fecha DESC;
 END
 
-
+---------------------------------------- CANCELAR RESERVA ----------------------------------------
 CREATE PROCEDURE CancelarReserva
     @Id_Movimiento INT
 AS
@@ -656,7 +654,8 @@ BEGIN
     WHERE Id_Libro = (SELECT Id_Libro FROM Movimiento WHERE Id_Movimiento = @Id_Movimiento);
 END
 
-------------------------------------------EJEMPLARES----------------------------------------------------
+
+/******************************************* EJEMPLARES *******************************************/
 
 ALTER PROCEDURE ObtenerEjemplares
 AS
@@ -724,14 +723,16 @@ BEGIN
     WHERE Id_Ejemplar = @Id;
 END
 
+---------------------------------------- ELIMINAR EJEMPLAR ----------------------------------------
 CREATE PROCEDURE EliminarEjemplar
     @Id INT
 AS
 BEGIN
     DELETE FROM Ejemplar WHERE Id_Ejemplar = @Id;
 END
-
----------------------------------ESTADOS SP-----------------------------------------------------------
+/* ****************************************************************************************************
+   ******************************************** ESTADOS SP *********************************************
+   **************************************************************************************************** */---------------------------------ESTADOS SP-----------------------------------------------------------
 CREATE PROCEDURE ObtenerEstados
 AS
 BEGIN
@@ -739,9 +740,6 @@ BEGIN
 END
 
 
-
-/******************************************************************************************************
-*/
 
 /* ****************************************************************************************************
    ********************************** PROCEDIMIENTOS ALMACENADOS P4 ***********************************

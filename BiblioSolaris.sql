@@ -5,20 +5,20 @@
    /*
    PARA EL PROFESOR: PARA UTILIZAR LAS FUNCIONALIDADES DE ADMINISTRADOR, SI TIENE QUE REGISTRARSE NORMAL
    Y CAMBIARSE EL ROL AQUI DESDE LA BD, YA QUE NO SE PUEDE CREAR UN USUARIO AQUI POR EL TEMA DE LA ENCRIPTACION
-   DE LA CONTRASE—A, SIMPLEMENTE PASAR EL ROL A 1 (ADMIN) EN VEZ DE 2 (CLIENTE Y DEFAULT AL REGISTRARSE)
+   DE LA CONTRASE√ëA, SIMPLEMENTE PASAR EL ROL A 1 (ADMIN) EN VEZ DE 2 (CLIENTE Y DEFAULT AL REGISTRARSE)
    */
 
    /*
-   PROFE CONSIDERE QUE ERAMOS 5 INTEGRANTES Y DOS DE ELLOS QUEDARON DEBIENDO Y SE ESPERARON HASTA EL ⁄LTIMO 
-   MOMENTO PARA EMPEZARLO, ESO COMPLICO EL RESULTADO DE ESTE AVANCE EN TEMAS DE RESERVAS, LA GESTI”N COMO TAL DE 
-   PRODUCTOS, Y EL DISE—O, PERO TENGA CERTEZA QUE PARA LA ENTREGA FINAL SE TENDR¡ EL PRODUCTO COMPLETADO 
+   PROFE CONSIDERE QUE ERAMOS 5 INTEGRANTES Y DOS DE ELLOS QUEDARON DEBIENDO Y SE ESPERARON HASTA EL √öLTIMO 
+   MOMENTO PARA EMPEZARLO, ESO COMPLICO EL RESULTADO DE ESTE AVANCE EN TEMAS DE RESERVAS, LA GESTI√ìN COMO TAL DE 
+   PRODUCTOS, Y EL DISE√ëO, PERO TENGA CERTEZA QUE PARA LA ENTREGA FINAL SE TENDR√Å EL PRODUCTO COMPLETADO 
    Y UN MANEJO MUCHO MEJOR, A LO LARGO DE ESTAS SEMANAS NOS ESTAREMOS COMUNICANDO CON USTED PARA MOSTRARLE LAS MEJORAS
    EN LOS RESULTADOS 
    */
 
 
 
--- EliminaciÛn y recreaciÛn de la base de datos
+-- Eliminaci√≥n y recreaci√≥n de la base de datos
 USE master;
 IF DB_ID('BiblioSolaris') IS NOT NULL
 BEGIN
@@ -53,18 +53,17 @@ CREATE TABLE Categoria(
     Tipo VARCHAR(75) UNIQUE
 );
 
-CREATE TABLE Autor(
-    Id_Autor INT IDENTITY(1,1) PRIMARY KEY,
-    Nombre VARCHAR(100),
-    Apellidos VARCHAR(100),
-    Nacionalidad VARCHAR(50),
-    Fecha_Nacimiento DATE,
-    Id_Estado INT,
-    FOREIGN KEY (Id_Estado) REFERENCES Estado(Id_Estado)
-);
+--CREATE TABLE Autor(
+--    Id_Autor INT IDENTITY(1,1) PRIMARY KEY,
+--    Nombre VARCHAR(100),
+--    Apellidos VARCHAR(100),
+--    Nacionalidad VARCHAR(50),
+--    Fecha_Nacimiento DATE,
+--    Id_Estado INT,
+--    FOREIGN KEY (Id_Estado) REFERENCES Estado(Id_Estado)
+--);
 
 -- Campo para Imagen, ya sea que se guarde en la BD o como URL en el proyecto
--- Se puede normalizar creando una TABLA DE AUTOR y una FK aqui
 CREATE TABLE Libro(
     Id_Libro INT IDENTITY(1,1) PRIMARY KEY,
     ISBN VARCHAR(20) UNIQUE,
@@ -77,11 +76,14 @@ CREATE TABLE Libro(
     FOREIGN KEY (Id_Estado) REFERENCES Estado(Id_Estado)
 );
 
+ALTER TABLE Libro ADD Descripcion VARCHAR(150);
+
 -- EJEMPLAR -- NUEVA
 CREATE TABLE Ejemplar (
     Id_Ejemplar INT IDENTITY(1,1) PRIMARY KEY,
     CodigoEjemplar VARCHAR(20) UNIQUE NOT NULL,
     Id_Libro INT NOT NULL,
+	Cantidad INT, --CANTIDAD
     Estado VARCHAR(50) NOT NULL DEFAULT('Disponible'),
     Ubicacion VARCHAR(100) NULL,
     Fecha_Registro DATETIME2 DEFAULT(GETDATE())
@@ -375,7 +377,7 @@ BEGIN
 	WHERE Id_Usuario = @Id_Usuario
 END
 
--- SP PARA CAMBIAR CONTRASE—A -------------------------------------------------------------------------------------
+-- SP PARA CAMBIAR CONTRASE√ëA -------------------------------------------------------------------------------------
 CREATE PROCEDURE CambiarContrasena
 	@Id_Usuario INT,
 	@Contrasena VARCHAR(100)
@@ -387,7 +389,7 @@ BEGIN
 END
 
 --------------------------------------------------------------------------------------------------------
----------------------------------------- "OLVIDE MI CONTRASE—A" ----------------------------------------
+---------------------------------------- "OLVIDE MI CONTRASE√ëA" ----------------------------------------
 --------------------------------------------------------------------------------------------------------
 -- SP PARA VALIDAR USUARIO ---------------------------------------------------------------------------------
 CREATE PROCEDURE ValidarUsuario
@@ -407,7 +409,7 @@ BEGIN
 			WHERE Correo = @Correo AND Estado = 1
 END
 
--- SP PARA CAMBIAR CONTRASE—A -------------------------------------------------------------------------------------
+-- SP PARA CAMBIAR CONTRASE√ëA -------------------------------------------------------------------------------------
 CREATE PROCEDURE ActualizarContrasena
 	@Id_Usuario INT,
 	@Contrasena VARCHAR(255)
@@ -475,17 +477,14 @@ END
 --------------------------------------------------------------------------------------------------------
 
 
-/* ****************************************************************************************************
-   ******************************************** LIRBOS SP *********************************************
-   **************************************************************************************************** */
-
--- LISTAR -------------------------------------------------------------------------------------
-CREATE PROCEDURE ListarLibros
+-----------------------------------------LISTAR---------------------------------------------------------
+ALTER PROCEDURE ListarLibros
 AS
 BEGIN
     SELECT 
         Id_Libro,
         ISBN,
+		Descripcion,
         Estado_Libro,
         Titulo,
         Autor,
@@ -495,10 +494,11 @@ BEGIN
     FROM Libro;
 END;
 
--- REGISTRAR -------------------------------------------------------------------------------------
-CREATE PROCEDURE RegistrarLibro
+--------------------------------------------REGISTRAR----------------------------------------------
+ALTER PROCEDURE RegistrarLibro
     @ISBN VARCHAR(20),
     @Estado_Libro VARCHAR(100),
+	@Descripcion VARCHAR(150),
     @Titulo VARCHAR(200),
     @Autor VARCHAR(150),
     @Anio INT,
@@ -506,15 +506,16 @@ CREATE PROCEDURE RegistrarLibro
     @Id_Estado INT
 AS
 BEGIN
-    INSERT INTO Libro(ISBN, Estado_Libro, Titulo, Autor, Anio, Imagen_URL, Id_Estado)
-    VALUES (@ISBN, @Estado_Libro, @Titulo, @Autor, @Anio, @Imagen_URL, @Id_Estado);
+    INSERT INTO Libro(ISBN, Estado_Libro, Titulo, Descripcion, Autor, Anio, Imagen_URL, Id_Estado)
+    VALUES (@ISBN, @Estado_Libro, @Titulo, @Descripcion, @Autor, @Anio, @Imagen_URL, @Id_Estado);
 END;
 
--- ACTUALIZAR -------------------------------------------------------------------------------------
-CREATE PROCEDURE ActualizarLibro
+------------------------------------------ACTUALIZAR----------------------------------------------
+ALTER PROCEDURE ActualizarLibro
     @Id_Libro INT,
     @ISBN VARCHAR(20),
     @Estado_Libro VARCHAR(100),
+	@Descripcion VARCHAR(150),
     @Titulo VARCHAR(200),
     @Autor VARCHAR(150),
     @Anio INT,
@@ -526,6 +527,7 @@ BEGIN
     SET 
         ISBN = @ISBN,
         Estado_Libro = @Estado_Libro,
+		Descripcion = @Descripcion,
         Titulo = @Titulo,
         Autor = @Autor,
         Anio = @Anio,
@@ -553,6 +555,7 @@ BEGIN
         ISBN,
         Estado_Libro,
         Titulo,
+		Descripcion,
         Autor,
         Anio,
         Imagen_URL,

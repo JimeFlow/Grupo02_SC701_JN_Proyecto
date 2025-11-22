@@ -657,13 +657,14 @@ END
 
 /******************************************* EJEMPLARES *******************************************/
 
-CREATE PROCEDURE ObtenerEjemplares
+ALTER PROCEDURE ObtenerEjemplares
 AS
 BEGIN
     SELECT 
         E.Id_Ejemplar,
         E.CodigoEjemplar,
         E.Estado,
+		E.Cantidad,
         E.Ubicacion,
         E.Fecha_Registro,
         E.Id_Libro,
@@ -672,8 +673,8 @@ BEGIN
     INNER JOIN Libro L ON L.Id_Libro = E.Id_Libro;
 END
 
----------------------------------------- OBTENER EJEMPLAR POR ID ----------------------------------------
-CREATE PROCEDURE ObtenerEjemplarPorId
+
+ALTER PROCEDURE ObtenerEjemplarPorId
     @Id INT
 AS
 BEGIN
@@ -681,6 +682,7 @@ BEGIN
         E.Id_Ejemplar,
         E.CodigoEjemplar,
         E.Estado,
+		E.Cantidad,
         E.Ubicacion,
         E.Fecha_Registro,
         E.Id_Libro,
@@ -690,22 +692,23 @@ BEGIN
     WHERE E.Id_Ejemplar = @Id;
 END
 
----------------------------------------- REGISTRAR EJEMPLAR ----------------------------------------
-CREATE PROCEDURE RegistrarEjemplar
+
+ALTER PROCEDURE RegistrarEjemplar
     @CodigoEjemplar VARCHAR(20),
     @Id_Libro INT,
+	@Cantidad INT,
     @Estado VARCHAR(50),
     @Ubicacion VARCHAR(100)
 AS
 BEGIN
-    INSERT INTO Ejemplar (CodigoEjemplar, Id_Libro, Estado, Ubicacion, Fecha_Registro)
-    VALUES (@CodigoEjemplar, @Id_Libro, @Estado, @Ubicacion, GETDATE());
+    INSERT INTO Ejemplar (CodigoEjemplar, Id_Libro, Cantidad, Estado, Ubicacion, Fecha_Registro)
+    VALUES (@CodigoEjemplar, @Id_Libro, @Cantidad, @Estado, @Ubicacion, GETDATE());
 END
 
----------------------------------------- ACTUALIZAR EJEMPLAR ----------------------------------------
-CREATE PROCEDURE ActualizarEjemplar
+ALTER PROCEDURE ActualizarEjemplar
     @Id INT,
     @CodigoEjemplar VARCHAR(20),
+	@Cantidad INT,
     @Estado VARCHAR(50),
     @Ubicacion VARCHAR(100),
     @Id_Libro INT
@@ -713,6 +716,7 @@ AS
 BEGIN
     UPDATE Ejemplar SET 
         CodigoEjemplar = @CodigoEjemplar,
+		Cantidad = @Cantidad,
         Estado = @Estado,
         Ubicacion = @Ubicacion,
         Id_Libro = @Id_Libro

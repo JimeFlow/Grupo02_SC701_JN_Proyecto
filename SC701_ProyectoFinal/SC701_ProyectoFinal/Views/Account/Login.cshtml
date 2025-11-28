@@ -28,9 +28,9 @@
                             </div>
 
                             <div class="mb-0">
-                                <label asp-for="Contrasena" class="form-label">Marca</label>
+                                <label asp-for="Contrasena" class="form-label">Contraseña</label>
                                 <input name="contrasena" asp-for="Contrasena" class="form-control bg-light" type="password" placeholder="Contraseña" />                                
-                            </div>
+                            </div>                            
 
                             <div class="mb-3 d-grid">
                                 <button class="btn btn-dark mt-3" type="submit">Iniciar sesión</button>
@@ -40,6 +40,9 @@
                                 @Html.ValidationSummary()
                             </div>
                         </form>
+                        <div class="mb-0 text-center">
+                            <a class="btn btn-link" asp-action="RecuperarAcceso" asp-controller="Account">¿Olvidó su contraseña?</a>
+                        </div>
                         @if (ViewBag.Mensaje != null)
                         {
                             <div class="alert alert-warning text-center">

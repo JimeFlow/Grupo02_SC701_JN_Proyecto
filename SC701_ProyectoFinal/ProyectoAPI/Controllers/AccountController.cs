@@ -102,13 +102,13 @@ namespace ProyectoAPI.Controllers
 
                 if (user != null)
                 {
-                    var contrasennaGenerada = GenerarContrasena();
+                    var contrasenaGenerada = GenerarContrasena();
 
-                    var contrasennaCifrada = BCrypt.Net.BCrypt.HashPassword(contrasennaGenerada);
+                    var contrasenaCifrada = BCrypt.Net.BCrypt.HashPassword(contrasenaGenerada);
 
                     var parametrosActualizar = new DynamicParameters();
                     parametrosActualizar.Add("@Id_Usuario", user.Id_Usuario);
-                    parametrosActualizar.Add("@Contrasena", contrasennaCifrada);
+                    parametrosActualizar.Add("@Contrasena", contrasenaCifrada);
 
                     var resultadoActualizar = context.Execute("ActualizarContrasena", parametrosActualizar);
 
@@ -119,7 +119,7 @@ namespace ProyectoAPI.Controllers
                         var html = System.IO.File.ReadAllText(ruta, UTF8Encoding.UTF8);
 
                         html = html.Replace("{{Nombre}}", user.Nombre);
-                        html = html.Replace("{{Contrasenna}}", contrasennaGenerada);
+                        html = html.Replace("{{Contrasena}}", contrasenaGenerada);
 
                         EnviarCorreo("Recuperar Acceso", html, user.Correo);
 

@@ -75,7 +75,6 @@ CREATE TABLE Libro(
 	Descripcion VARCHAR(150),
 	FOREIGN KEY(Id_Categoria) REFERENCES Categoria(Id_Categoria)
 	);
-	
 
 -- EJEMPLAR -- NUEVA
 CREATE TABLE Ejemplar (
@@ -188,6 +187,7 @@ CREATE TABLE Movimiento(
     FOREIGN KEY (Id_Ejemplar) REFERENCES Ejemplar(Id_Ejemplar),
 	FOREIGN KEY (Id_Estado) REFERENCES Estado(Id_Estado)
 );
+
 
 -- REVISAR
 CREATE TABLE Sancion(
@@ -499,54 +499,52 @@ BEGIN
         Id_Libro,
         ISBN,
 		Descripcion,
-        Estado_Libro,
+		L.Id_Categoria,
+		C.Tipo,
         Titulo,
         Autor,
         Anio,
-        Imagen_URL,
-        Id_Estado
-    FROM Libro;
+        Imagen_URL
+    FROM Libro L INNER JOIN Categoria C ON L.Id_Categoria = C.Id_Categoria;
 END;
 
 --------------------------------------------REGISTRAR----------------------------------------------
 ALTER PROCEDURE RegistrarLibro
     @ISBN VARCHAR(20),
-    @Estado_Libro VARCHAR(100),
 	@Descripcion VARCHAR(150),
     @Titulo VARCHAR(200),
     @Autor VARCHAR(150),
     @Anio INT,
     @Imagen_URL VARCHAR(600),
-    @Id_Estado INT
+	@Id_Categoria INT
 AS
 BEGIN
-    INSERT INTO Libro(ISBN, Estado_Libro, Titulo, Descripcion, Autor, Anio, Imagen_URL, Id_Estado)
-    VALUES (@ISBN, @Estado_Libro, @Titulo, @Descripcion, @Autor, @Anio, @Imagen_URL, @Id_Estado);
+    INSERT INTO Libro(ISBN, Titulo, Descripcion, Autor, Id_Categoria, Anio, Imagen_URL)
+    VALUES (@ISBN, @Titulo, @Descripcion, @Autor, @Id_Categoria, @Anio, @Imagen_URL);
 END;
 
 ------------------------------------------ACTUALIZAR----------------------------------------------
 ALTER PROCEDURE ActualizarLibro
+	@Id_Usuario INT,
     @Id_Libro INT,
     @ISBN VARCHAR(20),
-    @Estado_Libro VARCHAR(100),
 	@Descripcion VARCHAR(150),
     @Titulo VARCHAR(200),
     @Autor VARCHAR(150),
     @Anio INT,
     @Imagen_URL VARCHAR(600),
-    @Id_Estado INT
+    @Id_Categoria INT
 AS
 BEGIN
     UPDATE Libro
     SET 
         ISBN = @ISBN,
-        Estado_Libro = @Estado_Libro,
+        Id_Categoria = @Id_Categoria,
 		Descripcion = @Descripcion,
         Titulo = @Titulo,
         Autor = @Autor,
         Anio = @Anio,
-        Imagen_URL = @Imagen_URL,
-        Id_Estado = @Id_Estado
+        Imagen_URL = @Imagen_URL
     WHERE Id_Libro = @Id_Libro;
 
 	INSERT INTO Logs(Fecha, Tipo_Accion, Descripcion_Accion, Modulo_Afectado,Id_Usuario)
@@ -555,7 +553,8 @@ BEGIN
 END;
 
 -- ELIMINAR -------------------------------------------------------------------------------------
-CREATE PROCEDURE EliminarLibro
+ALTER PROCEDURE EliminarLibro
+	@Id_Usuario INT,
     @Id_Libro INT
 AS
 BEGIN
@@ -568,21 +567,21 @@ BEGIN
 END;
 
 -- OBTENER LIBRO X ID -------------------------------------------------------------------------------------
-CREATE PROCEDURE ObtenerLibroPorId
+ALTER PROCEDURE ObtenerLibroPorId
     @Id_Libro INT
 AS
 BEGIN
     SELECT 
         Id_Libro,
         ISBN,
-        Estado_Libro,
         Titulo,
 		Descripcion,
+		L.Id_Categoria,
+		C.Tipo
         Autor,
         Anio,
-        Imagen_URL,
-        Id_Estado
-    FROM Libro
+        Imagen_URL
+    FROM Libro L INNER JOIN Categoria C ON L.Id_Categoria = C.Id_Categoria
     WHERE Id_Libro = @Id_Libro;
 END;
 

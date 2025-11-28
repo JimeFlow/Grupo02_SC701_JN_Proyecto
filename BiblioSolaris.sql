@@ -63,20 +63,19 @@ CREATE TABLE Categoria(
 --    FOREIGN KEY (Id_Estado) REFERENCES Estado(Id_Estado)
 --);
 
--- Campo para Imagen, ya sea que se guarde en la BD o como URL en el proyecto
+
 CREATE TABLE Libro(
     Id_Libro INT IDENTITY(1,1) PRIMARY KEY,
     ISBN VARCHAR(20) UNIQUE,
-    Estado_Libro VARCHAR(100),
     Titulo VARCHAR(200),
+	Id_Categoria INT,
     Autor VARCHAR(150),
     Anio SMALLINT,
-    Imagen_URL VARCHAR(600),     
-    Id_Estado INT,
-    FOREIGN KEY (Id_Estado) REFERENCES Estado(Id_Estado)
-);
-
-ALTER TABLE Libro ADD Descripcion VARCHAR(150);
+    Imagen_URL VARCHAR(600),
+	Descripcion VARCHAR(150),
+	FOREIGN KEY(Id_Categoria) REFERENCES Categoria(Id_Categoria)
+	);
+	
 
 -- EJEMPLAR -- NUEVA
 CREATE TABLE Ejemplar (
@@ -96,57 +95,69 @@ REFERENCES Libro(Id_Libro)
 ON DELETE CASCADE;
 -------------------------------------------------------------------------------------------------------
 
-CREATE TABLE Libro_Etiquetas( --- NUEVA
-    Id_Libro INT,
-    Id_Categoria INT,
-    PRIMARY KEY(Id_Libro, Id_Categoria),
+CREATE TABLE Etiqueta( --- NUEVA
+	Id_Etiqueta INT IDENTITY(1,1) PRIMARY KEY,
+	Nombre VARCHAR(75) UNIQUE
+);
+
+
+CREATE TABLE Libro_Etiqueta(
+	Id_Libro INT,
+    Id_Etiqueta INT,
+    PRIMARY KEY(Id_Libro, Id_Etiqueta),
     FOREIGN KEY (Id_Libro) REFERENCES Libro(Id_Libro),
-    FOREIGN KEY (Id_Categoria) REFERENCES Categoria(Id_Categoria)
+    FOREIGN KEY (Id_Etiqueta) REFERENCES Etiqueta(Id_Etiqueta)
 );
 
-CREATE TABLE Alerta( -- NUEVA - Administrador pueda registrar inconvenientes o situaciones
-    Id_Alerta INT IDENTITY(1,1) PRIMARY KEY,
-    Comentario VARCHAR(255),
-    Fecha DATETIME2,
-    Id_Libro INT,
-    FOREIGN KEY (Id_Libro) REFERENCES Libro(Id_Libro)
-);
+DROP TABLE Alerta;
+--CREATE TABLE Alerta( --CAMBIAR A OTRA FINALIDAD
+--    Id_Alerta INT IDENTITY(1,1) PRIMARY KEY,
+--    Comentario VARCHAR(255),
+--    Fecha DATETIME2,
+--    Id_Libro INT,
+--    FOREIGN KEY (Id_Libro) REFERENCES Libro(Id_Libro)
+--);
 
-CREATE TABLE Inventario(
-    Id_Inventario INT IDENTITY(1,1) PRIMARY KEY,
-    Id_Libro INT,
-    Stock INT,
-    Id_Estado INT,
-    FOREIGN KEY(Id_Libro) REFERENCES Libro(Id_Libro),
-    FOREIGN KEY (Id_Estado) REFERENCES Estado(Id_Estado)
-);
+--SE ELIMINA
+--CREATE TABLE Inventario(
+--    Id_Inventario INT IDENTITY(1,1) PRIMARY KEY,
+--    Id_Libro INT,
+--    Stock INT,
+--    Id_Estado INT,
+--    FOREIGN KEY(Id_Libro) REFERENCES Libro(Id_Libro),
+--    FOREIGN KEY (Id_Estado) REFERENCES Estado(Id_Estado)
+--);
+DROP TABLE Inventario;
+DROP TABLE Entrega;
 
-CREATE TABLE Entrega(
-    Id_Entrega INT IDENTITY(1,1) PRIMARY KEY,
-    Fecha DATETIME2,
-    Id_Libro INT,
-    Cantidad INT,
-    Id_Estado INT,
-    FOREIGN KEY(Id_Libro) REFERENCES Libro(Id_Libro),
-    FOREIGN KEY (Id_Estado) REFERENCES Estado(Id_Estado)
-);
+--CREATE TABLE Entrega(
+--    Id_Entrega INT IDENTITY(1,1) PRIMARY KEY,
+--    Fecha DATETIME2,
+--    Id_Libro INT,
+--    Cantidad INT,
+--    Id_Estado INT,
+--    FOREIGN KEY(Id_Libro) REFERENCES Libro(Id_Libro),
+--    FOREIGN KEY (Id_Estado) REFERENCES Estado(Id_Estado)
+--);
 
-CREATE TABLE Ingreso(
-    Id_Ingreso INT IDENTITY(1,1) PRIMARY KEY,
-    Fecha DATETIME2,
-    Id_Libro INT,
-    Cantidad INT,
-    Id_Estado INT,
-    FOREIGN KEY (Id_Libro) REFERENCES Libro(Id_Libro),
-    FOREIGN KEY (Id_Estado) REFERENCES Estado(Id_Estado)
-);
+DROP TABLE Ingreso;
+--CREATE TABLE Ingreso(
+--    Id_Ingreso INT IDENTITY(1,1) PRIMARY KEY,
+--    Fecha DATETIME2,
+--    Id_Libro INT,
+--    Cantidad INT,
+--    Id_Estado INT,
+--    FOREIGN KEY (Id_Libro) REFERENCES Libro(Id_Libro),
+--    FOREIGN KEY (Id_Estado) REFERENCES Estado(Id_Estado)
+--);
 
 CREATE TABLE Usuario(
     Id_Usuario INT IDENTITY(1,1) PRIMARY KEY,
     Nombre VARCHAR(50),
     Apellidos VARCHAR(100),
+	Identificacion VARCHAR(9) UNIQUE,
     Correo VARCHAR(75) UNIQUE,
-    Contrasena VARCHAR(100),
+    Contrasena VARCHAR(255),
     Telefono VARCHAR(15) UNIQUE,
     Id_Rol INT,
     Estado BIT, -- Estado Activo o Inactivo
@@ -158,29 +169,32 @@ CREATE TABLE Comentario(
     Creacion DATETIME2,
     Comentario VARCHAR(150),
     Rating INT,
-    Id_Libro INT,
+    Id_Ejemplar INT,
     Id_Usuario INT,
-    FOREIGN KEY (Id_Libro) REFERENCES Libro(Id_Libro),
+    FOREIGN KEY (Id_Ejemplar) REFERENCES Ejemplar(Id_Ejemplar),
     FOREIGN KEY (Id_Usuario) REFERENCES Usuario(Id_Usuario)
 );
 
 CREATE TABLE Movimiento(
     Id_Movimiento INT IDENTITY(1,1) PRIMARY KEY,
-    Tipo VARCHAR(10), -- 'RESERVA' o 'PRESTAMO'
+    Tipo VARCHAR(30) DEFAULT('Préstamo'), -- 'PRESTAMO'
     Fecha DATETIME2,
     Fecha_Vencimiento DATETIME2 NULL,
     Estado INT,
     Id_Usuario INT,
-    Id_Libro INT,
+    Id_Ejemplar INT,
+	Id_Estado INT,
     FOREIGN KEY (Id_Usuario) REFERENCES Usuario(Id_Usuario),
-    FOREIGN KEY (Id_Libro) REFERENCES Libro(Id_Libro)
+    FOREIGN KEY (Id_Ejemplar) REFERENCES Ejemplar(Id_Ejemplar),
+	FOREIGN KEY (Id_Estado) REFERENCES Estado(Id_Estado)
 );
 
 -- REVISAR
 CREATE TABLE Sancion(
     Id_Sancion INT IDENTITY(1,1) PRIMARY KEY,
     Id_Movimiento INT,
-    --Monto DECIMAL(10,2),
+	Estado BIT,
+	Fecha_Finalizacion DATETIME DEFAULT(GETDATE()+14), --14 días de sanción sin poder reservar, una vez cumplida esa fecha, el estado se vuelve 0 y puede reservar de nuevo
     FOREIGN KEY(Id_Movimiento) REFERENCES Movimiento(Id_Movimiento)
 );
 
@@ -202,9 +216,6 @@ CREATE TABLE Logs( -- Registro Diario
 USE BiblioSolaris;
 GO
 
--- ALTER TABLE AGREGAR COLUMNA IDENTIFICACION
-ALTER TABLE Usuario ADD Identificacion VARCHAR(9);
-ALTER TABLE Usuario ADD CONSTRAINT IDENTIFICACION_UNIQUE UNIQUE(Identificacion);
 -------------------------------------------------------------------------------------------------------
 
 -- INSERT DE LOS ROLES 
@@ -212,13 +223,6 @@ INSERT INTO Rol(Tipo_Rol) VALUES
 ('Administrador'), ('Cliente');
 -------------------------------------------------------------------------------------------------------
 
--- ALTER TABLE HACER MAS GRANDE LAS CONTRASENAS
-ALTER TABLE Usuario ALTER COLUMN Contrasena VARCHAR(255);
--------------------------------------------------------------------------------------------------------
-
--- ALTER TABLE - ESTADO A FK ID_ESTADO
-ALTER TABLE Movimiento ADD Id_Estado INT;
-ALTER TABLE Movimiento ADD FOREIGN KEY (Id_Estado) REFERENCES Estado(Id_Estado);
 -------------------------------------------------------------------------------------------------------
 
 -- ALTER TABLE - VALIDAR QUE RATING ESTE ENTRE 1 Y 5
@@ -355,7 +359,7 @@ BEGIN
 END
 
 -- SP PARA ACTUALIZAR USUARIO -------------------------------------------------------------------------------------
-CREATE PROCEDURE ActualizarUsuarioAdmin
+ALTER PROCEDURE ActualizarUsuarioAdmin --CAMBIO 2DO AVANCE
 	@Id_Usuario INT,
 	@Nombre VARCHAR(50),
 	@Apellidos VARCHAR(100),
@@ -375,6 +379,13 @@ BEGIN
 	Id_Rol = @Id_Rol,
 	Estado = @Estado
 	WHERE Id_Usuario = @Id_Usuario
+
+	DECLARE @Resultado INT = @@ROWCOUNT;
+
+	INSERT INTO Logs(Fecha, Tipo_Accion, Descripcion_Accion, Modulo_Afectado, Id_Usuario)
+	VALUES (GETDATE(), 'Actualización', 'El administrador actualizó la información de un usuario', 'Usuario', @Id_Usuario );
+
+	SELECT @Resultado AS Resultado;
 END
 
 -- SP PARA CAMBIAR CONTRASEÑA -------------------------------------------------------------------------------------
@@ -458,11 +469,14 @@ BEGIN
 END
 
 -- SP PARA ELIMINAR USUARIO ADMIN -------------------------------------------------------------------------------------
-CREATE PROCEDURE EliminarUsuario
+ALTER PROCEDURE EliminarUsuario --CAMBIO 2DO AVANCE
 	@Id_Usuario INT
 AS
 BEGIN
 	DELETE FROM Usuario WHERE Id_Usuario = @Id_Usuario
+	INSERT INTO Logs(Fecha, Tipo_Accion, Descripcion_Accion, Modulo_Afectado,Id_Usuario)
+	VALUES (GETDATE(),'Eliminar', 'Se eliminó un usuario', 'Usuario', @Id_Usuario);
+
 END
 
 -- SP PARA OBTENER USUARIO X ID -------------------------------------------------------------------------------------
@@ -534,6 +548,10 @@ BEGIN
         Imagen_URL = @Imagen_URL,
         Id_Estado = @Id_Estado
     WHERE Id_Libro = @Id_Libro;
+
+	INSERT INTO Logs(Fecha, Tipo_Accion, Descripcion_Accion, Modulo_Afectado,Id_Usuario)
+	VALUES (GETDATE(),'Actualización', CONCAT('Se actualizó el libro ', @Titulo), 'Libro', @Id_Usuario);
+
 END;
 
 -- ELIMINAR -------------------------------------------------------------------------------------
@@ -543,6 +561,10 @@ AS
 BEGIN
     DELETE FROM Libro
     WHERE Id_Libro = @Id_Libro;
+
+	INSERT INTO Logs(Fecha, Tipo_Accion, Descripcion_Accion, Modulo_Afectado,Id_Usuario)
+	VALUES (GETDATE(),'Eliminar', CONCAT('Se eliminó el libro ', @Id_Libro), 'Libro', @Id_Usuario);
+
 END;
 
 -- OBTENER LIBRO X ID -------------------------------------------------------------------------------------
@@ -848,3 +870,41 @@ END
 -- SELECT 
 SELECT TOP 1 * FROM Libro;
 --------------------------------------------------------------------------------------------------------
+
+
+/*
+	************************************REPORTES Y OBTENCION DE DATOS RELEVANTES************************
+*/
+
+CREATE PROCEDURE ObtenerReservasActivas
+AS
+BEGIN
+	SELECT Id_Movimiento, Tipo, Fecha, Fecha_Vencimiento, M.Estado, CONCAT(U.Nombre, ' ',U.Apellidos) AS Nombre, L.Titulo
+	FROM Movimiento M INNER JOIN Usuario U ON M.Id_Usuario = U.Id_Usuario 
+	INNER JOIN Libro L ON M.Id_Libro = L.Id_Libro
+	--HAY QUE AGREGAR ESTADO PERO NO SE GUARDAN CORRECTAMENTE WHERE ID_ESTADO = 1-2-3
+END;
+--EXEC ObtenerReservasActivas;
+
+CREATE PROCEDURE ObtenerLibrosConMasCantidadMovimientos
+AS
+BEGIN
+    SELECT TOP 5
+        L.Id_Libro,
+        L.Titulo,
+        COUNT(DISTINCT M.Id_Movimiento) AS CantidadMovimientos
+    FROM Libro L
+    INNER JOIN Movimiento M ON L.Id_Libro = M.Id_Libro
+    --WHERE M.Id_Estado IN (1, 2, 3)
+    GROUP BY L.Id_Libro, L.Titulo
+    ORDER BY CantidadMovimientos DESC;
+END;
+--EXEC ObtenerLibrosConMasCantidadMovimientos;
+
+-------------------------------USUARIOS CON MÁS SANCIONES--------------------------------------------------
+
+---------------------PENDIENTE--------------------------
+
+
+-------------------------------TEMAS DE BITACORAS/AUDITLOGS------------------------------------------------
+

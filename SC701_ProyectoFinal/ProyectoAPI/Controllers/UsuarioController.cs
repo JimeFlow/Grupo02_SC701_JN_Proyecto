@@ -1,4 +1,8 @@
-﻿using Dapper;
+﻿using System.Net;
+using System.Net.Mail;
+using System.Security.Cryptography;
+using System.Text;
+using Dapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,28 +17,47 @@ namespace ProyectoAPI.Controllers
     public class UsuarioController : ControllerBase
     {
         private readonly IConfiguration _configuration;
+        private readonly IHostEnvironment _environment;
 
-        public UsuarioController(IConfiguration configuration)
+        public UsuarioController(IConfiguration configuration, IHostEnvironment environment)
         {
             _configuration = configuration;
+            _environment = environment;
         }
 
         [HttpPost]
         [Route("RegistrarUsuario")]
         public IActionResult RegistrarUsuarioAdmin(RegistroUsuarioAdminRequestModel usuario)
-        {
+        {           
             using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
+                var generateNewPass = GenerarContrasena();
+                string hashPassword = BCrypt.Net.BCrypt.HashPassword(generateNewPass);
+                usuario.Contrasena = hashPassword;
                 var parametros = new DynamicParameters();
                 parametros.Add("@Nombre", usuario.Nombre);
                 parametros.Add("@Apellidos", usuario.Apellidos);
                 parametros.Add("@Identificacion", usuario.Identificacion);
+                parametros.Add("@Contrasena", usuario.Contrasena);
                 parametros.Add("@Correo", usuario.Correo);
                 parametros.Add("@Telefono", usuario.Telefono);
                 parametros.Add("@Id_Rol", usuario.Id_Rol);
 
-                var resultado = context.QueryFirstOrDefault<DatosUsuarioResponseModel>("RegistroUsuarioAdmin", parametros);
-                return Ok(resultado!.Id_Usuario);
+                var resultado = context.QueryFirstOrDefault<int>("RegistroUsuarioAdmin", parametros);
+                if(resultado > 0)
+                {
+                    //Enviar Correo
+                    var ruta = Path.Combine(_environment.ContentRootPath,"PlantillasCorreo", "NuevoUsuarioAdmin.html");
+                    var html = System.IO.File.ReadAllText(ruta, UTF8Encoding.UTF8);
+
+                    html = html.Replace("{{Nombre}}", usuario.Nombre);
+                    html = html.Replace("{{Contrasena}}", generateNewPass);
+                    html = html.Replace("{{UrlAcceso}}", "https://localhost:7163");
+
+                    EnviarCorreo("Creación de usuario", html, usuario.Correo);
+                    return Ok(resultado);
+                }
+                return Ok(resultado);
             }
         }
 
@@ -112,5 +135,55 @@ namespace ProyectoAPI.Controllers
                 return Ok(resultado);
             }
         }
+
+        #region METODOS PRIVADOS
+        private string GenerarContrasena()
+        {
+            int longitud = 8;
+            const string caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            StringBuilder resultado = new();
+
+            using var rng = RandomNumberGenerator.Create();
+            byte[] buffer = new byte[1];
+
+            while (resultado.Length < longitud)
+            {
+                rng.GetBytes(buffer);
+                int valor = buffer[0] % caracteres.Length;
+                resultado.Append(caracteres[valor]);
+            }
+
+            return resultado.ToString();
+        }
+
+        private void EnviarCorreo(string subject, string body, string destinatario)
+        {
+            var correoSMTP = _configuration["Valores:CorreoSMTP"]!;
+            var contrasennaSMTP = _configuration["Valores:ContrasenaSMTP"]!;
+
+            if (string.IsNullOrEmpty(contrasennaSMTP))
+                return;
+
+            var mensaje = new MailMessage
+            {
+                From = new MailAddress(correoSMTP),
+                Subject = subject,
+                Body = body,
+                IsBodyHtml = true
+            };
+
+            mensaje.To.Add(destinatario);
+
+            using var smtp = new SmtpClient("smtp.office365.com")
+            {
+                Port = 587,
+                Credentials = new NetworkCredential(correoSMTP, contrasennaSMTP),
+                EnableSsl = true
+            };
+
+            smtp.Send(mensaje);
+        }
+        #endregion
+
     }
 }

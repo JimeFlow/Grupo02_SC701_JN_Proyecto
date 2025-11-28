@@ -1,0 +1,102 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Creación de Usuario</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f7;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 30px auto;
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            font-size: 22px;
+            font-weight: bold;
+            color: #004aad;
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #004aad;
+            padding-bottom: 10px;
+        }
+
+        .content {
+            font-size: 15px;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .password-box {
+            background: #e8f0ff;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 15px 0;
+            font-size: 16px;
+            font-weight: bold;
+            color: #004aad;
+            text-align: center;
+            border: 1px solid #cbd8ff;
+        }
+
+        .footer {
+            font-size: 12px;
+            color: #777;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #004aad;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 14px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+            .btn:hover {
+                background-color: #003680;
+            }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">Creación de Usuario</div>
+
+        <div class="content">
+            <p>Estimado(a) <strong>{{Nombre}}</strong>,</p>
+
+            <p>Su cuenta ha sido creada exitosamente por un administrador en nuestro sistema.</p>
+
+            <p>A continuación encontrará sus credenciales de acceso temporales:</p>
+
+            <div class="password-box">
+                Contraseña: {{Contrasena}}
+            </div>
+
+            <p>Por motivos de seguridad, se recomienda ingresar al sistema lo antes posible y cambiar su contraseña.</p>
+
+            <p>Muchas gracias por utilizar nuestros servicios.</p>
+
+            <a class="btn" href="{{UrlAcceso}}" target="_blank">Ingresar al sistema</a>
+        </div>
+
+        <div class="footer">
+            &copy; BiblioSolaris – Todos los derechos reservados.
+        </div>
+    </div>
+</body>
+</html>

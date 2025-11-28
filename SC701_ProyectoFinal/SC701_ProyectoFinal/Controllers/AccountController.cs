@@ -105,7 +105,7 @@ namespace SC701_ProyectoFinal.Controllers
             using (var context = _httpClientFactory.CreateClient())
             {
                 var urlApi = _configuration["Valores:UrlAPI"] +
-                             "Account/ValidarUsuario?Correo=" + usuario.Correo;
+                             "Account/RecuperarAcceso?Correo=" + usuario.Correo;
 
                 var respuesta = context.GetAsync(urlApi).Result;
 

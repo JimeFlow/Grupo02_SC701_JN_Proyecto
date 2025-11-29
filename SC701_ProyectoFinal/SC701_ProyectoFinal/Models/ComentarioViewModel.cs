@@ -2,10 +2,13 @@
 {
     public class ComentarioViewModel
     {
-        public required string NombreUsuario { get; set; }
-        public string? Libro { get; set; }
-        public required string Comentario { get; set; }
+        public int ComentarioId { get; set; }
+        public int UsuarioId { get; set; }
+        public int LibroId { get; set; }
+        public  string NombreUsuario { get; set; }
+        public string Libro { get; set; }
+        public string Comentario { get; set; }
         public int Rating { get; set; }
-        public DateTime FechaCreacion { get; set; } = DateTime.Now;
+        public DateTime FechaCreacion { get; set; } 
     }
 }

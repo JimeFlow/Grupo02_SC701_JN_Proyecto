@@ -1,11 +1,14 @@
 ﻿namespace ProyectoAPI.Models
 {
-    public class ComentarioViewModel : ComentarioModel
+    public class ComentarioViewModel 
     {
-        public required string NombreUsuario { get; set; }
-        public required string Libro { get; set; }
-        public required string Comentario { get; set; }
-        public new int Rating { get; set; }
-        public new DateTime FechaCreacion { get; set; } = DateTime.Now;
+        public int ComentarioId { get; set; }
+        public int UsuarioId { get; set; }
+        public int LibroId { get; set; }
+        public string NombreUsuario { get; set; }
+        public string Libro { get; set; }
+        public string Comentario { get; set; }
+        public int Rating { get; set; }
+        public DateTime FechaCreacion { get; set; } 
     }
 }

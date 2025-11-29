@@ -2,10 +2,9 @@
 {
     public class ComentarioModel
     {
-        public int UsuarioId { get; set; }
-        public int LibroId { get; set; }
-        public int ComentarioId { get; set; }  
+        public int Id_Usuario { get; set; }
+        public int Id_Libro { get; set; }
+        public string Comentario { get; set; }  
         public int Rating { get; set; }
-        public DateTime FechaCreacion { get; set; } = DateTime.Now;
     }
 }

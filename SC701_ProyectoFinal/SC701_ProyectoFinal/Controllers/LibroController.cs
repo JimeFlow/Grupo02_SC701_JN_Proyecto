@@ -1,10 +1,8 @@
-﻿using System.Net.Http;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using SC701_ProyectoFinal.Models;
-using static System.Net.WebRequestMethods;
+
 
 namespace SC701_ProyectoFinal.Controllers
 {
@@ -213,7 +211,7 @@ namespace SC701_ProyectoFinal.Controllers
 
             var libro = await response.Content.ReadFromJsonAsync<LibroViewModel>();
 
-            var comentariosResponse = await client.GetAsync($"/api/Comentarios/Libro/{id}");
+            var comentariosResponse = await client.GetAsync($"/api/Comentarios/ListarPorLibro/{id}");
             var comentarios = new List<ComentarioViewModel>();
 
             if (comentariosResponse.IsSuccessStatusCode)
@@ -225,28 +223,31 @@ namespace SC701_ProyectoFinal.Controllers
             return View(libro);
         }
 
-        // Enviar comentario
         [HttpPost]
-        public async Task<IActionResult> EnviarComentario(ComentarioModel comentario)
+        public async Task<IActionResult> AgregarComentario(ComentarioModel model)
         {
-            var UsuarioId = HttpContext.Session.GetInt32("UsuarioId");
-            if (UsuarioId == null)
+            var usuarioId = HttpContext.Session.GetInt32("Id_Usuario");
+
+            if (usuarioId == null)
             {
-                return RedirectToAction("DetalleLibro", new { id = comentario.LibroId });
+                TempData["ErrorComentario"] = "Debe iniciar sesión para comentar.";
+                return RedirectToAction("Detalle", new { id = model.Id_Libro });
             }
 
-            comentario.UsuarioId = UsuarioId.Value;
+            model.Id_Usuario = usuarioId.Value;
 
             var client = _httpClientFactory.CreateClient("ProyectoAPI");
-            var response = await client.PostAsJsonAsync("/api/Comentarios/Crear", comentario);
+            var response = await client.PostAsJsonAsync("/api/Comentarios/Crear", model);
 
             if (response.IsSuccessStatusCode)
-                TempData["SuccessMessage"] = "Comentario enviado exitosamente.";
+                TempData["MensajeComentario"] = "Comentario agregado correctamente.";
             else
-                TempData["ErrorMessage"] = "Error al enviar el comentario.";
+                TempData["ErrorComentario"] = "Ocurrió un error al agregar el comentario.";
 
-            return RedirectToAction("DetalleLibro", new { id = comentario.LibroId });
+            return RedirectToAction("Detalle", new { id = model.Id_Libro });
         }
+
+
 
         // Obtener estados para select
         private async Task<List<EstadoModel>> ObtenerEstadosAsync()

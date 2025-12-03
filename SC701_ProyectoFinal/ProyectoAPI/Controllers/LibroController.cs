@@ -35,6 +35,18 @@ namespace ProyectoAPI.Controllers
             
         }
 
+        [HttpGet]
+        [Route("ListarLibrosCliente")]
+        public IActionResult ObtenerLibrosCliente()
+        {
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
+            {
+                var parametros = new DynamicParameters();
+                var resultado = context.Query<LibroResponseModel>("ObtenerListaLibrosCliente", parametros, commandType: CommandType.StoredProcedure);
+                return Ok(resultado);
+            }
+        }
+
         // Registra nuevo libro
         [HttpPost]
         [Route("RegistrarLibro")]
@@ -46,13 +58,11 @@ namespace ProyectoAPI.Controllers
                 var parametros = new DynamicParameters();
 
                 parametros.Add("@ISBN", libro.ISBN);
-                parametros.Add("@Estado_Libro", libro.Estado_Libro);
                 parametros.Add("@Descripcion", libro.Descripcion);
                 parametros.Add("@Titulo", libro.Titulo);
                 parametros.Add("@Autor", libro.Autor);
                 parametros.Add("@Anio", libro.Anio);
                 parametros.Add("@Imagen_URL", libro.Imagen_URL);
-                parametros.Add("@Id_Estado", libro.Id_Estado);
 
                 var resultado = context.Execute("RegistrarLibro", parametros, commandType: CommandType.StoredProcedure);
 
@@ -72,13 +82,11 @@ namespace ProyectoAPI.Controllers
 
                 parametros.Add("@Id_Libro", id);
                 parametros.Add("@ISBN", libro.ISBN);
-                parametros.Add("@Estado_Libro", libro.Estado_Libro);
                 parametros.Add("@Descripcion", libro.Descripcion);
                 parametros.Add("@Titulo", libro.Titulo);
                 parametros.Add("@Autor", libro.Autor);
                 parametros.Add("@Anio", libro.Anio);
                 parametros.Add("@Imagen_URL", libro.Imagen_URL);
-                parametros.Add("@Id_Estado", libro.Id_Estado);
 
                 var resultado = context.Execute("ActualizarLibro", parametros, commandType: CommandType.StoredProcedure);
 
@@ -139,10 +147,8 @@ namespace ProyectoAPI.Controllers
                 var parametros = new DynamicParameters();
 
                 parametros.Add("@Id_Libro", request.Id_Libro);
-                parametros.Add("@Tipo", request.Tipo);
                 parametros.Add("@Fecha", request.Fecha);
                 parametros.Add("@Fecha_Vencimiento", request.Fecha_Vencimiento);
-                parametros.Add("@Estado", request.Estado);
                 parametros.Add("@Id_Usuario", request.Id_Usuario);
 
                 var result = context.QueryFirstOrDefault<int>("ReservarLibro", parametros, commandType: CommandType.StoredProcedure);

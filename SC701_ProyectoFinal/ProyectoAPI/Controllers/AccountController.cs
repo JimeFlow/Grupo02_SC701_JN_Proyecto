@@ -51,7 +51,7 @@ namespace ProyectoAPI.Controllers
 
                 if (!validPassword) return Unauthorized(new { mensaje = "Contraseña incorrecta" });
 
-                resultado.Token = GenerarToken(resultado.Id_Usuario, resultado.Nombre, resultado.Id_Rol);
+                resultado.Token = GenerarToken(resultado.Id_Usuario, resultado.Nombre, resultado.Id_Rol, resultado.Correo);
                 return Ok(resultado);                
 
             }
@@ -229,7 +229,7 @@ namespace ProyectoAPI.Controllers
         }
 
         //generar token JWT
-        private string GenerarToken(int usuarioId, string nombre, int rol)
+        private string GenerarToken(int usuarioId, string nombre, int rol, string correo)
         {
             var key = _configuration["Valores:KeyJWT"]!;
 
@@ -240,7 +240,8 @@ namespace ProyectoAPI.Controllers
             {
                 new Claim("id", usuarioId.ToString()),
                 new Claim("nombre", nombre),
-                new Claim("rol", rol.ToString())
+                new Claim("rol", rol.ToString()),
+                new Claim("correo", correo)
             };
 
             var token = new JwtSecurityToken(

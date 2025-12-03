@@ -24,7 +24,7 @@ namespace SC701_ProyectoFinal.Controllers
         {
             using (var client = _httpClientFactory.CreateClient())
             {
-                var urlApi = _configuration["Valores:UrlAPI"] + "Libro/ListarLibros";
+                var urlApi = _configuration["Valores:UrlAPI"] + "Libro/ListarLibrosCliente";
 
                 client.DefaultRequestHeaders.Authorization =
                     new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
@@ -285,7 +285,7 @@ namespace SC701_ProyectoFinal.Controllers
 
                 return View(new ReservaViewModel
                 {
-                    Id = libro.Id_Libro,
+                    LibroId = libro.Id_Libro,
                     Titulo = libro.Titulo
                 });
             }
@@ -295,7 +295,7 @@ namespace SC701_ProyectoFinal.Controllers
 
         // POST: Confirmar reserva
         [HttpPost]
-        public IActionResult Reservar(ReservaViewModel reserva)
+        public IActionResult Reservar(ReservaViewModel reserva) //NO LLEGA ID LIBRO
         {
             if (!ModelState.IsValid)
                 return View(reserva);
@@ -316,12 +316,10 @@ namespace SC701_ProyectoFinal.Controllers
 
                 var request = new ReservaRequestModel
                 {
-                    Id_Libro = reserva.Id,
+                    Id_Libro = reserva.LibroId,
                     Id_Usuario = idUsuario.Value,
-                    Tipo = "RESERVA",
                     Fecha = reserva.FechaReserva,
-                    Fecha_Vencimiento = reserva.FechaVencimiento,
-                    Estado = 1
+                    Fecha_Vencimiento = reserva.FechaVencimiento
                 };
 
                 var respuesta = client.PostAsJsonAsync(urlApi, request).Result;

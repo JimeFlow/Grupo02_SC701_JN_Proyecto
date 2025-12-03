@@ -1,16 +1,42 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Mvc;
 using SC701_ProyectoFinal.Models;
+using static System.Net.WebRequestMethods;
 
 namespace SC701_ProyectoFinal.Controllers
 {
     public class ReservaController : Controller
     {
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IConfiguration _configuration;
 
-        public ReservaController(IHttpClientFactory httpClientFactory)
+        public ReservaController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory;
+            _configuration = configuration;
         }
+
+        [HttpGet]
+        public IActionResult Index()
+        {
+            using (var context = _httpClientFactory.CreateClient())
+            {
+                var IdUsuario = HttpContext.Session.GetInt32("Id_Usuario");
+                var urlApi = _configuration["Valores:UrlAPI"] + "Reserva/ObtenerReservas?Id_Usuario="+IdUsuario;
+                context.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
+                var respuesta = context.GetAsync(urlApi).Result;
+
+                if (respuesta.IsSuccessStatusCode)
+                {
+                    var datosApi = respuesta.Content.ReadFromJsonAsync<List<ReservaRequestModel>>().Result;
+                    return View(datosApi);
+                }
+
+                ViewBag.Mensaje = "No hay productos registrados";
+                return View(new List<UsuarioModel>());
+            }
+        }
+
 
         [HttpPost]
         public async Task<IActionResult> CrearReserva(int LibroId)

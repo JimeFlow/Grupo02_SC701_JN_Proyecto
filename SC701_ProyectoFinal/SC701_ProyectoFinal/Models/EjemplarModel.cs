@@ -14,7 +14,7 @@ namespace SC701_ProyectoFinal.Models
         public DateTime Fecha_Registro { get; set; }
         
         [ValidateNever]
-        public string? TituloLibro { get; set; }
+        public string? Titulo { get; set; }
 
     }
 }

@@ -11,7 +11,7 @@ namespace Utils
     public class Helper
     {
         private readonly string CorreoSMTP = "jmendez50979@ufide.ac.cr";
-        private readonly string ContrasenaSMTP = "";
+        private readonly string ContrasenaSMTP = ""; //AQUI SU CONTRASEÑA PARA QUE LES SIRVA!
 
 
         public void EnviarCorreo(string subject, string body, string destinatario)

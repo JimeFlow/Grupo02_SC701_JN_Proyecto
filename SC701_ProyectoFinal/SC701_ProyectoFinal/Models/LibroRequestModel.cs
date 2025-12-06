@@ -9,5 +9,6 @@
         public int Anio { get; set; }
         public string Imagen_URL { get; set; }
         public int Id_Estado { get; set; }
+        public int Id_Categoria { get; set; }
     }
 }

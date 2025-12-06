@@ -24,7 +24,16 @@ namespace SC701_ProyectoFinal.Controllers
         {
             using (var client = _httpClientFactory.CreateClient())
             {
-                var urlApi = _configuration["Valores:UrlAPI"] + "Libro/ListarLibrosCliente";
+                var rol = HttpContext.Session.GetInt32("Id_Rol");
+                var urlApi = "";
+                if(rol == 2)
+                {
+                    urlApi = _configuration["Valores:UrlAPI"] + "Libro/ListarLibrosCliente";
+                }
+                else
+                {
+                    urlApi = _configuration["Valores:UrlAPI"] + "Libro/ListarLibros";
+                }
 
                 client.DefaultRequestHeaders.Authorization =
                     new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
@@ -46,6 +55,7 @@ namespace SC701_ProyectoFinal.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
+            ViewBag.Categorias = await ObtenerCategoriasAsync();
             ViewBag.Estados = await ObtenerEstadosAsync();
             return View();
         }
@@ -56,6 +66,7 @@ namespace SC701_ProyectoFinal.Controllers
         {
             if (!ModelState.IsValid)
             {
+                ViewBag.Categorias = await ObtenerCategoriasAsync();
                 ViewBag.Estados = await ObtenerEstadosAsync();
                 return View(libro);
             }
@@ -80,7 +91,8 @@ namespace SC701_ProyectoFinal.Controllers
                     Anio = libro.Anio,
                     Imagen_URL = libro.Imagen_URL,
                     Id_Estado = libro.Id_Estado,
-                    Estado_Libro = libro.Estado_Libro
+                    Estado_Libro = libro.Estado_Libro,
+                    Id_Categoria = libro.Id_Categoria
                 };
 
                 var respuesta = client.PostAsJsonAsync(urlApi, request).Result;
@@ -90,6 +102,7 @@ namespace SC701_ProyectoFinal.Controllers
 
                 ViewBag.Mensaje = "No se pudo registrar el libro";
                 ViewBag.Estados = await ObtenerEstadosAsync();
+                ViewBag.Categorias = await ObtenerCategoriasAsync();
                 return View(libro);
             }
         }
@@ -286,7 +299,9 @@ namespace SC701_ProyectoFinal.Controllers
                 return View(new ReservaViewModel
                 {
                     LibroId = libro.Id_Libro,
-                    Titulo = libro.Titulo
+                    Titulo = libro.Titulo,
+                    FechaReserva = DateTime.Now.Date,
+                    FechaVencimiento = DateTime.Now.Date
                 });
             }
 
@@ -334,6 +349,28 @@ namespace SC701_ProyectoFinal.Controllers
                 return View(reserva);
             }
         }
+
+        //OBTENER CATEGORIAS
+        private async Task<List<CategoriaModel>> ObtenerCategoriasAsync()
+        {
+            using (var client = _httpClientFactory.CreateClient())
+            {
+                var urlApi = _configuration["Valores:UrlAPI"] + "Categoria/ObtenerCategorias";
+
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
+
+                var respuesta = await client.GetAsync(urlApi);
+
+                if (respuesta.IsSuccessStatusCode)
+                {
+                    return await respuesta.Content.ReadFromJsonAsync<List<CategoriaModel>>();
+                }
+
+                return new List<CategoriaModel>();
+            }
+        }
+
     }
 
 }

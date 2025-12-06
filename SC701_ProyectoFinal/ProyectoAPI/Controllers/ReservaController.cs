@@ -80,6 +80,81 @@ namespace ProyectoAPI.Controllers
             }
         }
 
+        [HttpPut]
+        [Route("CambiarEstadoReserva")]
+        public IActionResult CambiarEstadoReservaAdmin(CambiarEstadoReservaRequestModel model)
+        {
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
+            {
+                var parametros = new DynamicParameters();
+                parametros.Add("@Id_Movimiento", model.Id_Movimiento);
+
+                var resultado = context.Execute("CambiarEstadoReservaAdmin", parametros);
+                return Ok(resultado);
+            }
+        }
+
+        [HttpPut]
+        [Route("ExtenderPrestamo")]
+        public IActionResult ExtenderPrestamo(ExtenderPrestamoRequestModel reserva)
+        {
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
+            {
+                var parametros = new DynamicParameters();
+                parametros.Add("@Id_Movimiento", reserva.Id_Movimiento);
+                parametros.Add("@Fecha_Vencimiento", reserva.Fecha_Vencimiento);
+
+                var resultado = context.Execute("ExtenderPrestamoCliente", parametros);
+                return Ok(resultado);
+            }
+        }
+
+        [HttpPut]
+        [Route("CancelarReserva")]
+        public IActionResult CancelarReserva(CambiarEstadoReservaRequestModel model)
+        {
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
+            {
+                var parametros = new DynamicParameters();
+                parametros.Add("@Id_Movimiento", model.Id_Movimiento);
+
+                var resultado = context.Execute("CancelarReserva", parametros);
+                return Ok(resultado);
+            }
+
+        }
+
+        [HttpPut]
+        [Route("CancelarEstadoCancelado")]
+        public IActionResult CambiarEstadoCancelado(CambiarEstadoReservaRequestModel model)
+        {
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
+            {
+                var parametros = new DynamicParameters();
+                parametros.Add("@Id_Movimiento", model.Id_Movimiento);
+
+                var resultado = context.Execute("CambiarEstadoCancelado", parametros);
+                return Ok(resultado);
+            }
+        }
+
+        [HttpGet]
+        [Route("ObtenerReservasAdmin")]
+        public IActionResult ObtenerReservasPendientesAdmin(int? estado)
+        {
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
+            {
+                var parametros = new DynamicParameters();
+                if(estado != null)
+                {
+                    parametros.Add("EstadoFiltro", estado);
+                }
+
+                var resultado = context.Query<ReservaResponseModel>("ObtenerReservasAdmin", parametros);
+                return Ok(resultado);
+            }
+        }
+
 
 
         [HttpGet("Usuario/{idUsuario}")]
@@ -102,19 +177,7 @@ namespace ProyectoAPI.Controllers
 
         }
 
-        [HttpDelete("Cancelar/{idReserva}")]
-        public IActionResult CancelarReserva(int idReserva)
-        {
-            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
-            {
-                var parametros = new DynamicParameters();
-                parametros.Add("@Id_Movimiento", idReserva);
 
-                context.Execute("CancelarReserva", parametros);
-            }
-
-            return Ok(new { mensaje = "Reserva cancelada exitosamente." });
-        }
     }
 
 }

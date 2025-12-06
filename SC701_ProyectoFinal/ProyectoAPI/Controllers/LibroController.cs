@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using ProyectoAPI.Models;
+using Utils;
 
 namespace ProyectoAPI.Controllers
 {
@@ -15,10 +16,12 @@ namespace ProyectoAPI.Controllers
     public class LibroController : ControllerBase
     {
         private readonly IConfiguration _configuration;
+        private readonly IHostEnvironment _environment;
 
-        public LibroController(IConfiguration configuration)
+        public LibroController(IConfiguration configuration, IHostEnvironment environment)
         {
             _configuration = configuration;
+            _environment = environment;
         }
 
         // Lista todos los libros
@@ -32,7 +35,7 @@ namespace ProyectoAPI.Controllers
                 var resultado = context.Query<LibroResponseModel>("ListarLibros", parametros, commandType: CommandType.StoredProcedure);
                 return Ok(resultado);
             }
-            
+
         }
 
         [HttpGet]
@@ -52,13 +55,14 @@ namespace ProyectoAPI.Controllers
         [Route("RegistrarLibro")]
         public IActionResult RegistrarLibro([FromBody] LibroRequestModel libro)
         {
-            
+
             using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
                 var parametros = new DynamicParameters();
 
                 parametros.Add("@ISBN", libro.ISBN);
                 parametros.Add("@Descripcion", libro.Descripcion);
+                parametros.Add("@Id_Categoria", libro.Id_Categoria);
                 parametros.Add("@Titulo", libro.Titulo);
                 parametros.Add("@Autor", libro.Autor);
                 parametros.Add("@Anio", libro.Anio);
@@ -75,7 +79,7 @@ namespace ProyectoAPI.Controllers
         [Route("ActualizarLibro/{id}")]
         public IActionResult ActualizarLibro(int id, [FromBody] LibroRequestModel libro)
         {
-            
+
             using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
                 var parametros = new DynamicParameters();
@@ -99,7 +103,7 @@ namespace ProyectoAPI.Controllers
         [Route("EliminarLibro/{id}")]
         public IActionResult EliminarLibro(int id)
         {
-            
+
             using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
                 var parametros = new DynamicParameters();
@@ -118,7 +122,7 @@ namespace ProyectoAPI.Controllers
         [HttpGet("{id}")]
         public IActionResult ObtenerLibro(int id)
         {
-            
+
             using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
                 var parametros = new DynamicParameters();
@@ -141,9 +145,21 @@ namespace ProyectoAPI.Controllers
         [Route("ReservarLibro")]
         public IActionResult ReservarLibro([FromBody] ReservaRequestModel request)
         {
-            
+
             using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
+                var helper = new Helper();
+                var sanciones = context.ExecuteScalar<int>(
+        "UsuarioTieneSancionActiva",
+        new { Id_Usuario = request.Id_Usuario },
+        commandType: CommandType.StoredProcedure
+    );
+
+                if (sanciones > 0)
+                {
+                    return BadRequest("El usuario tiene una sanción activa y no puede realizar préstamos.");
+                }
+
                 var parametros = new DynamicParameters();
 
                 parametros.Add("@Id_Libro", request.Id_Libro);
@@ -155,6 +171,20 @@ namespace ProyectoAPI.Controllers
 
                 if (result == -1)
                     return BadRequest(new { mensaje = "El libro no está disponible para reservar." });
+
+                var ruta = Path.Combine(_environment.ContentRootPath, "PlantillasCorreo", "NotificacionReserva.html");
+                var html = System.IO.File.ReadAllText(ruta, UTF8Encoding.UTF8);
+
+                html = html.Replace("{{Usuario}}", request.Id_Usuario.ToString());
+                html = html.Replace("{{Libro}}", request.Id_Libro.ToString());
+                html = html.Replace("{{FechaReserva}}", request.Fecha.ToString("F"));
+                html = html.Replace("{{FechaVencimiento}}", request.Fecha_Vencimiento.ToString("F"));
+
+                string? correoUsuario = HttpContext.User.FindFirst("correo")?.Value;
+                if( correoUsuario != null)
+                {
+                    helper.EnviarCorreo("Confirmación de reserva exitosa", html, correoUsuario);
+                }
 
                 return Ok(new { mensaje = "Libro reservado correctamente." });
             }

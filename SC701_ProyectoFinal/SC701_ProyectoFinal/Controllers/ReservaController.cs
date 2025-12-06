@@ -93,6 +93,115 @@ namespace SC701_ProyectoFinal.Controllers
 
         }
 
+        [HttpPost]
+        public IActionResult CancelarReserva(ReservaRequestModel reserva)
+        {
+            using (var context = _httpClientFactory.CreateClient())
+            {
+                var urlApi = _configuration["Valores:UrlAPI"] + "Reserva/CancelarReserva";
+                context.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
+                var respuesta = context.PutAsJsonAsync(urlApi, reserva).Result;
+
+                if (respuesta.IsSuccessStatusCode)
+                {
+                    var datosApi = respuesta.Content.ReadFromJsonAsync<int>().Result;
+
+                    if (datosApi > 0)
+                    {
+                        return RedirectToAction("Index");
+                    }
+                }                
+                return RedirectToAction("Index");
+            }
+        }
+
+        [HttpPost]
+        public IActionResult CambiarEstadoReserva(ReservaRequestModel reserva)
+        {
+            using (var context = _httpClientFactory.CreateClient())
+            {
+                var urlApi = _configuration["Valores:UrlAPI"] + "Reserva/CambiarEstadoReserva"; //admin -> de pendiente a reservado
+                context.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
+                var respuesta = context.PutAsJsonAsync(urlApi, reserva).Result;
+
+                if (respuesta.IsSuccessStatusCode)
+                {
+                    var datosApi = respuesta.Content.ReadFromJsonAsync<int>().Result;
+
+                    if (datosApi > 0)
+                    {
+                        return RedirectToAction("ObtenerReservas");
+                    }
+                }
+                return RedirectToAction("ObtenerReservas");
+            }
+        }
+
+        [HttpPost]
+        public IActionResult CambiarEstadoCancelacion(ReservaRequestModel reserva)
+        {
+            using (var context = _httpClientFactory.CreateClient())
+            {
+                var urlApi = _configuration["Valores:UrlAPI"] + "Reserva/CancelarEstadoCancelado";//si
+                context.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
+                var respuesta = context.PutAsJsonAsync(urlApi, reserva).Result;
+
+                if (respuesta.IsSuccessStatusCode)
+                {
+                    var datosApi = respuesta.Content.ReadFromJsonAsync<int>().Result;
+
+                    if (datosApi > 0)
+                    {
+                        return RedirectToAction("ObtenerReservas");
+                    }
+                }
+                return RedirectToAction("ObtenerReservas");
+            }
+        }
+
+        [HttpPost]
+        public IActionResult ExtenderPlazoPrestamo(ReservaRequestModel reserva)
+        {
+            using (var context = _httpClientFactory.CreateClient())
+            {
+                var urlApi = _configuration["Valores:UrlAPI"] + "Reserva/ExtenderPrestamo";
+                context.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
+                var respuesta = context.PutAsJsonAsync(urlApi, reserva).Result;
+
+                if (respuesta.IsSuccessStatusCode)
+                {
+                    var datosApi = respuesta.Content.ReadFromJsonAsync<int>().Result;
+
+                    if (datosApi > 0)
+                    {
+                        return RedirectToAction("Index");
+                    }
+                }
+                return RedirectToAction("Index");
+            }
+        }
+
+        [HttpGet]
+        public IActionResult ObtenerReservas(int? estado)
+        {
+            using (var context = _httpClientFactory.CreateClient())
+            {
+                var IdUsuario = HttpContext.Session.GetInt32("Id_Usuario");
+                var urlApi = _configuration["Valores:UrlAPI"] + "Reserva/ObtenerReservasAdmin?estado=" + estado;
+                context.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
+                var respuesta = context.GetAsync(urlApi).Result;
+
+                if (respuesta.IsSuccessStatusCode)
+                {
+                    var datosApi = respuesta.Content.ReadFromJsonAsync<List<ReservaRequestModel>>().Result;
+                    return View(datosApi);
+                }
+
+                ViewBag.Mensaje = "No hay productos registrados";
+                return View(new List<ReservaRequestModel>());
+            }
+        }
+
         [HttpGet]
         public async Task<IActionResult> CancelarReserva(int id)
         {

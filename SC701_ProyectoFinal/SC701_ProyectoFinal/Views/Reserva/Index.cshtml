@@ -7,7 +7,7 @@
 }
 
 <div class="container mt-4">
-    <h2 class="mb-4 text-center"> 📘 Mis Reservas</h2>
+    <h2 class="mb-4 text-center">Mis Reservas</h2>
 
     @if (!Model.Any())
     {
@@ -41,7 +41,17 @@
                         <td>@r.Fecha.ToShortDateString()</td>
                         <td>@r.Fecha_Vencimiento.ToShortDateString()</td>
                         <td>
-                            <span class="badge bg-primary">@r.Estado</span>
+                            @if(r.Estado == "Pendiente")
+                            {
+                                <span class="badge bg-warning">@r.Estado</span>
+                            }else if(r.Estado == "Completado")
+                            {
+                                <span class="badge bg-success">@r.Estado</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-primary">@r.Estado</span>
+                            }
                         </td>
 
                         <td>
@@ -52,9 +62,17 @@
                                 Ver libro
                             </a>
 
+                            @if (r.Estado == "Reservado")
+                            {
+                                <button class="btn btn-primary btn-sm"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalExtender"
+                                        data-id="@r.Id_Movimiento"
+                                        data-fecha="@r.Fecha_Vencimiento.ToString("yyyy-MM-dd")">
+                                    Extender préstamo
+                                </button>
 
-
-                            @if (r.Estado != "Cancelada")
+                            }else if (r.Estado != "Completado")
                             {
                                 <a asp-action="CancelarReserva"
                                    asp-route-id="@r.Id_Movimiento"
@@ -70,3 +88,56 @@
     }
 
 </div>
+<div class="modal fade" id="modalExtender" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-action="ExtenderPlazoPrestamo">
+                <div class="modal-header">
+                    <h5 class="modal-title">Extender préstamo</h5>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" id="movIdExtender" name="Id_Movimiento" />
+
+                    <label class="form-label">Nueva fecha de vencimiento</label>
+                    <input type="date"
+                           id="fechaExtender"
+                           name="Fecha_Vencimiento"
+                           class="form-control"
+                           required />
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">
+                        Confirmar extensión
+                    </button>
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        const modalExtender = document.getElementById('modalExtender');
+
+        modalExtender.addEventListener('show.bs.modal', event => {
+            const button = event.relatedTarget;
+
+            const movId = button.getAttribute('data-id');
+            const fechaVenc = button.getAttribute('data-fecha');
+
+            const idInput = document.getElementById('movIdExtender');
+            const fechaInput = document.getElementById('fechaExtender');
+
+            idInput.value = movId;
+            //validacion de la fecha
+            fechaInput.min = fechaVenc;
+            fechaInput.value = fechaVenc;
+        });
+    </script>
+}

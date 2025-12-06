@@ -5,7 +5,7 @@
 }
 
 <div class="container mt-5">
-    <h2 class="text-center mb-4">📖 Registrar Nuevo Libro</h2>
+    <h2 class="text-center mb-4">Registrar Nuevo Libro</h2>
 
     <div class="card shadow-lg">
         <div class="card-body">
@@ -22,15 +22,25 @@
                 </div>
 
                 <div class="row mb-3">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label asp-for="ISBN" class="form-label fw-bold">ISBN</label>
                         <input asp-for="ISBN" class="form-control" placeholder="Ejemplo: 978-84-376-0494-7" />
                     </div>
-                    <div class="col-md-4">
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Categoría</label>
+                        <select class="form-select" asp-for="Id_Categoria"
+                                asp-items="@(new SelectList(ViewBag.Categorias, "Id_Categoria", "Tipo"))">
+                            <option value="">-- Seleccione una categoría --</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
                         <label asp-for="Anio" class="form-label fw-bold">Año de Publicación</label>
                         <input asp-for="Anio" class="form-control" type="number" min="1900" max="2100" />
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label class="form-label fw-bold">Estado</label>
                         <select id="selectEstado" class="form-select" asp-for="Id_Estado" asp-items="@(new SelectList(ViewBag.Estados, "Id_Estado", "Estado"))">
                             <option value="">-- Seleccione un estado --</option>
@@ -64,7 +74,6 @@
         const select = document.getElementById('selectEstado');
         const hidden = document.getElementById('Estado_Libro');
 
-            // Actualizar el Estado_Libro según la selección
             select.addEventListener('change', function() {
                 hidden.value = select.options[select.selectedIndex].text;
             });

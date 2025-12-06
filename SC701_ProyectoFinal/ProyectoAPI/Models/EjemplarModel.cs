@@ -9,7 +9,7 @@
         public DateTime Fecha_Registro { get; set; }
 
         public int Id_Libro { get; set; }
-        public string TituloLibro { get; set; }  
+        public string Titulo { get; set; }  
     }
 }
 

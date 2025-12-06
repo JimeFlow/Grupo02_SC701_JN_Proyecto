@@ -104,13 +104,12 @@ END;
 
 ---------------------------------- EXTENDER PLAZO DE PRESTAMO --------------------------------------
 
-CREATE PROCEDURE ExtenderPrestamoCliente
-	@Fecha DATETIME,
+CREATE OR ALTER PROCEDURE ExtenderPrestamoCliente
 	@Fecha_Vencimiento DATETIME,
 	@Id_Movimiento INT
 AS
 BEGIN
-	UPDATE Movimiento SET Fecha = @Fecha, Fecha_Vencimiento = @Fecha_Vencimiento 
+	UPDATE Movimiento SET Fecha_Vencimiento = @Fecha_Vencimiento 
 	WHERE Id_Movimiento = @Id_Movimiento;
 END;
 
@@ -325,3 +324,24 @@ BEGIN
     INNER JOIN Libro L ON L.Id_Libro = E.Id_Libro;
 END
 
+ALTER PROCEDURE [dbo].[ObtenerReservasUsuario]
+    @Id_Usuario INT
+AS
+BEGIN
+    SELECT 
+        M.Id_Movimiento,
+        M.Fecha,
+        M.Fecha_Vencimiento,
+		M.Id_Ejemplar,
+        L.Id_Libro,
+        L.Titulo,
+        L.Imagen_URL,
+        S.Estado
+    FROM Movimiento M INNER JOIN Ejemplar E ON M.Id_Ejemplar = E.Id_Ejemplar
+    INNER JOIN Libro L ON L.Id_Libro = E.Id_Libro
+    INNER JOIN Estado S ON S.Id_Estado = M.Id_Estado
+    WHERE M.Id_Usuario = @Id_Usuario
+      AND M.Tipo = 'Préstamo'
+      AND (M.Id_Estado = 4 OR M.Id_Estado = 5 OR M.Id_Estado = 7)
+    ORDER BY M.Fecha DESC;
+END

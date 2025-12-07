@@ -108,7 +108,6 @@ CREATE TABLE Libro_Etiqueta(
     FOREIGN KEY (Id_Etiqueta) REFERENCES Etiqueta(Id_Etiqueta)
 );
 
-DROP TABLE Alerta;
 --CREATE TABLE Alerta( --CAMBIAR A OTRA FINALIDAD
 --    Id_Alerta INT IDENTITY(1,1) PRIMARY KEY,
 --    Comentario VARCHAR(255),
@@ -116,6 +115,7 @@ DROP TABLE Alerta;
 --    Id_Libro INT,
 --    FOREIGN KEY (Id_Libro) REFERENCES Libro(Id_Libro)
 --);
+DROP TABLE Alerta;
 
 --SE ELIMINA
 --CREATE TABLE Inventario(
@@ -127,7 +127,6 @@ DROP TABLE Alerta;
 --    FOREIGN KEY (Id_Estado) REFERENCES Estado(Id_Estado)
 --);
 DROP TABLE Inventario;
-DROP TABLE Entrega;
 
 --CREATE TABLE Entrega(
 --    Id_Entrega INT IDENTITY(1,1) PRIMARY KEY,
@@ -138,8 +137,8 @@ DROP TABLE Entrega;
 --    FOREIGN KEY(Id_Libro) REFERENCES Libro(Id_Libro),
 --    FOREIGN KEY (Id_Estado) REFERENCES Estado(Id_Estado)
 --);
+DROP TABLE Entrega;
 
-DROP TABLE Ingreso;
 --CREATE TABLE Ingreso(
 --    Id_Ingreso INT IDENTITY(1,1) PRIMARY KEY,
 --    Fecha DATETIME2,
@@ -149,6 +148,7 @@ DROP TABLE Ingreso;
 --    FOREIGN KEY (Id_Libro) REFERENCES Libro(Id_Libro),
 --    FOREIGN KEY (Id_Estado) REFERENCES Estado(Id_Estado)
 --);
+DROP TABLE Ingreso;
 
 CREATE TABLE Usuario(
     Id_Usuario INT IDENTITY(1,1) PRIMARY KEY,
@@ -221,8 +221,6 @@ GO
 -- INSERT DE LOS ROLES 
 INSERT INTO Rol(Tipo_Rol) VALUES
 ('Administrador'), ('Cliente');
--------------------------------------------------------------------------------------------------------
-
 -------------------------------------------------------------------------------------------------------
 
 -- ALTER TABLE - VALIDAR QUE RATING ESTE ENTRE 1 Y 5
@@ -359,7 +357,7 @@ BEGIN
 END
 
 -- SP PARA ACTUALIZAR USUARIO -------------------------------------------------------------------------------------
-ALTER PROCEDURE ActualizarUsuarioAdmin --CAMBIO 2DO AVANCE
+CREATE PROCEDURE ActualizarUsuarioAdmin -- CAMBIO 2DO AVANCE - 
 	@Id_Usuario INT,
 	@Nombre VARCHAR(50),
 	@Apellidos VARCHAR(100),
@@ -469,7 +467,7 @@ BEGIN
 END
 
 -- SP PARA ELIMINAR USUARIO ADMIN -------------------------------------------------------------------------------------
-ALTER PROCEDURE EliminarUsuario --CAMBIO 2DO AVANCE
+CREATE PROCEDURE EliminarUsuario -- CAMBIO 2DO AVANCE
 	@Id_Usuario INT
 AS
 BEGIN
@@ -491,8 +489,8 @@ END
 --------------------------------------------------------------------------------------------------------
 
 
------------------------------------------LISTAR---------------------------------------------------------
-ALTER PROCEDURE ListarLibros
+------------------------------------------ LISTAR ------------------------------------------ PENDIENTE
+CREATE PROCEDURE ListarLibros
 AS
 BEGIN
     SELECT 
@@ -508,8 +506,8 @@ BEGIN
     FROM Libro L INNER JOIN Categoria C ON L.Id_Categoria = C.Id_Categoria;
 END;
 
---------------------------------------------REGISTRAR----------------------------------------------
-ALTER PROCEDURE RegistrarLibro
+------------------------------------------ REGISTRAR ------------------------------------------ PENDIENTE
+CREATE PROCEDURE RegistrarLibro
     @ISBN VARCHAR(20),
 	@Descripcion VARCHAR(150),
     @Titulo VARCHAR(200),
@@ -523,8 +521,8 @@ BEGIN
     VALUES (@ISBN, @Titulo, @Descripcion, @Autor, @Id_Categoria, @Anio, @Imagen_URL);
 END;
 
-------------------------------------------ACTUALIZAR----------------------------------------------
-ALTER PROCEDURE ActualizarLibro
+------------------------------------------ ACTUALIZAR ------------------------------------------ PENDIENTE
+CREATE PROCEDURE ActualizarLibro
 	@Id_Usuario INT,
     @Id_Libro INT,
     @ISBN VARCHAR(20),
@@ -552,8 +550,8 @@ BEGIN
 
 END;
 
--- ELIMINAR -------------------------------------------------------------------------------------
-ALTER PROCEDURE EliminarLibro
+-- ELIMINAR ------------------------------------------------------------------------------------- PENDIENTE
+CREATE PROCEDURE EliminarLibro
 	@Id_Usuario INT,
     @Id_Libro INT
 AS
@@ -566,8 +564,8 @@ BEGIN
 
 END;
 
--- OBTENER LIBRO X ID -------------------------------------------------------------------------------------
-ALTER PROCEDURE ObtenerLibroPorId
+-- OBTENER LIBRO X ID ------------------------------------------------------------------------------------- PENDIENTE
+CREATE PROCEDURE ObtenerLibroPorId 
     @Id_Libro INT
 AS
 BEGIN
@@ -586,7 +584,7 @@ BEGIN
 END;
 
 -- RESERVAR LIRBO -------------------------------------------------------------------------------------
-CREATE PROCEDURE ReservarLibro
+CREATE PROCEDURE ReservarLibro -- REVISAR PROCEDIMIENTO - PENDIENTE
     @Id_Libro INT,
     @Tipo VARCHAR(10),
     @Fecha DATETIME,
@@ -638,7 +636,7 @@ END
 
 */
 
----------------------------------------- OBTENER RESERVAS ----------------------------------------
+---------------------------------------- OBTENER RESERVAS ---------------------------------------- PENDIENTE
 CREATE PROCEDURE ObtenerReservasUsuario
     @Id_Usuario INT
 AS
@@ -660,7 +658,7 @@ BEGIN
     ORDER BY M.Fecha DESC;
 END
 
----------------------------------------- CANCELAR RESERVA ----------------------------------------
+---------------------------------------- CANCELAR RESERVA ---------------------------------------- PENDIENTE
 CREATE PROCEDURE CancelarReserva
     @Id_Movimiento INT
 AS
@@ -678,7 +676,7 @@ END
 
 /******************************************* EJEMPLARES *******************************************/
 
-ALTER PROCEDURE ObtenerEjemplares
+CREATE PROCEDURE ObtenerEjemplares
 AS
 BEGIN
     SELECT 
@@ -695,7 +693,7 @@ BEGIN
 END
 
 
-ALTER PROCEDURE ObtenerEjemplarPorId
+CREATE PROCEDURE ObtenerEjemplarPorId
     @Id INT
 AS
 BEGIN
@@ -714,7 +712,7 @@ BEGIN
 END
 
 
-ALTER PROCEDURE RegistrarEjemplar
+CREATE PROCEDURE RegistrarEjemplar
     @CodigoEjemplar VARCHAR(20),
     @Id_Libro INT,
 	@Cantidad INT,
@@ -726,7 +724,8 @@ BEGIN
     VALUES (@CodigoEjemplar, @Id_Libro, @Cantidad, @Estado, @Ubicacion, GETDATE());
 END
 
-ALTER PROCEDURE ActualizarEjemplar
+
+CREATE PROCEDURE ActualizarEjemplar
     @Id INT,
     @CodigoEjemplar VARCHAR(20),
 	@Cantidad INT,
@@ -751,9 +750,10 @@ AS
 BEGIN
     DELETE FROM Ejemplar WHERE Id_Ejemplar = @Id;
 END
+
 /* ****************************************************************************************************
    ******************************************** ESTADOS SP *********************************************
-   **************************************************************************************************** */---------------------------------ESTADOS SP-----------------------------------------------------------
+   **************************************************************************************************** */
 CREATE PROCEDURE ObtenerEstados
 AS
 BEGIN
@@ -768,7 +768,7 @@ END
    **************************************************************************************************** */
 
 -- RESERVAS DE LIBROS 
--- Crear reserva -------------------------------------------------------------------------------------
+-- Crear reserva ------------------------------------------------------------------------------------- PENDIENTE
 CREATE PROCEDURE CrearReserva
     @Id_Usuario INT,
     @Id_Libro INT,
@@ -781,7 +781,7 @@ BEGIN
     VALUES ('RESERVA', @Fecha_Reserva, @Fecha_Expiracion, @Id_Usuario, @Id_Libro, @Id_Estado)
 END
 
--- Cancelar reserva -------------------------------------------------------------------------------------
+-- Cancelar reserva ------------------------------------------------------------------------------------- PENDIENTE
 CREATE PROCEDURE CancelarReserva
     @Id_Movimiento INT,
     @Id_Estado INT -- Cancelada
@@ -792,7 +792,7 @@ BEGIN
     WHERE Id_Movimiento = @Id_Movimiento AND Tipo = 'RESERVA'
 END
 
--- Expirar reserva -------------------------------------------------------------------------------------
+-- Expirar reserva ------------------------------------------------------------------------------------- PENDIENTE
 CREATE PROCEDURE ExpirarReserva
 AS
 BEGIN
@@ -818,24 +818,24 @@ END
 -- Agregar comentario -------------------------------------------------------------------------------------
 CREATE PROCEDURE AgregarComentario
     @Id_Usuario INT,
-    @Id_Libro INT,
+    @Id_Ejemplar INT,
     @Comentario VARCHAR(150),
     @Rating INT
 AS
 BEGIN
-    INSERT INTO Comentario (Creacion, Comentario, Rating, Id_Libro, Id_Usuario)
-    VALUES (GETDATE(), @Comentario, @Rating, @Id_Libro, @Id_Usuario)
+    INSERT INTO Comentario (Creacion, Comentario, Rating, Id_Ejemplar, Id_Usuario)
+    VALUES (GETDATE(), @Comentario, @Rating, @Id_Ejemplar, @Id_Usuario)
 END
 
 -- Listar comentarios por libro -------------------------------------------------------------------------------------
 CREATE PROCEDURE ListarComentariosPorLibro
-    @Id_Libro INT
+    @Id_Ejemplar INT
 AS
 BEGIN
     SELECT C.Id_Comentario, C.Comentario, C.Rating, C.Creacion, U.Nombre, U.Apellidos
     FROM Comentario C
     INNER JOIN Usuario U ON C.Id_Usuario = U.Id_Usuario
-    WHERE C.Id_Libro = @Id_Libro
+    WHERE C.Id_Ejemplar = @Id_Ejemplar
 END
 
 
@@ -871,21 +871,25 @@ SELECT TOP 1 * FROM Libro;
 --------------------------------------------------------------------------------------------------------
 
 
-/*
-	************************************REPORTES Y OBTENCION DE DATOS RELEVANTES************************
-*/
 
+/* ****************************************************************************************************
+   *********************************** REPORTES DE DATOS RELEVANTES ***********************************
+   **************************************************************************************************** */
+-- SP OBTENER RESERVAS ACTIVAS -------------------------------------------------------------------------------------
 CREATE PROCEDURE ObtenerReservasActivas
 AS
 BEGIN
-	SELECT Id_Movimiento, Tipo, Fecha, Fecha_Vencimiento, M.Estado, CONCAT(U.Nombre, ' ',U.Apellidos) AS Nombre, L.Titulo
-	FROM Movimiento M INNER JOIN Usuario U ON M.Id_Usuario = U.Id_Usuario 
-	INNER JOIN Libro L ON M.Id_Libro = L.Id_Libro
-	--HAY QUE AGREGAR ESTADO PERO NO SE GUARDAN CORRECTAMENTE WHERE ID_ESTADO = 1-2-3
+	SELECT M.Id_Movimiento, M.Tipo, M.Fecha, M.Fecha_Vencimiento, M.Id_Estado, CONCAT(U.Nombre, ' ',U.Apellidos) AS Nombre, L.Titulo
+	FROM Movimiento M 
+    INNER JOIN Usuario U ON M.Id_Usuario = U.Id_Usuario 
+	INNER JOIN Libro L ON M.Id_Ejemplar = L.Id_Libro
+    INNER JOIN Estado E ON M.Id_Estado = E.Id_Estado WHERE E.Estado IN 
+	-- AND M.Id_Estado = 1
 END;
 --EXEC ObtenerReservasActivas;
 
-CREATE PROCEDURE ObtenerLibrosConMasCantidadMovimientos
+-- SP OBTENER LIBROS DEL TOP 5 -------------------------------------------------------------------------------------
+CREATE PROCEDURE ObtenerLibrosConMasCantidadMovimientos 
 AS
 BEGIN
     SELECT TOP 5
@@ -893,17 +897,31 @@ BEGIN
         L.Titulo,
         COUNT(DISTINCT M.Id_Movimiento) AS CantidadMovimientos
     FROM Libro L
-    INNER JOIN Movimiento M ON L.Id_Libro = M.Id_Libro
-    --WHERE M.Id_Estado IN (1, 2, 3)
+    INNER JOIN Ejemplar E ON L.Id_Libro = E.Id_Libro
+    INNER JOIN Movimiento M ON E.Id_Ejemplar = M.Id_Ejemplar
     GROUP BY L.Id_Libro, L.Titulo
     ORDER BY CantidadMovimientos DESC;
 END;
 --EXEC ObtenerLibrosConMasCantidadMovimientos;
 
--------------------------------USUARIOS CON MÁS SANCIONES--------------------------------------------------
+-- SP OBTENER USUARIOS CON MÁS SANCIONES -------------------------------------------------------------------------------------
+CREATE PROCEDURE ObtenerUsuariosConMasSanciones
+AS
+BEGIN
+    SELECT 
+        U.Id_Usuario,
+        CONCAT(U.Nombre, ' ', U.Apellidos) AS Usuario,
+        COUNT(S.Id_Sancion) AS TotalSanciones,
+        MIN(S.Fecha_Finalizacion) AS ProximaFechaFin
+    FROM Sancion S
+    INNER JOIN Movimiento M ON S.Id_Movimiento = M.Id_Movimiento
+    INNER JOIN Usuario U ON M.Id_Usuario = U.Id_Usuario
+    WHERE S.Estado = 1
+    GROUP BY U.Id_Usuario, U.Nombre, U.Apellidos
+    ORDER BY TotalSanciones DESC;
+END;
 
----------------------PENDIENTE--------------------------
-
-
--------------------------------TEMAS DE BITACORAS/AUDITLOGS------------------------------------------------
+/* ****************************************************************************************************
+   ********************************** MODULO DE BITACORA & AUDITLOGS **********************************
+   **************************************************************************************************** */
 

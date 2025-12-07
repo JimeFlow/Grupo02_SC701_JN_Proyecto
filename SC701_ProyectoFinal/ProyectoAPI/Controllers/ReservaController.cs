@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Text;
+using Azure.Core;
 using Dapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -100,6 +101,17 @@ namespace ProyectoAPI.Controllers
         {
             using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
+                int consecutivoUsuario = int.TryParse(HttpContext.User.FindFirst("id")?.Value, out var id) ? id : 0;
+                var sanciones = context.ExecuteScalar<int>(
+        "UsuarioTieneSancionActiva",
+        new { Id_Usuario = consecutivoUsuario },
+        commandType: CommandType.StoredProcedure
+    );
+
+                if (sanciones > 0)
+                {
+                    return BadRequest("El usuario tiene una sanción activa y no puede realizar préstamos.");
+                }
                 var parametros = new DynamicParameters();
                 parametros.Add("@Id_Movimiento", reserva.Id_Movimiento);
                 parametros.Add("@Fecha_Vencimiento", reserva.Fecha_Vencimiento);

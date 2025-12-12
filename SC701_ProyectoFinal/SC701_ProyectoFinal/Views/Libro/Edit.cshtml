@@ -11,7 +11,6 @@
         <div class="card-body">
             <form asp-action="Edit" method="post">
                 <input type="hidden" asp-for="Id_Libro" />
-                <input type="hidden" asp-for="Estado_Libro" id="Estado_Libro" />
 
                 <div class="row mb-3">
                     <div class="col-md-6">
@@ -29,16 +28,24 @@
                         <label asp-for="ISBN" class="form-label fw-bold">ISBN</label>
                         <input asp-for="ISBN" class="form-control" />
                     </div>
+
                     <div class="col-md-4">
-                        <label asp-for="Anio" class="form-label fw-bold">Año de Publicación</label>
-                        <input asp-for="Anio" class="form-control" type="number" min="1900" max="2100" />
-                    </div>
-                    <div class="col-md-4">
-                        <label asp-for="Id_Estado" class="form-label fw-bold">Estado</label>
-                        <select asp-for="Id_Estado" class="form-select"
-                                asp-items="@(new SelectList(ViewBag.Estados, "Id_Estado", "Estado", Model.Id_Estado))">
-                            <option value="">-- Seleccione un estado --</option>
+                        <label class="form-label fw-bold">Categoría</label>
+                        <select asp-for="Id_Categoria" class="form-select"
+                                asp-items="@(new SelectList(ViewBag.Categorias, "Id_Categoria", "Tipo", Model.Id_Categoria))">
+                            <option value="">-- Seleccione una categoría --</option>
                         </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="Anio" class="form-label fw-bold">Año</label>
+                        <input asp-for="Anio" class="form-control" type="number" />
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label asp-for="Descripcion" class="form-label fw-bold">Descripción</label>
+                        <input asp-for="Descripcion" class="form-control" type="text" />
                     </div>
                 </div>
 

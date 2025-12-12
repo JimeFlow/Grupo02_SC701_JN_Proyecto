@@ -48,6 +48,10 @@
                             {
                                 <span class="badge bg-success">@r.Estado</span>
                             }
+                            else if (r.Estado == "Cancelado")
+                            {
+                                <span class="badge text-bg-danger">@r.Estado</span>
+                            }
                             else
                             {
                                 <span class="badge bg-primary">@r.Estado</span>
@@ -64,21 +68,18 @@
 
                             @if (r.Estado == "Reservado")
                             {
-                                <button class="btn btn-primary btn-sm"
+                                @if (ViewBag.TieneSancion == false)
+                                {                                    
+                                    <button class="btn btn-primary btn-sm"
                                         data-bs-toggle="modal"
                                         data-bs-target="#modalExtender"
                                         data-id="@r.Id_Movimiento"
                                         data-fecha="@r.Fecha_Vencimiento.ToString("yyyy-MM-dd")">
                                     Extender préstamo
                                 </button>
+                                }
+                                
 
-                            }else if (r.Estado != "Completado")
-                            {
-                                <a asp-action="CancelarReserva"
-                                   asp-route-id="@r.Id_Movimiento"
-                                   class="btn btn-danger btn-sm">
-                                    Cancelar
-                                </a>
                             }
                         </td>
                     </tr>

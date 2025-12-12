@@ -82,6 +82,8 @@ namespace ProyectoAPI.Controllers
 
             using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
+                int consecutivoUsuario = int.TryParse(HttpContext.User.FindFirst("id")?.Value, out var idU) ? idU
+             : 0;
                 var parametros = new DynamicParameters();
 
                 parametros.Add("@Id_Libro", id);
@@ -91,6 +93,8 @@ namespace ProyectoAPI.Controllers
                 parametros.Add("@Autor", libro.Autor);
                 parametros.Add("@Anio", libro.Anio);
                 parametros.Add("@Imagen_URL", libro.Imagen_URL);
+                parametros.Add("@Id_Usuario", consecutivoUsuario);
+                parametros.Add("@Id_Categoria", libro.Id_Categoria);
 
                 var resultado = context.Execute("ActualizarLibro", parametros, commandType: CommandType.StoredProcedure);
 
@@ -106,8 +110,11 @@ namespace ProyectoAPI.Controllers
 
             using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
+                int consecutivoUsuario = int.TryParse(HttpContext.User.FindFirst("id")?.Value, out var idU) ? idU
+            : 0;
                 var parametros = new DynamicParameters();
                 parametros.Add("@Id_Libro", id);
+                parametros.Add("@Id_Usuario", consecutivoUsuario);
 
                 var res = context.Execute("EliminarLibro", parametros, commandType: CommandType.StoredProcedure);
 

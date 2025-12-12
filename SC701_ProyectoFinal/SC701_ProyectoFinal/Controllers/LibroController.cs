@@ -67,14 +67,8 @@ namespace SC701_ProyectoFinal.Controllers
             if (!ModelState.IsValid)
             {
                 ViewBag.Categorias = await ObtenerCategoriasAsync();
-                ViewBag.Estados = await ObtenerEstadosAsync();
                 return View(libro);
             }
-
-            // Llenar Estado_Libro según Id_Estado
-            var estados = await ObtenerEstadosAsync();
-            var estadoSeleccionado = estados.FirstOrDefault(e => e.Id_Estado == libro.Id_Estado);
-            libro.Estado_Libro = estadoSeleccionado?.Estado;
 
             using (var client = _httpClientFactory.CreateClient())
             {
@@ -88,10 +82,9 @@ namespace SC701_ProyectoFinal.Controllers
                     ISBN = libro.ISBN,
                     Titulo = libro.Titulo,
                     Autor = libro.Autor,
+                    Descripcion = libro.Descripcion,
                     Anio = libro.Anio,
                     Imagen_URL = libro.Imagen_URL,
-                    Id_Estado = libro.Id_Estado,
-                    Estado_Libro = libro.Estado_Libro,
                     Id_Categoria = libro.Id_Categoria
                 };
 
@@ -101,7 +94,6 @@ namespace SC701_ProyectoFinal.Controllers
                     return RedirectToAction("Index");
 
                 ViewBag.Mensaje = "No se pudo registrar el libro";
-                ViewBag.Estados = await ObtenerEstadosAsync();
                 ViewBag.Categorias = await ObtenerCategoriasAsync();
                 return View(libro);
             }
@@ -123,7 +115,7 @@ namespace SC701_ProyectoFinal.Controllers
 
                 var libro = respuesta.Content.ReadFromJsonAsync<LibroModel>().Result;
 
-                ViewBag.Estados = await ObtenerEstadosAsync();
+                ViewBag.Categorias = await ObtenerCategoriasAsync();
                 return View(libro);
             }
         }
@@ -132,16 +124,12 @@ namespace SC701_ProyectoFinal.Controllers
         public async Task<IActionResult> Edit(int id, LibroModel libro)
         {
             if (!ModelState.IsValid)
-            {
-                ViewBag.Estados = await ObtenerEstadosAsync();
+            {                
+                ViewBag.Categorias = await ObtenerCategoriasAsync();
                 return View(libro);
             }
 
-            // Llenar Estado_Libro según Id_Estado
-            var estados = await ObtenerEstadosAsync();
-            var estadoSeleccionado = estados.FirstOrDefault(e => e.Id_Estado == libro.Id_Estado);
-            libro.Estado_Libro = estadoSeleccionado?.Estado;
-
+            
             using (var client = _httpClientFactory.CreateClient())
             {
                 var urlApi = _configuration["Valores:UrlAPI"] + $"Libro/ActualizarLibro/{id}";
@@ -154,10 +142,10 @@ namespace SC701_ProyectoFinal.Controllers
                     ISBN = libro.ISBN,
                     Titulo = libro.Titulo,
                     Autor = libro.Autor,
+                    Descripcion = libro.Descripcion,
                     Anio = libro.Anio,
                     Imagen_URL = libro.Imagen_URL,
-                    Id_Estado = libro.Id_Estado,
-                    Estado_Libro = libro.Estado_Libro
+                    Id_Categoria = libro.Id_Categoria,
                 };
 
                 var respuesta = client.PutAsJsonAsync(urlApi, request).Result;
@@ -166,7 +154,7 @@ namespace SC701_ProyectoFinal.Controllers
                     return RedirectToAction("Index");
 
                 ViewBag.Mensaje = "No se pudo actualizar el libro";
-                ViewBag.Estados = await ObtenerEstadosAsync();
+                ViewBag.Categorias = await ObtenerCategoriasAsync();
                 return View(libro);
             }
         }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using ProyectoAPI.Models;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace ProyectoAPI.Controllers
 {
@@ -71,6 +72,26 @@ namespace ProyectoAPI.Controllers
 
                 return Ok(resultado.ToList());
             }
+        }
+
+        [HttpGet]
+        [Route("UsuarioTieneSancion")]
+        public IActionResult UsuarioTieneSancionActiva()
+        {
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
+            {
+                int consecutivoUsuario = int.TryParse(HttpContext.User.FindFirst("id")?.Value, out var id) ? id
+             : 0;
+                var parametros = new DynamicParameters();
+                parametros.Add("@Id_Usuario", consecutivoUsuario);
+                int tieneSancion = context.ExecuteScalar<int>(
+                        "UsuarioTieneSancionActiva",
+                        parametros,
+                        commandType: CommandType.StoredProcedure
+                    );
+
+                return Ok(tieneSancion);
+            }            
         }
 
 

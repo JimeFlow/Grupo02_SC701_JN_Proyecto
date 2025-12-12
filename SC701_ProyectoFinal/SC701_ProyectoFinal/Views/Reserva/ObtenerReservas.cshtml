@@ -102,7 +102,7 @@
 				</div>
 				<div class="modal-footer">
 					<button type="submit" class="btn btn-success">Sí</button>
-					<button data-bs-dismiss="modal" class="btn btn-secondary">No</button>
+					<button type="button" data-bs-dismiss="modal" class="btn btn-secondary">No</button>
 				</div>
 			</form>
 		</div>
@@ -113,7 +113,7 @@
 <div class="modal fade" id="modalCancelar" tabindex="-1">
 	<div class="modal-dialog">
 		<div class="modal-content">
-			<form method="post" asp-action="CancelarReserva">
+			<form method="post" asp-controller="Reserva" asp-action="CancelarReserva">
 				<div class="modal-header">
 					<h5 class="modal-title">Cancelar Reserva</h5>
 				</div>
@@ -123,7 +123,7 @@
 				</div>
 				<div class="modal-footer">
 					<button type="submit" class="btn btn-danger">Sí</button>
-					<button data-bs-dismiss="modal" class="btn btn-secondary">No</button>
+					<button type="button" data-bs-dismiss="modal" class="btn btn-secondary">No</button>
 				</div>
 			</form>
 		</div>
@@ -134,7 +134,7 @@
 <div class="modal fade" id="modalCompletado" tabindex="-1">
 	<div class="modal-dialog">
 		<div class="modal-content">
-			<form method="post" asp-action="CambiarEstadoCancelacion">
+			<form method="post" asp-controller="Reserva" asp-action="CambiarEstadoCompletado">
 				<div class="modal-header">
 					<h5 class="modal-title">Marcar como Devuelto</h5>
 				</div>
@@ -144,7 +144,7 @@
 				</div>
 				<div class="modal-footer">
 					<button type="submit" class="btn btn-primary">Sí</button>
-					<button data-bs-dismiss="modal" class="btn btn-secondary">No</button>
+					<button type="button" data-bs-dismiss="modal" class="btn btn-secondary">No</button>
 				</div>
 			</form>
 		</div>

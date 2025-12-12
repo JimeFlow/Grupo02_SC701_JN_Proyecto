@@ -102,9 +102,11 @@ namespace ProyectoAPI.Controllers
             using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
                 int consecutivoUsuario = int.TryParse(HttpContext.User.FindFirst("id")?.Value, out var id) ? id : 0;
+                var parametroValidar = new DynamicParameters();
+                parametroValidar.Add("@Id_Usuario", consecutivoUsuario);
                 var sanciones = context.ExecuteScalar<int>(
         "UsuarioTieneSancionActiva",
-        new { Id_Usuario = consecutivoUsuario },
+       parametroValidar,
         commandType: CommandType.StoredProcedure
     );
 
@@ -137,7 +139,7 @@ namespace ProyectoAPI.Controllers
         }
 
         [HttpPut]
-        [Route("CancelarEstadoCancelado")]
+        [Route("CambiarEstadoCompletado")]
         public IActionResult CambiarEstadoCancelado(CambiarEstadoReservaRequestModel model)
         {
             using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
@@ -145,7 +147,7 @@ namespace ProyectoAPI.Controllers
                 var parametros = new DynamicParameters();
                 parametros.Add("@Id_Movimiento", model.Id_Movimiento);
 
-                var resultado = context.Execute("CambiarEstadoCancelado", parametros);
+                var resultado = context.Execute("CambiarEstadoCompletado", parametros);
                 return Ok(resultado);
             }
         }

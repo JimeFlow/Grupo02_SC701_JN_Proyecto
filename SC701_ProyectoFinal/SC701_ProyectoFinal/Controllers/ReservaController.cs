@@ -22,8 +22,24 @@ namespace SC701_ProyectoFinal.Controllers
             using (var context = _httpClientFactory.CreateClient())
             {
                 var IdUsuario = HttpContext.Session.GetInt32("Id_Usuario");
-                var urlApi = _configuration["Valores:UrlAPI"] + "Reserva/ObtenerReservas?Id_Usuario="+IdUsuario;
+
+                var urlSancion = _configuration["Valores:UrlAPI"] + "Sancion/UsuarioTieneSancion";
                 context.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
+                var respSancion = context.GetAsync(urlSancion).Result;
+                bool tieneSancion = false;
+                if(respSancion.IsSuccessStatusCode)
+                {
+                    var numero = respSancion.Content.ReadAsStringAsync().Result;
+                    if(int.TryParse(numero, out int result))
+                    {
+                        tieneSancion = result > 0;
+                    }
+                                        
+                }
+                ViewBag.tieneSancion = tieneSancion;
+
+
+                var urlApi = _configuration["Valores:UrlAPI"] + "Reserva/ObtenerReservas?Id_Usuario="+IdUsuario;
                 var respuesta = context.GetAsync(urlApi).Result;
 
                 if (respuesta.IsSuccessStatusCode)
@@ -32,8 +48,8 @@ namespace SC701_ProyectoFinal.Controllers
                     return View(datosApi);
                 }
 
-                ViewBag.Mensaje = "No hay productos registrados";
-                return View(new List<UsuarioModel>());
+                ViewBag.Mensaje = "No hay reservas registradas";
+                return View(new List<ReservaRequestModel>());
             }
         }
 
@@ -108,10 +124,10 @@ namespace SC701_ProyectoFinal.Controllers
 
                     if (datosApi > 0)
                     {
-                        return RedirectToAction("Index");
+                        return RedirectToAction("ObtenerReservas");
                     }
                 }                
-                return RedirectToAction("Index");
+                return RedirectToAction("ObtenerReservas");
             }
         }
 
@@ -138,11 +154,11 @@ namespace SC701_ProyectoFinal.Controllers
         }
 
         [HttpPost]
-        public IActionResult CambiarEstadoCancelacion(ReservaRequestModel reserva)
+        public IActionResult CambiarEstadoCompletado(ReservaRequestModel reserva)
         {
             using (var context = _httpClientFactory.CreateClient())
             {
-                var urlApi = _configuration["Valores:UrlAPI"] + "Reserva/CancelarEstadoCancelado";//si
+                var urlApi = _configuration["Valores:UrlAPI"] + "Reserva/CambiarEstadoCompletado";//si
                 context.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
                 var respuesta = context.PutAsJsonAsync(urlApi, reserva).Result;
 
@@ -218,7 +234,7 @@ namespace SC701_ProyectoFinal.Controllers
                 TempData["ErrorMessage"] = "No se pudo cancelar la reserva.";
             }
 
-            return RedirectToAction("MisReservas");
+            return RedirectToAction("ObtenerReservas");
         }
 
     }

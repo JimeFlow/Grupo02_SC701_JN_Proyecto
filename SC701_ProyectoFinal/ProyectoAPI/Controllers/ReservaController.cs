@@ -20,98 +20,58 @@ namespace ProyectoAPI.Controllers
         }
 
         [HttpPost("Crear")]
-        public IActionResult crearReserva([FromBody] ReservaLibroModel reserva)
-        {            
-                // Logica para crear una reserva en la base de datos
-                using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("BDConnection")))
-                {
-                    SqlCommand command = new SqlCommand("CrearReserva", connection);
-                    command.CommandType = System.Data.CommandType.StoredProcedure;
-
-                    command.Parameters.AddWithValue("@Id_Usuario", reserva.UsuarioId);
-                    command.Parameters.AddWithValue("@Id_Libro", reserva.LibroId);
-                    command.Parameters.AddWithValue("@Fecha_Reserva", reserva.FechaReserva);
-                    command.Parameters.AddWithValue("@Fecha_Vencimiento", reserva.FechaVencimiento);
-                    command.Parameters.AddWithValue("@Id_Estado", reserva.EstadoReserva);
-
-                    connection.Open();
-                    command.ExecuteNonQuery();
-                    connection.Close();
-                }
-
-                string correoUsuario = "";
-                using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("BDConnection")))
-                {
-                    SqlCommand command = new SqlCommand("SELECT Correo FROM Usuario WHERE Id_Usuario = @Id", connection);
-                    command.Parameters.AddWithValue("@Id", reserva.UsuarioId);
-
-                    connection.Open();
-                    correoUsuario = command.ExecuteScalar().ToString() ?? "";
-                    connection.Close();
-                }
-
-                if (string.IsNullOrEmpty(correoUsuario))
-                {
-                    return BadRequest("No se pudo obtener el correo del usuario.");
-                }
-
-                // Preparar el contenido del correo utilizando la plantilla
-                var ruta = Path.Combine(Directory.GetCurrentDirectory(), "PlantillasCorreo", "NotificacionReserva.html");
-                string html = System.IO.File.ReadAllText(ruta, UTF8Encoding.UTF8);
-                html = html.Replace("{{Usuario}}", "Nombre");
-                html = html.Replace("{{Libro}}", "Titulo");
-                html = html.Replace("{{FechaReserva}}", reserva.FechaReserva.ToString("dd/MM/yyyy"));
-                html = html.Replace("{{FechaVencimiento}}", reserva.FechaVencimiento.ToShortDateString());
-
-                // REVISAR
-                //CorreoService _correoService = new CorreoService(_configuration);
-                //_correoService.EnviarCorreo(correoUsuario, "Confirmación de Reserva de Libro", html);                               
-
-                return Ok(new { mensaje = "¡Reserva creada exitosamente!" });
-            }            
-
-        
-
-        [HttpGet("Usuario/{idUsuario}")]
-        public IActionResult ObtenerReservasDeUsuario(int idUsuario)
+        public IActionResult CrearReserva([FromBody] ReservaRequestModel reserva)
         {
+            // 1. Crear la reserva (Dapper + SP)
             using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
                 var parametros = new DynamicParameters();
-                parametros.Add("@Id_Usuario", idUsuario);
+                parametros.Add("@Id_Usuario", reserva.Id_Usuario);
+                parametros.Add("@Id_Libro", reserva.Id_Libro);
+                parametros.Add("@Fecha_Reserva", reserva.Fecha_Reserva);
+                parametros.Add("@Fecha_Vencimiento", reserva.Fecha_Vencimiento);
+                parametros.Add("@Id_Estado", reserva.Id_Estado);
 
-                var resultado = context.Query<dynamic>(
-                    "ObtenerReservasUsuario",
+                context.Execute(
+                    "CrearReserva",
                     parametros,
                     commandType: CommandType.StoredProcedure
                 );
-
-                return Ok(resultado);
             }
 
-
-        }
-
-        [HttpDelete("Cancelar/{idReserva}")]
-        public IActionResult CancelarReserva(int idReserva)
-        {
+            // 2. Obtener correo del usuario (SP + Dapper)
+            string? correoUsuario;
             using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
-                var parametros = new DynamicParameters();
-                parametros.Add("@Id_Movimiento", idReserva);
-
-                context.Execute("CancelarReserva", parametros);
+                correoUsuario = context.QueryFirstOrDefault<string>(
+                    "ObtenerCorreoUsuario",
+                    new { Id_Usuario = reserva.Id_Usuario },
+                    commandType: CommandType.StoredProcedure
+                );
             }
 
-            return Ok(new { mensaje = "Reserva cancelada exitosamente." });
+            if (string.IsNullOrEmpty(correoUsuario))
+                return BadRequest("No se pudo obtener el correo del usuario.");
+
+            // 3. Preparar correo (esto está perfecto)
+            var ruta = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "PlantillasCorreo",
+                "NotificacionReserva.html"
+            );
+
+            string html = System.IO.File.ReadAllText(ruta, UTF8Encoding.UTF8);
+            html = html.Replace("{{Usuario}}", "Nombre");
+            html = html.Replace("{{Libro}}", "Titulo");
+            html = html.Replace("{{FechaReserva}}", reserva.Fecha_Reserva.ToString("dd/MM/yyyy"));
+            html = html.Replace("{{FechaVencimiento}}", reserva.Fecha_Vencimiento.ToShortDateString());
+
+            // (envío comentado está bien para entrega)
+            // _correoService.EnviarCorreo(...)
+
+            return Ok(new { mensaje = "¡Reserva creada exitosamente!" });
         }
+
     }
 
 }
-
-    
-    
-
-
-
-

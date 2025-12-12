@@ -8,30 +8,30 @@ namespace ProyectoAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EstadoController : ControllerBase
+    public class FAQController : ControllerBase
     {
         private readonly IConfiguration _configuration;
 
-        public EstadoController(IConfiguration configuration)
+        public FAQController(IConfiguration configuration)
         {
             _configuration = configuration;
         }
 
+        // LISTAR SOLO FAQ ACTIVOS
         [HttpGet]
-        public IActionResult ObtenerEstados()
+        public IActionResult ObtenerFAQ()
         {
-
             using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
-                var resultado = context.Query<EstadoModel>(
-             "ObtenerEstados",
-             commandType: CommandType.StoredProcedure
-         );
+                var resultado = context.Query<FAQModel>(
+                    "ListarFAQActivos",
+                    commandType: CommandType.StoredProcedure
+                );
 
                 return Ok(resultado);
             }
         }
+
     }
+
 }
-
-

@@ -1,0 +1,28 @@
+﻿<div class="container mt-4">
+    <h2>Preguntas Frecuentes</h2>
+
+    <div id="faqContainer"></div>
+</div>
+
+<script>
+    fetch("/api/FAQ")
+        .then(res => res.json())
+        .then(data => {
+            let html = "";
+
+            data.forEach(f => {
+                html += `
+                <div class="card mb-2">
+                    <div class="card-header">
+                        <h5>${f.pregunta}</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>${f.respuesta}</p>
+                    </div>
+                </div>`;
+            });
+
+            document.getElementById("faqContainer").innerHTML = html;
+        })
+        .catch(error => console.log(error));
+</script>

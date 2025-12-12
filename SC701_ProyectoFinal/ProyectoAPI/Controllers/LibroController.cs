@@ -140,9 +140,9 @@ namespace ProyectoAPI.Controllers
 
                 parametros.Add("@Id_Libro", request.Id_Libro);
                 parametros.Add("@Tipo", request.Tipo);
-                parametros.Add("@Fecha", request.Fecha);
+                parametros.Add("@Fecha", request.Fecha_Reserva);
                 parametros.Add("@Fecha_Vencimiento", request.Fecha_Vencimiento);
-                parametros.Add("@Estado", request.Estado);
+                parametros.Add("@Estado", request.Id_Estado);
                 parametros.Add("@Id_Usuario", request.Id_Usuario);
 
                 var result = context.QueryFirstOrDefault<int>("ReservarLibro", parametros, commandType: CommandType.StoredProcedure);

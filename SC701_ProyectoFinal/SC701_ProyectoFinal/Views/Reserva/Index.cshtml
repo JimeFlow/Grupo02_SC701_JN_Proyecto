@@ -1,0 +1,198 @@
+﻿@model IEnumerable<SC701_ProyectoFinal.Models.ReservaRequestModel>
+
+
+@{
+    ViewData["Title"] = "MisReservas";
+    Layout = "~/Views/Shared/_LayoutInterno.cshtml";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4 text-center">Mis Reservas</h2>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center">
+            No tienes reservas en este momento.
+        </div>
+    }
+    else
+
+    {
+        <table class="table table-hover shadow-sm">
+            <thead class="table-dark text-center">
+                <tr>
+                    <th>Imagen</th>
+                    <th>Libro</th>
+                    <th>Fecha Reserva</th>
+                    <th>Fecha Vencimiento</th>
+                    <th>Estado</th>
+                    <th style="width:190px;">Acciones</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model)
+                {
+                    <tr class="align-middle text-center">
+                        <td>
+                            <img src="@r.Imagen_URL" width="50" height="70" class="rounded shadow-sm" />
+                        </td>
+                        <td>@r.Titulo</td>
+                        <td>@r.Fecha.ToShortDateString()</td>
+                        <td>@r.Fecha_Vencimiento.ToShortDateString()</td>
+                        <td>
+                            @if(r.Estado == "Pendiente")
+                            {
+                                <span class="badge bg-warning">@r.Estado</span>
+                            }else if(r.Estado == "Completado")
+                            {
+                                <span class="badge bg-success">@r.Estado</span>
+                            }
+                            else if (r.Estado == "Cancelado")
+                            {
+                                <span class="badge text-bg-danger">@r.Estado</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-primary">@r.Estado</span>
+                            }
+                        </td>
+
+                        <td>
+                            <div class="text-center">
+
+                            
+                            <a asp-controller="Libro"
+                               asp-action="Detalle"
+                               asp-route-id="@r.Id_Libro"
+                               class="btn btn-info btn-sm me-1 mb-3">
+                                Ver detalles libro
+                            </a>
+
+                            @if (r.Estado == "Reservado")
+                            {
+                                @if (ViewBag.TieneSancion == false)
+                                {                                    
+                                    <button class="btn btn-primary btn-sm mb-3"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalExtender"
+                                        data-id="@r.Id_Movimiento"
+                                        data-fecha="@r.Fecha_Vencimiento.ToString("yyyy-MM-dd")">
+                                    Extender préstamo
+                                </button>
+                                }
+                            }
+                            else if(r.Estado == "Pendiente")
+                            {
+                                <button class="btn btn-primary btn-sm mb-3"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalCancelar"
+                                        data-id="@r.Id_Movimiento"
+                                >
+                                    Cancelar reserva
+                                </button>
+                            }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+</div>
+<div class="modal fade" id="modalExtender" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-action="ExtenderPlazoPrestamo">
+                <div class="modal-header">
+                    <h5 class="modal-title">Extender préstamo</h5>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" id="movIdExtender" name="Id_Movimiento" />
+
+                    <label class="form-label">Nueva fecha de vencimiento</label>
+                    <input type="date"
+                           id="fechaExtender"
+                           name="Fecha_Vencimiento"
+                           class="form-control"
+                           required />
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">
+                        Confirmar extensión
+                    </button>
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="modalCancelar" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-action="CancelarReserva" asp-controller="Reserva">
+                <div class="modal-header">
+                    <h5 class="modal-title">Cancelar reserva</h5>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" id="movIdCancelar" name="Id_Movimiento" />
+                    ¿Desea cancelar esta reserva?
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">
+                        Confirmar cancelación
+                    </button>
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        const modalExtender = document.getElementById('modalExtender');
+
+        modalExtender.addEventListener('show.bs.modal', event => {
+            const button = event.relatedTarget;
+
+            const movId = button.getAttribute('data-id');
+            const fechaVenc = button.getAttribute('data-fecha');
+
+            const idInput = document.getElementById('movIdExtender');
+            const fechaInput = document.getElementById('fechaExtender');
+
+            idInput.value = movId;
+            //validacion de la fecha
+            fechaInput.min = fechaVenc;
+            fechaInput.value = fechaVenc;
+        });
+
+        const modalCancelar = document.getElementById('modalCancelar');
+
+        modalCancelar.addEventListener('show.bs.modal', event => {
+            const button = event.relatedTarget;
+
+            const movId = button.getAttribute('data-id');
+
+            const idInput = document.getElementById('movIdCancelar');
+            idInput.value = movId;
+        });
+    </script>
+}

@@ -6,7 +6,7 @@
 }
 
 <div class="container mt-5">
-    <h2 class="text-center mb-4">📌 Reservar Libro</h2>
+    <h2 class="text-center mb-4">Reservar Libro</h2>
 
 
     @if (TempData["ErrorMessage"] != null)
@@ -23,7 +23,7 @@
             <h5 class="card-title text-center">@Model.Titulo</h5>
 
             <form asp-action="Reservar" method="post">
-                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="LibroId" />
 
                 <div class="mb-3">
                     <label asp-for="FechaReserva" class="form-label">Fecha de inicio</label>
@@ -43,11 +43,10 @@
                 </div>
             </form>
         </div>
-    </div>
-    ```
+    </div>    
 
 </div>
 
-@section Scripts {
+@section Scripts {    
     <partial name="_ValidationScriptsPartial" />
 }

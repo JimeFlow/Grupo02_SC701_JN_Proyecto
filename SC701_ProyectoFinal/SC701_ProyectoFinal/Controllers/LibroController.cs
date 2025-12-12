@@ -24,7 +24,16 @@ namespace SC701_ProyectoFinal.Controllers
         {
             using (var client = _httpClientFactory.CreateClient())
             {
-                var urlApi = _configuration["Valores:UrlAPI"] + "Libro/ListarLibros";
+                var rol = HttpContext.Session.GetInt32("Id_Rol");
+                var urlApi = "";
+                if(rol == 2)
+                {
+                    urlApi = _configuration["Valores:UrlAPI"] + "Libro/ListarLibrosCliente";
+                }
+                else
+                {
+                    urlApi = _configuration["Valores:UrlAPI"] + "Libro/ListarLibros";
+                }
 
                 client.DefaultRequestHeaders.Authorization =
                     new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
@@ -46,6 +55,7 @@ namespace SC701_ProyectoFinal.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
+            ViewBag.Categorias = await ObtenerCategoriasAsync();
             ViewBag.Estados = await ObtenerEstadosAsync();
             return View();
         }
@@ -56,14 +66,9 @@ namespace SC701_ProyectoFinal.Controllers
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.Estados = await ObtenerEstadosAsync();
+                ViewBag.Categorias = await ObtenerCategoriasAsync();
                 return View(libro);
             }
-
-            // Llenar Estado_Libro según Id_Estado
-            var estados = await ObtenerEstadosAsync();
-            var estadoSeleccionado = estados.FirstOrDefault(e => e.Id_Estado == libro.Id_Estado);
-            libro.Estado_Libro = estadoSeleccionado?.Estado;
 
             using (var client = _httpClientFactory.CreateClient())
             {
@@ -77,10 +82,10 @@ namespace SC701_ProyectoFinal.Controllers
                     ISBN = libro.ISBN,
                     Titulo = libro.Titulo,
                     Autor = libro.Autor,
+                    Descripcion = libro.Descripcion,
                     Anio = libro.Anio,
                     Imagen_URL = libro.Imagen_URL,
-                    Id_Estado = libro.Id_Estado,
-                    Estado_Libro = libro.Estado_Libro
+                    Id_Categoria = libro.Id_Categoria
                 };
 
                 var respuesta = client.PostAsJsonAsync(urlApi, request).Result;
@@ -89,7 +94,7 @@ namespace SC701_ProyectoFinal.Controllers
                     return RedirectToAction("Index");
 
                 ViewBag.Mensaje = "No se pudo registrar el libro";
-                ViewBag.Estados = await ObtenerEstadosAsync();
+                ViewBag.Categorias = await ObtenerCategoriasAsync();
                 return View(libro);
             }
         }
@@ -110,7 +115,7 @@ namespace SC701_ProyectoFinal.Controllers
 
                 var libro = respuesta.Content.ReadFromJsonAsync<LibroModel>().Result;
 
-                ViewBag.Estados = await ObtenerEstadosAsync();
+                ViewBag.Categorias = await ObtenerCategoriasAsync();
                 return View(libro);
             }
         }
@@ -119,16 +124,12 @@ namespace SC701_ProyectoFinal.Controllers
         public async Task<IActionResult> Edit(int id, LibroModel libro)
         {
             if (!ModelState.IsValid)
-            {
-                ViewBag.Estados = await ObtenerEstadosAsync();
+            {                
+                ViewBag.Categorias = await ObtenerCategoriasAsync();
                 return View(libro);
             }
 
-            // Llenar Estado_Libro según Id_Estado
-            var estados = await ObtenerEstadosAsync();
-            var estadoSeleccionado = estados.FirstOrDefault(e => e.Id_Estado == libro.Id_Estado);
-            libro.Estado_Libro = estadoSeleccionado?.Estado;
-
+            
             using (var client = _httpClientFactory.CreateClient())
             {
                 var urlApi = _configuration["Valores:UrlAPI"] + $"Libro/ActualizarLibro/{id}";
@@ -141,10 +142,10 @@ namespace SC701_ProyectoFinal.Controllers
                     ISBN = libro.ISBN,
                     Titulo = libro.Titulo,
                     Autor = libro.Autor,
+                    Descripcion = libro.Descripcion,
                     Anio = libro.Anio,
                     Imagen_URL = libro.Imagen_URL,
-                    Id_Estado = libro.Id_Estado,
-                    Estado_Libro = libro.Estado_Libro
+                    Id_Categoria = libro.Id_Categoria,
                 };
 
                 var respuesta = client.PutAsJsonAsync(urlApi, request).Result;
@@ -153,7 +154,7 @@ namespace SC701_ProyectoFinal.Controllers
                     return RedirectToAction("Index");
 
                 ViewBag.Mensaje = "No se pudo actualizar el libro";
-                ViewBag.Estados = await ObtenerEstadosAsync();
+                ViewBag.Categorias = await ObtenerCategoriasAsync();
                 return View(libro);
             }
         }
@@ -285,8 +286,10 @@ namespace SC701_ProyectoFinal.Controllers
 
                 return View(new ReservaViewModel
                 {
-                    Id = libro.Id_Libro,
-                    Titulo = libro.Titulo
+                    LibroId = libro.Id_Libro,
+                    Titulo = libro.Titulo,
+                    FechaReserva = DateTime.Now.Date,
+                    FechaVencimiento = DateTime.Now.Date
                 });
             }
 
@@ -295,7 +298,7 @@ namespace SC701_ProyectoFinal.Controllers
 
         // POST: Confirmar reserva
         [HttpPost]
-        public IActionResult Reservar(ReservaViewModel reserva)
+        public IActionResult Reservar(ReservaViewModel reserva) //NO LLEGA ID LIBRO
         {
             if (!ModelState.IsValid)
                 return View(reserva);
@@ -316,12 +319,10 @@ namespace SC701_ProyectoFinal.Controllers
 
                 var request = new ReservaRequestModel
                 {
-                    Id_Libro = reserva.Id,
+                    Id_Libro = reserva.LibroId,
                     Id_Usuario = idUsuario.Value,
-                    Tipo = "RESERVA",
                     Fecha = reserva.FechaReserva,
-                    Fecha_Vencimiento = reserva.FechaVencimiento,
-                    Estado = 1
+                    Fecha_Vencimiento = reserva.FechaVencimiento
                 };
 
                 var respuesta = client.PostAsJsonAsync(urlApi, request).Result;
@@ -336,6 +337,28 @@ namespace SC701_ProyectoFinal.Controllers
                 return View(reserva);
             }
         }
+
+        //OBTENER CATEGORIAS
+        private async Task<List<CategoriaModel>> ObtenerCategoriasAsync()
+        {
+            using (var client = _httpClientFactory.CreateClient())
+            {
+                var urlApi = _configuration["Valores:UrlAPI"] + "Categoria/ObtenerCategorias";
+
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
+
+                var respuesta = await client.GetAsync(urlApi);
+
+                if (respuesta.IsSuccessStatusCode)
+                {
+                    return await respuesta.Content.ReadFromJsonAsync<List<CategoriaModel>>();
+                }
+
+                return new List<CategoriaModel>();
+            }
+        }
+
     }
 
 }

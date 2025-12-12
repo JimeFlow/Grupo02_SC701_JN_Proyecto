@@ -81,11 +81,11 @@ CREATE TABLE Ejemplar (
     Id_Ejemplar INT IDENTITY(1,1) PRIMARY KEY,
     CodigoEjemplar VARCHAR(20) UNIQUE NOT NULL,
     Id_Libro INT NOT NULL,
-	Cantidad INT, --CANTIDAD
     Estado VARCHAR(50) NOT NULL DEFAULT('Disponible'),
     Ubicacion VARCHAR(100) NULL,
     Fecha_Registro DATETIME2 DEFAULT(GETDATE())
 );
+ALTER TABLE Ejemplar DROP COLUMN Cantidad;
 
 ALTER TABLE Ejemplar
 ADD CONSTRAINT FK_Ejemplar_Libro
@@ -179,7 +179,6 @@ CREATE TABLE Movimiento(
     Tipo VARCHAR(30) DEFAULT('Préstamo'), -- 'PRESTAMO'
     Fecha DATETIME2,
     Fecha_Vencimiento DATETIME2 NULL,
-    Estado INT,
     Id_Usuario INT,
     Id_Ejemplar INT,
 	Id_Estado INT,
@@ -187,7 +186,6 @@ CREATE TABLE Movimiento(
     FOREIGN KEY (Id_Ejemplar) REFERENCES Ejemplar(Id_Ejemplar),
 	FOREIGN KEY (Id_Estado) REFERENCES Estado(Id_Estado)
 );
-
 
 -- REVISAR
 CREATE TABLE Sancion(
@@ -238,10 +236,10 @@ CREATE TABLE FAQ (
     Estado BIT -- 1 = Activa / 0 = Oculta
 );
 -------------------------------------------------------------------------------------------------------
-
+SELECT * FROM Estado;
 -- INSERTS TABLA ESTADO
 INSERT INTO Estado (Estado)
-VALUES ('Activo'), ('Inactivo'), ('Disponible'), ('Reservado'), ('Pendiente'),('En Proceso'), ('Completado');
+VALUES ('Activo'), ('Inactivo'), ('Disponible'), ('Pendiente'), ('Reservado'),('En Proceso'), ('Completado');
 -------------------------------------------------------------------------------------------------------
 
 /* ****************************************************************************************************
@@ -585,35 +583,102 @@ BEGIN
     WHERE Id_Libro = @Id_Libro;
 END;
 
--- RESERVAR LIRBO -------------------------------------------------------------------------------------
+/*
+******************************RESERVAS/PRESTAMOS NUEVOS MÉTODOS****************************************
+*/
+
 CREATE PROCEDURE ReservarLibro
+(
     @Id_Libro INT,
-    @Tipo VARCHAR(10),
-    @Fecha DATETIME,
-    @Fecha_Vencimiento DATETIME,
-    @Estado INT,
-    @Id_Usuario INT
+    @Id_Usuario INT,
+    @FechaInicio DATETIME2,
+    @FechaFin DATETIME2
+)
 AS
 BEGIN
-    DECLARE @EstadoActual VARCHAR(100);
 
-    SELECT @EstadoActual = Estado_Libro
-    FROM Libro
-    WHERE Id_Libro = @Id_Libro;
+    DECLARE @Id_Ejemplar INT;
 
-    IF (@EstadoActual <> 'Disponible')
+
+    SELECT TOP 1 @Id_Ejemplar = Id_Ejemplar
+    FROM Ejemplar
+    WHERE Id_Libro = @Id_Libro
+      AND Estado = 'Disponible'
+    ORDER BY Id_Ejemplar;
+
+
+    IF @Id_Ejemplar IS NULL
     BEGIN
         SELECT -1 AS Resultado;
         RETURN;
     END
 
-    UPDATE Libro
-    SET Estado_Libro = 'Reservado',
-        Id_Estado = 2
-    WHERE Id_Libro = @Id_Libro;
 
-    INSERT INTO Movimiento (Tipo, Fecha, Fecha_Vencimiento, Estado, Id_Usuario, Id_Libro)
-    VALUES (@Tipo, @Fecha, @Fecha_Vencimiento, @Estado, @Id_Usuario, @Id_Libro);
+    INSERT INTO Movimiento (Tipo, Fecha, Fecha_Vencimiento, Id_Usuario, Id_Ejemplar, Id_Estado)
+    VALUES ('Préstamo', @FechaInicio, @FechaFin, @Id_Usuario, @Id_Ejemplar, 6); 
+
+
+    UPDATE Ejemplar
+    SET Estado = 'Prestado'
+    WHERE Id_Ejemplar = @Id_Ejemplar;
+
+--AQUI ESTA
+    SELECT 1 AS Resultado;
+END;
+
+
+
+
+/*********************************** LISTAR LIBROS NUEVOS-> NO SOBRE EJEMPLARES */
+
+ALTER PROCEDURE ObtenerListaLibrosCliente
+AS
+BEGIN
+SELECT 
+    L.Id_Libro,
+    L.Titulo,
+    L.Autor,
+    L.Imagen_URL,
+    L.Descripcion,
+	L.ISBN,
+	L.Anio,
+    COUNT(E.Id_Ejemplar) AS Disponibles
+FROM Libro L
+LEFT JOIN Ejemplar E 
+    ON L.Id_Libro = E.Id_Libro 
+    AND E.Estado = 'Disponible'
+GROUP BY 
+    L.Id_Libro, L.Titulo, L.Autor, L.Imagen_URL, L.Descripcion, L.ISBN, L.Anio
+ORDER BY L.Titulo;
+END
+
+
+--*************************************
+
+-- RESERVAR LIRBO -------------------------------------------------------------------------------------
+CREATE PROCEDURE ReservarLibro
+    @Id_Libro INT,--
+    @Fecha DATETIME,
+    @Fecha_Vencimiento DATETIME,
+    @Id_Usuario INT
+AS
+BEGIN
+    DECLARE @Id_Ejemplar INT;
+
+	SELECT TOP 1 @Id_Ejemplar = Id_Ejemplar
+	FROM Ejemplar WHERE Id_Libro = @Id_Libro 
+	AND Estado = 'Disponible' ORDER BY Id_Ejemplar;
+
+	IF @Id_Ejemplar IS NULL
+	BEGIN 
+		SELECT -1 AS Resultado
+		RETURN;
+	END
+
+    INSERT INTO Movimiento (Tipo, Fecha, Fecha_Vencimiento, Id_Estado, Id_Usuario, Id_Ejemplar)
+    VALUES ('Préstamo', @Fecha, @Fecha_Vencimiento, 4, @Id_Usuario, @Id_Ejemplar);
+
+	UPDATE Ejemplar SET Estado = 'Prestado' WHERE Id_Ejemplar = @Id_Ejemplar;
 
     SELECT 1 AS Resultado;
 END;
@@ -703,7 +768,6 @@ BEGIN
         E.Id_Ejemplar,
         E.CodigoEjemplar,
         E.Estado,
-		E.Cantidad,
         E.Ubicacion,
         E.Fecha_Registro,
         E.Id_Libro,
@@ -722,8 +786,8 @@ ALTER PROCEDURE RegistrarEjemplar
     @Ubicacion VARCHAR(100)
 AS
 BEGIN
-    INSERT INTO Ejemplar (CodigoEjemplar, Id_Libro, Cantidad, Estado, Ubicacion, Fecha_Registro)
-    VALUES (@CodigoEjemplar, @Id_Libro, @Cantidad, @Estado, @Ubicacion, GETDATE());
+    INSERT INTO Ejemplar (CodigoEjemplar, Id_Libro, Estado, Ubicacion, Fecha_Registro)
+    VALUES (@CodigoEjemplar, @Id_Libro, @Estado, @Ubicacion, GETDATE());
 END
 
 ALTER PROCEDURE ActualizarEjemplar
@@ -737,7 +801,6 @@ AS
 BEGIN
     UPDATE Ejemplar SET 
         CodigoEjemplar = @CodigoEjemplar,
-		Cantidad = @Cantidad,
         Estado = @Estado,
         Ubicacion = @Ubicacion,
         Id_Libro = @Id_Libro
@@ -878,10 +941,10 @@ SELECT TOP 1 * FROM Libro;
 CREATE PROCEDURE ObtenerReservasActivas
 AS
 BEGIN
-	SELECT Id_Movimiento, Tipo, Fecha, Fecha_Vencimiento, M.Estado, CONCAT(U.Nombre, ' ',U.Apellidos) AS Nombre, L.Titulo
+	SELECT Id_Movimiento, Tipo, Fecha, Fecha_Vencimiento, M.Id_Estado, CONCAT(U.Nombre, ' ',U.Apellidos) AS Nombre, L.Titulo
 	FROM Movimiento M INNER JOIN Usuario U ON M.Id_Usuario = U.Id_Usuario 
-	INNER JOIN Libro L ON M.Id_Libro = L.Id_Libro
-	--HAY QUE AGREGAR ESTADO PERO NO SE GUARDAN CORRECTAMENTE WHERE ID_ESTADO = 1-2-3
+	INNER JOIN Libro L ON M.Id_Ejemplar = L.Id_Libro
+	AND M.Id_Estado = 1
 END;
 --EXEC ObtenerReservasActivas;
 
@@ -893,12 +956,14 @@ BEGIN
         L.Titulo,
         COUNT(DISTINCT M.Id_Movimiento) AS CantidadMovimientos
     FROM Libro L
-    INNER JOIN Movimiento M ON L.Id_Libro = M.Id_Libro
-    --WHERE M.Id_Estado IN (1, 2, 3)
+    INNER JOIN Ejemplar E ON L.Id_Libro = E.Id_Libro
+    INNER JOIN Movimiento M ON E.Id_Ejemplar = M.Id_Ejemplar
+    
     GROUP BY L.Id_Libro, L.Titulo
     ORDER BY CantidadMovimientos DESC;
 END;
---EXEC ObtenerLibrosConMasCantidadMovimientos;
+
+EXEC ObtenerLibrosConMasCantidadMovimientos;
 
 -------------------------------USUARIOS CON MÁS SANCIONES--------------------------------------------------
 
@@ -907,3 +972,28 @@ END;
 
 -------------------------------TEMAS DE BITACORAS/AUDITLOGS------------------------------------------------
 
+-----------------------------------------------------------------------------------------------------------
+
+------------------------------SP Categorias--------------------------------------------------------------
+
+CREATE PROCEDURE RegistrarCategoria
+@Tipo VARCHAR(75)
+AS
+BEGIN
+	INSERT INTO Categoria(Tipo) VALUES
+	(@Tipo)
+END;
+
+CREATE PROCEDURE ObtenerCategorias
+AS
+BEGIN
+	SELECT Id_Categoria, Tipo FROM Categoria
+END;
+
+CREATE PROCEDURE EditarCategoria 
+@Id_Categoria INT,
+@Tipo VARCHAR(75)
+AS
+BEGIN
+	UPDATE Categoria SET Tipo = @Tipo WHERE Id_Categoria = @Id_Categoria
+END;

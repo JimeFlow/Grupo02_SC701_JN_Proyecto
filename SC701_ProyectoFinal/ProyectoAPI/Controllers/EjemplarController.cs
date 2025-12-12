@@ -67,7 +67,6 @@ namespace ProyectoAPI.Controllers
                 var parametros = new DynamicParameters();
                 parametros.Add("@CodigoEjemplar", ejemplar.CodigoEjemplar);
                 parametros.Add("@Id_Libro", ejemplar.Id_Libro);
-                parametros.Add("@Cantidad", ejemplar.Cantidad);
                 parametros.Add("@Estado", ejemplar.Estado);
                 parametros.Add("@Ubicacion", ejemplar.Ubicacion);
 
@@ -87,7 +86,6 @@ namespace ProyectoAPI.Controllers
                 parametros.Add("@Id", id);
                 parametros.Add("@CodigoEjemplar", ejemplar.CodigoEjemplar);
                 parametros.Add("@Id_Libro", ejemplar.Id_Libro);
-                parametros.Add("@Cantidad", ejemplar.Cantidad);
                 parametros.Add("@Estado", ejemplar.Estado);
                 parametros.Add("@Ubicacion", ejemplar.Ubicacion);
 

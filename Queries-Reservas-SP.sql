@@ -399,26 +399,6 @@ CREATE TABLE Sancion(
     FOREIGN KEY (Id_Usuario) REFERENCES Usuario(Id_Usuario)
 );
 
---CREATE PROCEDURE RegistrarSancion
---    @Id_Usuario INT
---AS
---BEGIN
---    INSERT INTO Sancion (Id_Usuario)
---    VALUES (@Id_Usuario);
-
-
---    SELECT SCOPE_IDENTITY() AS IdSancion;
---END;
-
-------------------------------------VALIDAR ATRASOS-----------------------------------------------
-CREATE PROCEDURE ObtenerMovimientosAtrasados
-AS
-BEGIN
-    SELECT M.Id_Movimiento, M.Id_Usuario
-    FROM Movimiento M
-    WHERE M.Id_Estado = 5
-      AND DATEADD(DAY, 2, M.Fecha_Vencimiento) < GETDATE(); --DOS DIAS DE MARGEN SINO SANCION
-END;
 
 -------------------------------VERIFICAR SI USUARIO TIENE SANCION ACTIVA--------------------------
 CREATE OR ALTER PROCEDURE UsuarioTieneSancionActiva
@@ -455,7 +435,6 @@ END;
 
 
 
-/***********************************OBTENER RESERVAS PENDIENTES************************************/
 
 ---------------METODO GENERAL DE RESERVAS PARA EL ADMIN--------------------------------------------
 
@@ -480,33 +459,16 @@ BEGIN
 END;
 
 
-----------------------------------------------------------------------------
-CREATE PROCEDURE ObtenerReservasPendientesAdmin
+CREATE OR ALTER PROCEDURE ReservasPorVencerPronto
 AS
 BEGIN
-	SELECT Id_Movimiento, Fecha, Fecha_Vencimiento, CONCAT(U.Nombre,' ', U.Apellidos) AS Nombre, 
-	U.Identificacion FROM Movimiento M INNER JOIN Usuario U 
-	ON M.Id_Usuario = U.Id_Usuario WHERE Id_Estado = 4 --PENDIENTE
+	SELECT Id_Movimiento, Tipo, Fecha, Fecha_Vencimiento, M.Id_Usuario, U.Nombre, L.Titulo, U.Correo 
+	FROM Movimiento M INNER JOIN Usuario U ON M.Id_Usuario = U.Id_Usuario
+	INNER JOIN Ejemplar E ON M.Id_Ejemplar = E.Id_Ejemplar INNER JOIN Libro L
+	ON E.Id_Libro = L.Id_Libro
+	WHERE CONVERT(date, M.Fecha_Vencimiento) = CONVERT(date, DATEADD(DAY, 1, GETDATE())) AND M.Id_Estado = 5
 END;
-
-EXEC ObtenerReservasPendientesAdmin;
-
-CREATE PROCEDURE ObtenerTodasLasReservasAdmin
-AS
-BEGIN
-	SELECT Id_Movimiento, Fecha, Fecha_Vencimiento, CONCAT(U.Nombre,' ', U.Apellidos) AS Nombre, 
-	U.Identificacion FROM Movimiento M INNER JOIN Usuario U 
-	ON M.Id_Usuario = U.Id_Usuario WHERE Id_Estado = 1 --ACTIVO
-END;
-
-CREATE PROCEDURE ObtenerTodasLasReservasGeneral
-AS
-BEGIN
-	SELECT Id_Movimiento, Fecha, Fecha_Vencimiento, CONCAT(U.Nombre,' ', U.Apellidos) AS Nombre, 
-	U.Identificacion, e.Estado FROM Movimiento M INNER JOIN Usuario U 
-	ON M.Id_Usuario = U.Id_Usuario INNER JOIN Estado E ON M.Id_Estado = E.Id_Estado
-END;
-
+EXEC ReservasPorVencerPronto;
 -------------------------------------------------------------------------------------------------------
 
 

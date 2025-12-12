@@ -114,6 +114,8 @@ namespace SC701_ProyectoFinal.Controllers
         {
             using (var context = _httpClientFactory.CreateClient())
             {
+                int Id_rol = (int)HttpContext.Session.GetInt32("Id_Rol")!;
+
                 var urlApi = _configuration["Valores:UrlAPI"] + "Reserva/CancelarReserva";
                 context.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
                 var respuesta = context.PutAsJsonAsync(urlApi, reserva).Result;
@@ -124,7 +126,8 @@ namespace SC701_ProyectoFinal.Controllers
 
                     if (datosApi > 0)
                     {
-                        return RedirectToAction("ObtenerReservas");
+                        return Id_rol == 1 ? RedirectToAction("ObtenerReservas") : RedirectToAction("Index");
+                        
                     }
                 }                
                 return RedirectToAction("ObtenerReservas");

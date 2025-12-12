@@ -26,7 +26,7 @@
                     <th>Fecha Reserva</th>
                     <th>Fecha Vencimiento</th>
                     <th>Estado</th>
-                    <th>Acciones</th>
+                    <th style="width:190px;">Acciones</th>
 
                 </tr>
             </thead>
@@ -59,18 +59,21 @@
                         </td>
 
                         <td>
+                            <div class="text-center">
+
+                            
                             <a asp-controller="Libro"
                                asp-action="Detalle"
                                asp-route-id="@r.Id_Libro"
-                               class="btn btn-info btn-sm me-1">
-                                Ver libro
+                               class="btn btn-info btn-sm me-1 mb-3">
+                                Ver detalles libro
                             </a>
 
                             @if (r.Estado == "Reservado")
                             {
                                 @if (ViewBag.TieneSancion == false)
                                 {                                    
-                                    <button class="btn btn-primary btn-sm"
+                                    <button class="btn btn-primary btn-sm mb-3"
                                         data-bs-toggle="modal"
                                         data-bs-target="#modalExtender"
                                         data-id="@r.Id_Movimiento"
@@ -78,9 +81,18 @@
                                     Extender préstamo
                                 </button>
                                 }
-                                
-
                             }
+                            else if(r.Estado == "Pendiente")
+                            {
+                                <button class="btn btn-primary btn-sm mb-3"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalCancelar"
+                                        data-id="@r.Id_Movimiento"
+                                >
+                                    Cancelar reserva
+                                </button>
+                            }
+                            </div>
                         </td>
                     </tr>
                 }
@@ -122,6 +134,37 @@
         </div>
     </div>
 </div>
+
+
+<div class="modal fade" id="modalCancelar" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-action="CancelarReserva" asp-controller="Reserva">
+                <div class="modal-header">
+                    <h5 class="modal-title">Cancelar reserva</h5>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" id="movIdCancelar" name="Id_Movimiento" />
+                    ¿Desea cancelar esta reserva?
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">
+                        Confirmar cancelación
+                    </button>
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
 @section Scripts {
     <script>
         const modalExtender = document.getElementById('modalExtender');
@@ -139,6 +182,17 @@
             //validacion de la fecha
             fechaInput.min = fechaVenc;
             fechaInput.value = fechaVenc;
+        });
+
+        const modalCancelar = document.getElementById('modalCancelar');
+
+        modalCancelar.addEventListener('show.bs.modal', event => {
+            const button = event.relatedTarget;
+
+            const movId = button.getAttribute('data-id');
+
+            const idInput = document.getElementById('movIdCancelar');
+            idInput.value = movId;
         });
     </script>
 }

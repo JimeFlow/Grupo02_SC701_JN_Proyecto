@@ -150,7 +150,7 @@ namespace ProyectoAPI.Controllers
 
         [HttpPost]
         [Route("ReservarLibro")]
-        public IActionResult ReservarLibro([FromBody] ReservaRequestModel request)
+        public IActionResult ReservarLibro([FromBody] ReservaLibroModel request)
         {
 
             using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
@@ -170,8 +170,8 @@ namespace ProyectoAPI.Controllers
                 var parametros = new DynamicParameters();
 
                 parametros.Add("@Id_Libro", request.Id_Libro);
-                parametros.Add("@Fecha", request.Fecha);
-                parametros.Add("@Fecha_Vencimiento", request.Fecha_Vencimiento);
+                parametros.Add("@Fecha", request.FechaReserva);
+                parametros.Add("@Fecha_Vencimiento", request.FechaVencimiento);
                 parametros.Add("@Id_Usuario", request.Id_Usuario);
 
                 var result = context.QueryFirstOrDefault<int>("ReservarLibro", parametros, commandType: CommandType.StoredProcedure);
@@ -184,8 +184,8 @@ namespace ProyectoAPI.Controllers
 
                 html = html.Replace("{{Usuario}}", request.Id_Usuario.ToString());
                 html = html.Replace("{{Libro}}", request.Id_Libro.ToString());
-                html = html.Replace("{{FechaReserva}}", request.Fecha.ToString("F"));
-                html = html.Replace("{{FechaVencimiento}}", request.Fecha_Vencimiento.ToString("F"));
+                html = html.Replace("{{FechaReserva}}", request.FechaReserva.ToString("F"));
+                html = html.Replace("{{FechaVencimiento}}", request.FechaVencimiento.ToString("F"));
 
                 string? correoUsuario = HttpContext.User.FindFirst("correo")?.Value;
                 if( correoUsuario != null)

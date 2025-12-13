@@ -76,7 +76,7 @@ namespace SC701_ProyectoFinal.Controllers
         [HttpPost]
         public IActionResult Register(UsuarioModel usuario)
         {
-            using (var context = _httpClientFactory.CreateClient())
+            using (var context = _httpClientFactory.CreateClient("ProyectoAPI"))
             {
                 var urlApi = _configuration["Valores:UrlAPI"] + "Account/Registrarse";
                 var respuesta = context.PostAsJsonAsync(urlApi, usuario).Result;

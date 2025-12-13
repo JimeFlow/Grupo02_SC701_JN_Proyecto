@@ -471,8 +471,17 @@ END;
 EXEC ReservasPorVencerPronto;
 -------------------------------------------------------------------------------------------------------
 
+USE [BiblioSolaris]
+GO
 
-ALTER PROCEDURE [dbo].[ObtenerEjemplares]
+/****** Object:  StoredProcedure [dbo].[ObtenerEjemplares]    Script Date: 12/12/2025 15:55:34 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE OR ALTER PROCEDURE [dbo].[ObtenerEjemplares]
 AS
 BEGIN
     SELECT 
@@ -486,6 +495,9 @@ BEGIN
     FROM Ejemplar E
     INNER JOIN Libro L ON L.Id_Libro = E.Id_Libro;
 END
+GO
+
+
 
 --------------------------------------------------------------------------------------
 ALTER PROCEDURE [dbo].[ObtenerEjemplarPorId]

@@ -70,6 +70,12 @@
 						<li class="nav-item">
 							<a class="nav-link" asp-controller="Libro" asp-action="Index">Libros</a>
 						</li>
+						<li class="nav-item">
+							<a class="nav-link" asp-controller="Reserva" asp-action="ObtenerReservas">Reservas</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" asp-controller="Categoria" asp-action="Index">Categoria</a>
+						</li>
 
 						<li class="nav-item">
 							<a class="nav-link" asp-controller="Ejemplar" asp-action="Index">Ejemplares</a>
@@ -87,10 +93,7 @@
 							<a class="nav-link" asp-controller="Libro" asp-action="Index">Catálogo</a>
 						</li>
 						<li class="nav-item">
-							<a class="nav-link" href="@Url.Action("MisReservas", "Reserva")">Reservaciones</a>
-							</li>
-						<li class="nav-item">
-							<a class="nav-link" asp-controller="FAQ" asp-action="Index">Preguntas Frecuentes</a>
+							<a class="nav-link" href="@Url.Action("Index", "Reserva")">Reservaciones</a>
 						</li>
 					}
 					<li class="nav-item">

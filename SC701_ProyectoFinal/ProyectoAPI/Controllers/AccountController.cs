@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.IdentityModel.Tokens;
 using ProyectoAPI.Models;
+using Utils;
 
 namespace ProyectoAPI.Controllers
 {
@@ -51,7 +52,7 @@ namespace ProyectoAPI.Controllers
 
                 if (!validPassword) return Unauthorized(new { mensaje = "Contraseña incorrecta" });
 
-                resultado.Token = GenerarToken(resultado.Id_Usuario, resultado.Nombre, resultado.Id_Rol);
+                resultado.Token = GenerarToken(resultado.Id_Usuario, resultado.Nombre, resultado.Id_Rol, resultado.Correo);
                 return Ok(resultado);                
 
             }
@@ -95,6 +96,7 @@ namespace ProyectoAPI.Controllers
         {
             using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
+                var helper = new Helper();
                 var parametros = new DynamicParameters();
                 parametros.Add("@Correo", Correo);
 
@@ -121,7 +123,7 @@ namespace ProyectoAPI.Controllers
                         html = html.Replace("{{Nombre}}", user.Nombre);
                         html = html.Replace("{{Contrasena}}", contrasenaGenerada);
 
-                        EnviarCorreo("Recuperar Acceso", html, user.Correo);
+                        helper.EnviarCorreo("Recuperar Acceso", html, user.Correo);
 
                         return Ok(user);
                     }
@@ -200,36 +202,10 @@ namespace ProyectoAPI.Controllers
             return resultado.ToString();
         }
 
-        private void EnviarCorreo(string subject, string body, string destinatario)
-        {
-            var correoSMTP = _configuration["Valores:CorreoSMTP"]!;
-            var contrasennaSMTP = _configuration["Valores:ContrasenaSMTP"]!;
-
-            if (string.IsNullOrEmpty(contrasennaSMTP))
-                return;
-
-            var mensaje = new MailMessage
-            {
-                From = new MailAddress(correoSMTP),
-                Subject = subject,
-                Body = body,
-                IsBodyHtml = true
-            };
-
-            mensaje.To.Add(destinatario);
-
-            using var smtp = new SmtpClient("smtp.office365.com")
-            {
-                Port = 587,
-                Credentials = new NetworkCredential(correoSMTP, contrasennaSMTP),
-                EnableSsl = true
-            };
-
-            smtp.Send(mensaje);
-        }
+        
 
         //generar token JWT
-        private string GenerarToken(int usuarioId, string nombre, int rol)
+        private string GenerarToken(int usuarioId, string nombre, int rol, string correo)
         {
             var key = _configuration["Valores:KeyJWT"]!;
 
@@ -240,7 +216,8 @@ namespace ProyectoAPI.Controllers
             {
                 new Claim("id", usuarioId.ToString()),
                 new Claim("nombre", nombre),
-                new Claim("rol", rol.ToString())
+                new Claim("rol", rol.ToString()),
+                new Claim("correo", correo)
             };
 
             var token = new JwtSecurityToken(

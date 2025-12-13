@@ -5,7 +5,7 @@
 }
 
 <div class="container mt-5">
-    <h2 class="text-center mb-4">📖 Registrar Nuevo Libro</h2>
+    <h2 class="text-center mb-4">Registrar Nuevo Libro</h2>
 
     <div class="card shadow-lg">
         <div class="card-body">
@@ -22,34 +22,38 @@
                 </div>
 
                 <div class="row mb-3">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label asp-for="ISBN" class="form-label fw-bold">ISBN</label>
                         <input asp-for="ISBN" class="form-control" placeholder="Ejemplo: 978-84-376-0494-7" />
                     </div>
-                    <div class="col-md-4">
-                        <label asp-for="Anio" class="form-label fw-bold">Año de Publicación</label>
-                        <input asp-for="Anio" class="form-control" type="number" min="1900" max="2100" />
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold">Estado</label>
-                        <select id="selectEstado" class="form-select" asp-for="Id_Estado" asp-items="@(new SelectList(ViewBag.Estados, "Id_Estado", "Estado"))">
-                            <option value="">-- Seleccione un estado --</option>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Categoría</label>
+                        <select class="form-select" asp-for="Id_Categoria"
+                                asp-items="@(new SelectList(ViewBag.Categorias, "Id_Categoria", "Tipo"))">
+                            <option value="">-- Seleccione una categoría --</option>
                         </select>
-                        <input type="hidden" asp-for="Estado_Libro" id="Estado_Libro" />
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="Anio" class="form-label fw-bold">Año</label>
+                        <input asp-for="Anio" class="form-control" type="number" />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Descripcion" class="form-label fw-bold">Descripción</label>
+                        <input asp-for="Descripcion" class="form-control" type="text" />
                     </div>
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="Imagen_URL" class="form-label fw-bold">URL de la Imagen</label>
-                    <input asp-for="Imagen_URL" class="form-control" placeholder="https://..." />
-                    <small class="text-muted">Si no tiene imagen, puede dejarlo vacío.</small>
+                    <label asp-for="Imagen_URL" class="form-label fw-bold">URL Imagen</label>
+                    <input asp-for="Imagen_URL" class="form-control" />
                 </div>
 
-                <div asp-validation-summary="All" class="text-danger"></div>
-
                 <div class="text-center">
-                    <button type="submit" class="btn btn-primary px-4">💾 Guardar</button>
-                    <a asp-action="Index" class="btn btn-secondary px-4">↩️ Volver</a>
+                    <button type="submit" class="btn btn-primary px-4">Guardar</button>
+                    <a asp-action="Index" class="btn btn-secondary px-4">Volver</a>
                 </div>
             </form>
         </div>
@@ -58,16 +62,3 @@
 
 </div>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-    <script>
-        const select = document.getElementById('selectEstado');
-        const hidden = document.getElementById('Estado_Libro');
-
-            // Actualizar el Estado_Libro según la selección
-            select.addEventListener('change', function() {
-                hidden.value = select.options[select.selectedIndex].text;
-            });
-    </script>
-
-}

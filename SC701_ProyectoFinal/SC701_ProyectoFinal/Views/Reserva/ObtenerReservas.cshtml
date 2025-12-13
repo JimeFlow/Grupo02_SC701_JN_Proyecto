@@ -1,0 +1,179 @@
+﻿@model IEnumerable<SC701_ProyectoFinal.Models.ReservaRequestModel>
+
+
+<div class="container mt-4">
+	<h2 class="fw-bold text-primary">
+		<i class="bi bi-people-fill"></i> Gestión de Reservas
+	</h2>
+	<form method="get" asp-action="ObtenerReservas" class="mb-5">
+		<div class="row">
+			<div class="col-md-4">
+				<select name="estado" class="form-control">
+					<option value="">-- Mostrar todos --</option>
+					<option value="4">Pendientes</option>
+					<option value="5">Reservadas</option>
+					<option value="7">Completadas</option>
+				</select>
+			</div>
+			<div class="col-md-2">
+				<button class="btn btn-primary">Filtrar</button>
+			</div>
+		</div>
+	</form>
+
+	<!-- TABLA DE RESERVAS -->
+	<div class="table-responsive shadow-sm rounded">
+		<table class="table table-hover table-striped align-middle">
+			<thead class="table-primary">
+				<tr>
+					<th>Movimiento</th>
+					<th>Fecha</th>
+					<th>Vence</th>
+					<th>Usuario</th>
+					<th>Identificación</th>
+					<th>Estado</th>
+					<th style="width:190px;">Acciones</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var r in Model)
+				{
+					<tr>
+						<td>@r.Id_Movimiento</td>
+						<td>@r.Fecha.ToString("yyyy-MM-dd")</td>
+						<td>@r.Fecha_Vencimiento.ToString("yyyy-MM-dd")</td>
+						<td>@r.Nombre</td>
+						<td>@r.Identificacion</td>
+						<td>@r.Estado</td>
+
+						<td>
+							@* pendiente *@
+							@if (r.Id_Estado == 4)
+							{
+								<div class="text-center">
+									<button class="btn btn-success btn-sm mb-3"
+											data-bs-toggle="modal" data-bs-target="#modalReservar"
+											data-id="@r.Id_Movimiento">
+										Activar Reserva
+									</button>
+
+									<button class="btn btn-danger btn-sm"
+											data-bs-toggle="modal" data-bs-target="#modalCancelar"
+											data-id="@r.Id_Movimiento">
+										Cancelar
+									</button>
+								</div>
+								
+							}else if(r.Id_Estado == 5)
+							@* reservado *@
+							{
+								<button class="btn btn-primary btn-sm"
+										data-bs-toggle="modal" data-bs-target="#modalCompletado"
+										data-id="@r.Id_Movimiento">
+									Marcar Devuelto
+								</button>
+							}
+							else
+							{
+								<a class="btn" disabled>Sin acciones</a>
+							}
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+	
+
+</div>
+
+
+<!-- MODAL QUE CAMBIA ESTADO A RESERVADO (5) -->
+<div class="modal fade" id="modalReservar" tabindex="-1">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form method="post" asp-action="CambiarEstadoReserva">
+				<div class="modal-header">
+					<h5 class="modal-title">Activar Reserva</h5>
+				</div>
+				<div class="modal-body">
+					¿Desea cambiar esta reserva a <strong>Reservado</strong>?
+					<input type="hidden" id="movIdReservar" name="Id_Movimiento" />
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-success">Sí</button>
+					<button type="button" data-bs-dismiss="modal" class="btn btn-secondary">No</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<!-- MODAL QUE CANCELA/COMPLETA RESERVA (7) -->
+<div class="modal fade" id="modalCancelar" tabindex="-1">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form method="post" asp-controller="Reserva" asp-action="CancelarReserva">
+				<div class="modal-header">
+					<h5 class="modal-title">Cancelar Reserva</h5>
+				</div>
+				<div class="modal-body">
+					¿Desea cancelar esta reserva?
+					<input type="hidden" id="movIdCancelar" name="Id_Movimiento" />
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-danger">Sí</button>
+					<button type="button" data-bs-dismiss="modal" class="btn btn-secondary">No</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<!-- MODAL COMPLETADO (DEVUELTO) -->
+<div class="modal fade" id="modalCompletado" tabindex="-1">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form method="post" asp-controller="Reserva" asp-action="CambiarEstadoCompletado">
+				<div class="modal-header">
+					<h5 class="modal-title">Marcar como Devuelto</h5>
+				</div>
+				<div class="modal-body">
+					¿Confirmar devolución y completar la reserva?
+					<input type="hidden" id="movIdCompletado" name="Id_Movimiento" />
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-primary">Sí</button>
+					<button type="button" data-bs-dismiss="modal" class="btn btn-secondary">No</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	<script>
+				   // Esto es para pasar el id al modal que abre, aqui es reservar
+		const modalReservar = document.getElementById('modalReservar');
+		modalReservar.addEventListener('show.bs.modal', event => {
+			document.getElementById('movIdReservar').value =
+				event.relatedTarget.getAttribute('data-id');
+		});
+
+		// id a cancelar
+		const modalCancelar = document.getElementById('modalCancelar');
+		modalCancelar.addEventListener('show.bs.modal', event => {
+			document.getElementById('movIdCancelar').value =
+				event.relatedTarget.getAttribute('data-id');
+		});
+
+		// id a completado
+		const modalCompletado = document.getElementById('modalCompletado');
+		modalCompletado.addEventListener('show.bs.modal', event => {
+			document.getElementById('movIdCompletado').value =
+				event.relatedTarget.getAttribute('data-id');
+		});
+
+	</script>
+	<partial name="_ValidationScriptsPartial" />
+}

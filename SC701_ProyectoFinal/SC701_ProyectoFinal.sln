@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SC701_ProyectoFinal", "SC70
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProyectoAPI", "ProyectoAPI\ProyectoAPI.csproj", "{1EE712D1-A571-47CC-AC36-6D590CA4E8BF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utils", "Utils\Utils.csproj", "{A39AE79F-E2E4-4220-B34C-D4E39698F26C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,14 @@ Global
 		{1EE712D1-A571-47CC-AC36-6D590CA4E8BF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1EE712D1-A571-47CC-AC36-6D590CA4E8BF}.Release|x64.ActiveCfg = Release|x64
 		{1EE712D1-A571-47CC-AC36-6D590CA4E8BF}.Release|x64.Build.0 = Release|x64
+		{A39AE79F-E2E4-4220-B34C-D4E39698F26C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A39AE79F-E2E4-4220-B34C-D4E39698F26C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A39AE79F-E2E4-4220-B34C-D4E39698F26C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A39AE79F-E2E4-4220-B34C-D4E39698F26C}.Debug|x64.Build.0 = Debug|Any CPU
+		{A39AE79F-E2E4-4220-B34C-D4E39698F26C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A39AE79F-E2E4-4220-B34C-D4E39698F26C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A39AE79F-E2E4-4220-B34C-D4E39698F26C}.Release|x64.ActiveCfg = Release|Any CPU
+		{A39AE79F-E2E4-4220-B34C-D4E39698F26C}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

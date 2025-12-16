@@ -187,8 +187,35 @@ namespace ProyectoAPI.Controllers
 
                 return Ok(resultado);
             }
+        }
 
+        [HttpPost]
+        [Route("RegistrarReservaAdmin")]
+        public IActionResult RegistrarReservaAdmin(ReservaAdminRequestModel reserva)
+        {
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
+            {
+                var sanciones = context.ExecuteScalar<int>(
+        "UsuarioTieneSancionActiva",
+        new { Id_Usuario = reserva.Id_Usuario },
+        commandType: CommandType.StoredProcedure
+    );
 
+                if (sanciones > 0)
+                {
+                    return BadRequest("El usuario tiene una sanción activa y no puede realizar préstamos.");
+                }
+                var parametros = new DynamicParameters();
+
+                parametros.Add("@Id_Ejemplar", reserva.Id_Ejemplar);
+                parametros.Add("@Fecha", reserva.Fecha);
+                parametros.Add("@Fecha_Vencimiento", reserva.Fecha_Vencimiento);
+                parametros.Add("@Id_Usuario", reserva.Id_Usuario);
+
+                var resultado = context.Execute("RegistrarReservaPorAdmin", parametros, commandType: CommandType.StoredProcedure);
+
+                return Ok(resultado);
+            }
         }
 
 

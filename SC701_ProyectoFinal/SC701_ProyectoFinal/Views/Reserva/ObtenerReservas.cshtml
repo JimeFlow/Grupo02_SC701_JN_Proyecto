@@ -5,21 +5,33 @@
 	<h2 class="fw-bold text-primary">
 		<i class="bi bi-people-fill"></i> Gestión de Reservas
 	</h2>
-	<form method="get" asp-action="ObtenerReservas" class="mb-5">
-		<div class="row">
-			<div class="col-md-4">
-				<select name="estado" class="form-control">
-					<option value="">-- Mostrar todos --</option>
-					<option value="4">Pendientes</option>
-					<option value="5">Reservadas</option>
-					<option value="7">Completadas</option>
-				</select>
-			</div>
-			<div class="col-md-2">
-				<button class="btn btn-primary">Filtrar</button>
+	<div class="row my-3">
+		<div class="col-6">
+			<div class="text-start mb-3">
+				<form method="get" asp-action="ObtenerReservas" class="mb-5">
+					<div class="row">
+						<div class="col-md-4">
+							<select name="estado" class="form-control">
+								<option value="">-- Mostrar todos --</option>
+								<option value="4">Pendientes</option>
+								<option value="5">Reservadas</option>
+								<option value="7">Completadas</option>
+							</select>
+						</div>
+						<div class="col-md-2">
+							<button class="btn btn-primary">Filtrar</button>
+						</div>
+					</div>
+				</form>
 			</div>
 		</div>
-	</form>
+		<div class="col-6">
+			<div class="text-end mb-3">
+				<a asp-action="RegistrarReservaAdmin" asp-controller="Reserva" class="btn btn-success">Registrar reserva</a>
+			</div>
+		</div>
+	</div>
+	
 
 	<!-- TABLA DE RESERVAS -->
 	<div class="table-responsive shadow-sm rounded">

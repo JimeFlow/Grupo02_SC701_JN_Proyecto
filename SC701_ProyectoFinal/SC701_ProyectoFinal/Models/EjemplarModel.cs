@@ -16,5 +16,7 @@ namespace SC701_ProyectoFinal.Models
         [ValidateNever]
         public string? Titulo { get; set; }
 
+        public string TituloConId => $"{CodigoEjemplar} - {Titulo}";
+
     }
 }

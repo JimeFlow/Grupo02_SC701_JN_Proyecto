@@ -109,5 +109,16 @@ namespace ProyectoAPI.Controllers
 
             return Ok(new { mensaje = "Ejemplar eliminado correctamente." });
         }
+
+        [HttpGet]
+        [Route("ObtenerEjemplaresDisponiblesAdmin")]
+        public IActionResult ObtenerEjemplaresDisponiblesAdmin()
+        {
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
+            {
+                var resultado = context.Query<EjemplarModel>("ObtenerEjemplaresDisponiblesAdmin");
+                return Ok(resultado);
+            }
+        }
     }
 }

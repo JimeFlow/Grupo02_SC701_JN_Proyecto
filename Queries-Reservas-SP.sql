@@ -583,3 +583,38 @@ BEGIN
       AND (M.Id_Estado = 4 OR M.Id_Estado = 5 OR M.Id_Estado = 7)
     ORDER BY M.Fecha DESC;
 END
+
+CREATE OR ALTER PROCEDURE RegistrarReservaPorAdmin
+	@Id_Ejemplar INT,
+    @Fecha DATETIME,
+    @Fecha_Vencimiento DATETIME,
+    @Id_Usuario INT
+AS
+BEGIN
+
+	INSERT INTO Movimiento (Tipo, Fecha, Fecha_Vencimiento, Id_Estado, Id_Usuario, Id_Ejemplar)
+    VALUES ('Préstamo', @Fecha, @Fecha_Vencimiento, 5, @Id_Usuario, @Id_Ejemplar);
+
+	UPDATE Ejemplar SET Estado = 'Prestado' WHERE Id_Ejemplar = @Id_Ejemplar;
+
+    SELECT 1 AS Resultado;
+END;
+
+
+-------------------OBTENER EJEMPLARES PARA ADMIN RESERVAR----------------------------------------------
+CREATE OR ALTER PROCEDURE ObtenerEjemplaresDisponiblesAdmin
+AS
+BEGIN
+    SELECT 
+        E.Id_Ejemplar,
+        E.CodigoEjemplar,
+        E.Estado,
+        E.Ubicacion,
+        E.Fecha_Registro,
+        E.Id_Libro,
+        L.Titulo
+    FROM Ejemplar E
+    INNER JOIN Libro L ON L.Id_Libro = E.Id_Libro
+	WHERE E.Estado = 'Disponible';
+END;
+

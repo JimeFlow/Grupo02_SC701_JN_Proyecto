@@ -1,0 +1,30 @@
+﻿@model IEnumerable<SC701_ProyectoFinal.Models.BitacoraModel>
+
+@{
+    ViewData["Title"] = "Bitácora";
+    Layout = "~/Views/Shared/_LayoutInterno.cshtml";
+}
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Usuario</th>
+            <th>Módulo</th>
+            <th>Acción</th>
+            <th>Detalle</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Fecha</td>
+                <td>@item.NombreUsuario</td>
+                <td>@item.Modulo</td>
+                <td>@item.Accion</td>
+                <td>@item.Detalle</td>
+            </tr>
+        }
+    </tbody>
+</table>

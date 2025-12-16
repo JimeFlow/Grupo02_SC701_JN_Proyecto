@@ -924,4 +924,38 @@ END;
 /* ****************************************************************************************************
    ********************************** MODULO DE BITACORA & AUDITLOGS **********************************
    **************************************************************************************************** */
+CREATE TABLE Bitacora (
+    Id_Bitacora INT IDENTITY PRIMARY KEY,
+    Id_Usuario INT NULL,
+    Modulo VARCHAR(50),
+    Accion VARCHAR(50),
+    Detalle VARCHAR(255),
+    Fecha DATETIME DEFAULT GETDATE()
+);
 
+-- SP PARA REGISTRAR BITACORA
+CREATE PROCEDURE RegistrarBitacora
+    @Id_Usuario INT = NULL,
+    @Modulo VARCHAR(50),
+    @Accion VARCHAR(50),
+    @Detalle VARCHAR(255)
+AS
+BEGIN
+    INSERT INTO Bitacora (Id_Usuario, Modulo, Accion, Detalle)
+    VALUES (@Id_Usuario, @Modulo, @Accion, @Detalle)
+END
+
+-- SP PARA OBTENER BITACORA
+CREATE PROCEDURE ObtenerBitacora
+AS
+BEGIN
+    SELECT 
+        B.Fecha,
+        U.Nombre AS NombreUsuario,
+        B.Modulo,
+        B.Accion,
+        B.Detalle
+    FROM Bitacora B
+    LEFT JOIN Usuario U ON B.Id_Usuario = U.Id_Usuario
+    ORDER BY B.Fecha DESC
+END

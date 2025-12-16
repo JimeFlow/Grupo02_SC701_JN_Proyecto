@@ -20,7 +20,7 @@ namespace SC701_ProyectoFinal.Controllers
         {
             using var client = _http.CreateClient();
 
-            var urlApi = _configuration["Valores:UrlAPI"] + "Bitacora/ObtenerBitacora";
+            var urlApi = _configuration["Valores:UrlAPI"] + "Bitacora/ObtenerLogs";
 
             client.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer",

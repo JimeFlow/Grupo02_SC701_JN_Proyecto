@@ -20,16 +20,17 @@ namespace ProyectoAPI.Controllers
         {
             _configuration = configuration;
         }
+
         [AllowAnonymous]
         [HttpGet]
-        [Route("ObtenerBitacora")]
-        public IActionResult ObtenerBitacora()
+        [Route("ObtenerLogs")]
+        public IActionResult ObtenerLogs()
         {
             using var context = new SqlConnection(
-                _configuration["ConnectionStrings:BDConnection"]);
+                _configuration.GetConnectionString("BDConnection"));
 
             var resultado = context.Query<BitacoraResponseModel>(
-                "ObtenerBitacora",
+                "ObtenerLogs", 
                 commandType: CommandType.StoredProcedure
             );
 

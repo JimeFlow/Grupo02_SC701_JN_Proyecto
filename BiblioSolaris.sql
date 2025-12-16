@@ -924,38 +924,32 @@ END;
 /* ****************************************************************************************************
    ********************************** MODULO DE BITACORA & AUDITLOGS **********************************
    **************************************************************************************************** */
-CREATE TABLE Bitacora (
-    Id_Bitacora INT IDENTITY PRIMARY KEY,
-    Id_Usuario INT NULL,
-    Modulo VARCHAR(50),
-    Accion VARCHAR(50),
-    Detalle VARCHAR(255),
-    Fecha DATETIME DEFAULT GETDATE()
-);
-
 -- SP PARA REGISTRAR BITACORA
-CREATE PROCEDURE RegistrarBitacora
+CREATE PROCEDURE RegistrarLog
     @Id_Usuario INT = NULL,
-    @Modulo VARCHAR(50),
-    @Accion VARCHAR(50),
-    @Detalle VARCHAR(255)
+    @Modulo_Afectado VARCHAR(50),
+    @Tipo_Accion VARCHAR(25),
+    @Descripcion_Accion VARCHAR(150)
 AS
 BEGIN
-    INSERT INTO Bitacora (Id_Usuario, Modulo, Accion, Detalle)
-    VALUES (@Id_Usuario, @Modulo, @Accion, @Detalle)
-END
+    INSERT INTO Logs (Fecha, Tipo_Accion, Descripcion_Accion, Modulo_Afectado, Id_Usuario)
+    VALUES (GETDATE(), @Tipo_Accion, @Descripcion_Accion, @Modulo_Afectado, @Id_Usuario);
+END;
+GO
 
 -- SP PARA OBTENER BITACORA
-CREATE PROCEDURE ObtenerBitacora
+CREATE PROCEDURE ObtenerLogs
 AS
 BEGIN
     SELECT 
-        B.Fecha,
-        U.Nombre AS NombreUsuario,
-        B.Modulo,
-        B.Accion,
-        B.Detalle
-    FROM Bitacora B
-    LEFT JOIN Usuario U ON B.Id_Usuario = U.Id_Usuario
-    ORDER BY B.Fecha DESC
-END
+        L.Id_Log,
+        L.Fecha,
+        L.Tipo_Accion,
+        L.Descripcion_Accion,
+        L.Modulo_Afectado,
+        CONCAT(U.Nombre, ' ', U.Apellidos) AS NombreUsuario
+    FROM Logs L
+    LEFT JOIN Usuario U ON L.Id_Usuario = U.Id_Usuario
+    ORDER BY L.Fecha DESC;
+END;
+GO

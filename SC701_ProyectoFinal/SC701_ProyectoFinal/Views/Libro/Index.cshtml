@@ -16,6 +16,20 @@
 <div class="container mt-5">
     <h2 class="text-center mb-4">Catálogo de Libros</h2>
 
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-warning text-center">
+            @TempData["Error"]
+        </div>
+    }
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success text-center">
+            @TempData["Success"]
+        </div>
+    }
+
     @* SOLO ADMINISTRADOR *@
     @if (rol == 1)
     {
@@ -119,13 +133,27 @@
                                     </div>
 
                                     <!-- btn reservar, solo cliente -->
-                                    <div class="col-12 mt-2 text-center">
-                                        <a asp-action="Reservar"
+
+                                    <div class="col-12 mt-2 text-center d-flex justify-content-center gap-2">
+
+                                        <!-- Ver detalles -->
+                                        <a asp-controller="Libro"
+                                           asp-action="Detalle"
                                            asp-route-id="@libro.Id_Libro"
-                                           class="btn btn-success btn-sm w-75">
+                                           class="btn btn-outline-info btn-sm">
+                                            Ver detalles
+                                        </a>
+
+                                        <!-- Reservar -->
+                                        <a asp-controller="Reserva"
+                                           asp-action="CrearReserva"
+                                           asp-route-libroId="@libro.Id_Libro"
+                                           class="btn btn-success btn-sm">
                                             Reservar
                                         </a>
+
                                     </div>
+
 
                                 </div>
                             </div>

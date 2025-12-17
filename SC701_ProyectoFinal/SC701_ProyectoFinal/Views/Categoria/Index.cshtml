@@ -30,6 +30,20 @@
         </button>
     </div>
 
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-warning text-center">
+            @TempData["Error"]
+        </div>
+    }
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success text-center">
+            @TempData["Success"]
+        </div>
+    }
+
     @if (!Model.Any())
     {
         <div class="alert alert-warning">
@@ -160,7 +174,7 @@
             cancelButtonText: "Cancelar"
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = "/Categoria/EliminarCategoria/" + id;
+                window.location.href = "/Categoria/Delete/" + id;
             }
         });
     }

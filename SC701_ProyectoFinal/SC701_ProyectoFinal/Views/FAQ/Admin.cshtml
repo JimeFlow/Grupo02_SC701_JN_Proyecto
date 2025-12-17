@@ -1,0 +1,38 @@
+﻿@model IEnumerable<SC701_ProyectoFinal.Models.FAQViewModel>
+
+<h2>Administrar Preguntas Frecuentes</h2>
+
+<form asp-action="Crear" method="post" class="mb-4">
+    <input name="Pregunta" class="form-control mb-2" placeholder="Pregunta" required />
+    <textarea name="Respuesta" class="form-control mb-2" placeholder="Respuesta" required></textarea>
+    <input type="hidden" name="Estado" value="true" />
+    <button class="btn btn-success">Agregar FAQ</button>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Pregunta</th>
+            <th>Estado</th>
+            <th>Acción</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var faq in Model)
+        {
+            <tr>
+                <td>@faq.Pregunta</td>
+                <td>@(faq.Estado ? "Activa" : "Inactiva")</td>
+                <td>
+                    <form asp-action="CambiarEstado" method="post">
+                        <input type="hidden" name="idFAQ" value="@faq.Id_FAQ" />
+                        <input type="hidden" name="estado" value="@(faq.Estado ? "false" : "true")" />
+                        <button class="btn btn-sm btn-warning">
+                            @(faq.Estado ? "Desactivar" : "Activar")
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

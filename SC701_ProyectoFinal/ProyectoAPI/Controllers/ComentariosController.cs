@@ -24,7 +24,7 @@ namespace ProyectoAPI.Controllers
             {
                 var parametros = new DynamicParameters();
                 parametros.Add("@Id_Usuario", comentario.Id_Usuario);
-                parametros.Add("@Id_Ejemplar", comentario.Id_Ejemplar);
+                parametros.Add("@Id_Ejemplar", comentario.Id_Ejemplar); 
                 parametros.Add("@Comentario", comentario.Comentario);
                 parametros.Add("@Rating", comentario.Rating);
 

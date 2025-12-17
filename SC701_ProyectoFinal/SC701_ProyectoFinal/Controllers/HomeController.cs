@@ -21,7 +21,7 @@ namespace SC701_ProyectoFinal.Controllers
             _configuration = configuration;
         }
 
-        public IActionResult Index() //HAY QUE AGREGAR UN GET DE LIBROS PARA MOSTRAR EN EL INDEX
+        public IActionResult Index() 
         {
             using (var client = _http.CreateClient())
             {
@@ -58,5 +58,6 @@ namespace SC701_ProyectoFinal.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
     }
 }

@@ -23,33 +23,57 @@ namespace SC701_ProyectoFinal.Controllers
             {
                 var IdUsuario = HttpContext.Session.GetInt32("Id_Usuario");
 
+                if (IdUsuario == null)
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+
+                // Validar sanción
                 var urlSancion = _configuration["Valores:UrlAPI"] + "Sancion/UsuarioTieneSancion";
-                context.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
+                context.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
+
                 var respSancion = context.GetAsync(urlSancion).Result;
                 bool tieneSancion = false;
-                if(respSancion.IsSuccessStatusCode)
+
+                if (respSancion.IsSuccessStatusCode)
                 {
                     var numero = respSancion.Content.ReadAsStringAsync().Result;
-                    if(int.TryParse(numero, out int result))
+                    if (int.TryParse(numero, out int result))
                     {
                         tieneSancion = result > 0;
                     }
-                                        
                 }
+
                 ViewBag.tieneSancion = tieneSancion;
 
+                // Obtener reservas del usuario
+                var urlApi = _configuration["Valores:UrlAPI"] +
+                             "Reserva/ObtenerReservas?Id_Usuario=" + IdUsuario;
 
-                var urlApi = _configuration["Valores:UrlAPI"] + "Reserva/ObtenerReservas?Id_Usuario="+IdUsuario;
                 var respuesta = context.GetAsync(urlApi).Result;
 
                 if (respuesta.IsSuccessStatusCode)
                 {
-                    var datosApi = respuesta.Content.ReadFromJsonAsync<List<ReservaLibroModel>>().Result;
-                    return View(datosApi);
+                    var datosApi =
+                        respuesta.Content.ReadFromJsonAsync<List<ReservaLibroModel>>().Result;
+
+                    var reservasView = datosApi.Select(r => new ReservaViewModel
+                    {
+                        Id_Movimiento = r.Id_Movimiento,
+                        Id_Libro = r.Id_Libro,
+                        Titulo = r.Titulo,
+                        Imagen_URL = r.Imagen_URL,
+                        FechaReserva = r.FechaReserva,
+                        FechaVencimiento = r.FechaVencimiento,
+                        Estado = r.Estado
+                    }).ToList();
+
+                    return View(reservasView);
                 }
 
-                ViewBag.Mensaje = "No hay reservas registradas";
-                return View(new List<ReservaLibroModel>());
+                ViewBag.Mensaje = "No tienes reservas registradas";
+                return View(new List<ReservaViewModel>());
             }
         }
 
@@ -139,7 +163,7 @@ namespace SC701_ProyectoFinal.Controllers
         {
             using (var context = _httpClientFactory.CreateClient())
             {
-                var urlApi = _configuration["Valores:UrlAPI"] + "Reserva/CambiarEstadoReserva"; //admin -> de pendiente a reservado
+                var urlApi = _configuration["Valores:UrlAPI"] + "Reserva/CambiarEstadoReserva"; 
                 context.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
                 var respuesta = context.PutAsJsonAsync(urlApi, reserva).Result;
 
@@ -161,7 +185,7 @@ namespace SC701_ProyectoFinal.Controllers
         {
             using (var context = _httpClientFactory.CreateClient())
             {
-                var urlApi = _configuration["Valores:UrlAPI"] + "Reserva/CambiarEstadoCompletado";//si
+                var urlApi = _configuration["Valores:UrlAPI"] + "Reserva/CambiarEstadoCompletado";
                 context.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
                 var respuesta = context.PutAsJsonAsync(urlApi, reserva).Result;
 

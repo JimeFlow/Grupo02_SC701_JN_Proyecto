@@ -9,9 +9,9 @@
 
 <div>
     <p class="text-center">
-        @if (!string.IsNullOrEmpty(Model.Imagen))
+        @if (!string.IsNullOrEmpty(Model.Imagen_URL))
         {
-            <img src="@Model.Imagen" alt="Portada" width="50" height="70" class="rounded shadow-sm" />
+            <img src="@Model.Imagen_URL" alt="Portada" width="150" class="rounded shadow-sm" />
         }
         else
         {
@@ -20,16 +20,22 @@
     </p>
     <p><strong>Autor:</strong> @Model.Autor || <strong>Año:</strong> @Model.AnioPublicacion  || <strong>ISBN:</strong> @Model.ISBN</p>
     <p><strong>Descripción:</strong> @Model.Descripcion</p>
-    <p><strong>Estado:</strong> @Model.Estado</p>
 </div>
 
 <hr />
 
 @* Boton de Reserva *@
-<form asp-action="Reservar" method="post">
-    <input type="hidden" name="idLibro" value="@Model.Id_Libro" />
-    <button type="submit" class="btn btn-primary">Reservar</button>
+
+<form asp-controller="Reserva"
+      asp-action="CrearReserva"
+      method="post">
+    <input type="hidden" name="LibroId" value="@Model.Id_Libro" />
+    <input type="hidden" name="Id_Ejemplar" value="@Model.Id_Ejemplar" />
+    <button type="submit" class="btn btn-primary">
+        Reservar
+    </button>
 </form>
+
 
 <hr />
 
@@ -47,7 +53,6 @@
     </div>
 }
 <form asp-action="Crear" asp-controller="Comentarios" method="post">
-    <input type="hidden" name="idEjemplar" value="@Model.Id_Ejemplar" />
     <input type="hidden" name="idLibro" value="@Model.Id_Libro" />
 
     <div class="form-group">

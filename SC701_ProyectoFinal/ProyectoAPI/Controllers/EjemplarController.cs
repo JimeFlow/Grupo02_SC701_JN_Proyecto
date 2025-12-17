@@ -71,7 +71,11 @@ namespace ProyectoAPI.Controllers
                 parametros.Add("@Ubicacion", ejemplar.Ubicacion);
                 parametros.Add("@Cantidad", ejemplar.Cantidad);
 
-                context.Execute("RegistrarEjemplar", parametros);
+                context.Execute(
+                    "RegistrarEjemplar",
+                    parametros,
+                    commandType: CommandType.StoredProcedure
+                    );
             }
 
             return Ok(new { mensaje = "Ejemplar registrado correctamente." });

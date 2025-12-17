@@ -18,36 +18,31 @@ namespace SC701_ProyectoFinal.Controllers
 
         // POST: Agregar comentario
         [HttpPost]
-        public IActionResult Crear(int idEjemplar, string comentario, int rating, int idLibro)
+        public async Task<IActionResult> Crear(
+      int idLibro,
+      int idEjemplar,
+      string comentario,
+      int rating)
         {
-            var idUsuario = HttpContext.Session.GetInt32("Id_Usuario");
-            if (idUsuario == null)
+            var body = new
             {
-                TempData["ErrorComentario"] = "Debe iniciar sesión para comentar.";
-                return RedirectToAction("Detalle", "Libro", new { id = idLibro });
+                Id_Usuario = HttpContext.Session.GetInt32("Id_Usuario"),
+                Id_Ejemplar = idEjemplar,
+                Comentario = comentario,
+                Rating = rating
+            };
+
+            var client = _httpClientFactory.CreateClient("ProyectoAPI");
+
+            var response = await client.PostAsJsonAsync("Comentarios/Crear", body);
+
+            if (response.IsSuccessStatusCode)
+            {
+                TempData["MensajeComentario"] = "Comentario agregado correctamente";
             }
-
-            using (var client = _httpClientFactory.CreateClient())
+            else
             {
-                var urlApi = _configuration["Valores:UrlAPI"] + "Comentarios/Crear";
-
-                client.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
-
-                var request = new
-                {
-                    Id_Usuario = idUsuario.Value,
-                    Id_Ejemplar = idEjemplar,
-                    Comentario = comentario,
-                    Rating = rating
-                };
-
-                var response = client.PostAsJsonAsync(urlApi, request).Result;
-
-                if (response.IsSuccessStatusCode)
-                    TempData["MensajeComentario"] = "Comentario agregado correctamente.";
-                else
-                    TempData["ErrorComentario"] = "No se pudo agregar el comentario.";
+                TempData["ErrorComentario"] = "No se pudo agregar el comentario";
             }
 
             return RedirectToAction("Detalle", "Libro", new { id = idLibro });

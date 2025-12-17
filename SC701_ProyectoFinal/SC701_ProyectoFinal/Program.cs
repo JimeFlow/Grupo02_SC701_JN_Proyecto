@@ -16,7 +16,7 @@ builder.Services.AddSession(options =>
 // HttpClient apuntando a la API
 builder.Services.AddHttpClient("ProyectoAPI", client =>
 {
-    client.BaseAddress = new Uri("https://localhost:5123/api/");
+    client.BaseAddress = new Uri("http://localhost:5123/api/");
 });
 
 var app = builder.Build();

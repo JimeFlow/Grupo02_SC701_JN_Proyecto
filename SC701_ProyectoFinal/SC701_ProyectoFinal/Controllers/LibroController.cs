@@ -184,19 +184,22 @@ namespace SC701_ProyectoFinal.Controllers
         {
             using (var client = _httpClientFactory.CreateClient())
             {
-                var urlApi = _configuration["Valores:UrlAPI"] + $"Libro/EliminarLibro/{id}";
+                var urlApi = _configuration["Valores:UrlAPI"] + $"Libro/{id}";
                 client.DefaultRequestHeaders.Authorization =
                     new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
 
-                var respuesta = client.DeleteAsync(urlApi).Result;
+                var response = await client.DeleteAsync(urlApi);
 
-                if (respuesta.IsSuccessStatusCode)
+                if (!response.IsSuccessStatusCode)
+                {
+                    var mensaje = await response.Content.ReadAsStringAsync();
+                    TempData["Error"] = mensaje;
                     return RedirectToAction("Index");
+                }
 
-                TempData["ErrorMessage"] = "No se pudo eliminar el libro";
-                return RedirectToAction("Delete", new { id });
+                TempData["Success"] = "Libro eliminado correctamente.";
+                return RedirectToAction("Index");
             }
-
         }
 
         // Vista detalle libro con comentarios
@@ -234,7 +237,7 @@ namespace SC701_ProyectoFinal.Controllers
                     libro.Comentarios = new List<ComentarioViewModel>();
                 }
 
-                return View(libro);
+                return View("DetalleLibro", libro);
             }
         }
 
@@ -287,7 +290,7 @@ namespace SC701_ProyectoFinal.Controllers
 
         // POST: Confirmar reserva
         [HttpPost]
-        public IActionResult Reservar(ReservaViewModel reserva) //NO LLEGA ID LIBRO
+        public IActionResult Reservar(ReservaViewModel reserva) 
         {
             if (!ModelState.IsValid)
                 return View(reserva);

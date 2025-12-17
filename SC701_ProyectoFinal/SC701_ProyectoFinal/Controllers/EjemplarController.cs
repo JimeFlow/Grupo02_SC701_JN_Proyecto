@@ -91,7 +91,8 @@ namespace SC701_ProyectoFinal.Controllers
                     CodigoEjemplar = ejemplar.CodigoEjemplar,
                     Id_Libro = ejemplar.Id_Libro,
                     Estado = ejemplar.Estado,
-                    Ubicacion = ejemplar.Ubicacion
+                    Ubicacion = ejemplar.Ubicacion,
+                    Cantidad = ejemplar.Cantidad
                 };
 
                 var respuesta = await client.PostAsJsonAsync(urlApi, request);

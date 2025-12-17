@@ -32,7 +32,7 @@ namespace SC701_ProyectoFinal.Controllers
             using (var context = _httpClientFactory.CreateClient())
             {
                 var urlApi = _configuration["Valores:UrlAPI"] + "Account/IniciarSesion";
-                var respuesta = context.PostAsJsonAsync(urlApi, usuario).Result; // ERROR 1
+                var respuesta = context.PostAsJsonAsync(urlApi, usuario).Result; 
 
                 if (respuesta.IsSuccessStatusCode)
                 {
@@ -45,6 +45,7 @@ namespace SC701_ProyectoFinal.Controllers
                         HttpContext.Session.SetInt32("Id_Usuario", datosApi.Id_Usuario);
                         HttpContext.Session.SetInt32("Id_Rol", datosApi.Id_Rol);
                         HttpContext.Session.SetString("Token", datosApi.Token);
+                        HttpContext.Session.SetString("Correo", datosApi.Correo);
                         return RedirectToAction("Index", "Home");
                     }
                 }
@@ -76,24 +77,26 @@ namespace SC701_ProyectoFinal.Controllers
         [HttpPost]
         public IActionResult Register(UsuarioModel usuario)
         {
-            using (var context = _httpClientFactory.CreateClient("ProyectoAPI"))
-            {
-                var urlApi = _configuration["Valores:UrlAPI"] + "Account/Registrarse";
-                var respuesta = context.PostAsJsonAsync(urlApi, usuario).Result;
+
+            var client = _httpClientFactory.CreateClient("ProyectoAPI");
+            var urlApi = _configuration["Valores:UrlAPI"] + "Account/Registrarse";
+
+
+            var respuesta = client.PostAsJsonAsync(urlApi, usuario).Result;
 
                 if (respuesta.IsSuccessStatusCode)
-                {                    
+                {
+                    TempData["RegistroExitoso"] = "Registro exitoso. Ya puedes iniciar sesión.";
                     return RedirectToAction("Login");
                 }
                 else
                 {
-                    var errorMessage = respuesta.Content.ReadAsStringAsync().Result;                    
-                    ViewBag.Mensaje = errorMessage;
+                    ViewBag.Mensaje = "No se pudo completar el registro. Verifique los datos ingresados.";
                     return View(usuario);
                 }                                
 
             }
-        }
+        
 
         #endregion
 
@@ -170,7 +173,7 @@ namespace SC701_ProyectoFinal.Controllers
             {
                 var urlApi = _configuration["Valores:UrlAPI"] + "Account/ActualizarPerfil";
                 context.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
-                var respuesta = context.PutAsJsonAsync(urlApi, usuario).Result; //404
+                var respuesta = context.PutAsJsonAsync(urlApi, usuario).Result; 
 
                 if (respuesta.IsSuccessStatusCode)
                 {                    

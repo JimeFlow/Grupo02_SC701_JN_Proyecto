@@ -70,22 +70,26 @@ namespace ProyectoAPI.Controllers
             }
         }
 
-        //[HttpDelete]
-        //[Route("EliminarCategoria")]
-        //public IActionResult EliminarCategoria(int id)
-        //{
-        //    using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
-        //    {
-        //        var parametros = new DynamicParameters();
+        [HttpDelete("{id}")]
+        public IActionResult EliminarCategoria(int id)
+        {
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
+            {
+                var parametros = new DynamicParameters();
+                parametros.Add("@Id_Categoria", id);
 
-        //        parametros.Add("@Id_Categoria", id);
+                var resultado = context.QueryFirst<int>(
+                    "EliminarCategoria",
+                    parametros,
+                    commandType: CommandType.StoredProcedure
+                );
 
+                if (resultado == 0)
+                    return BadRequest("No se puede eliminar la categoría porque tiene libros asociados.");
 
-        //        var resultado = context.Execute("EliminarCategoria", parametros, commandType: CommandType.StoredProcedure);
-
-        //        return Ok(resultado);
-        //    }
-        //}
+                return Ok();
+            }
+        }
 
     }
 }

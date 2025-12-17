@@ -167,7 +167,7 @@ namespace ProyectoAPI.Controllers
                 var parametros = new DynamicParameters();
                 parametros.Add("@Id_Usuario", idUsuario);
 
-                var resultado = context.Query<dynamic>( //id_Libro
+                var resultado = context.Query<dynamic>( 
                     "ObtenerReservasUsuario",
                     parametros,
                     commandType: CommandType.StoredProcedure

@@ -13,5 +13,6 @@
         public string Nombre { get; set; } = string.Empty;
         public string Identificacion { get; set; } = string.Empty;
         public int Id_Estado { get; set; }
+        public int Resultado { get; set; }
     }
 }

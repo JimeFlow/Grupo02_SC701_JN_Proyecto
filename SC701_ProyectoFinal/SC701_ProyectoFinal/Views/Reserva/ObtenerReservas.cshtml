@@ -1,6 +1,7 @@
 ﻿@model IEnumerable<SC701_ProyectoFinal.Models.ReservaRequestModel>
 
 
+
 <div class="container mt-4">
 	<h2 class="fw-bold text-primary">
 		<i class="bi bi-people-fill"></i> Gestión de Reservas
@@ -50,10 +51,34 @@
 			<tbody>
 				@foreach (var r in Model)
 				{
+					
+					DateTime hoy = DateTime.Now.Date;
+					DateTime vencimiento = r.Fecha_Vencimiento.Date;
+					int diasRestantes = (vencimiento - hoy).Days;
+
+
 					<tr>
 						<td>@r.Id_Movimiento</td>
-						<td>@r.Fecha.ToString("yyyy-MM-dd")</td>
-						<td>@r.Fecha_Vencimiento.ToString("yyyy-MM-dd")</td>
+						<td>@r.Fecha.ToString("dd-MM-yyyy")</td>
+						<td>
+							@if (r.Id_Estado == 5 && vencimiento < hoy)
+							{
+								<span class="badge text-bg-danger badge-pill">
+							@r.Fecha_Vencimiento.ToString("dd-MM-yyyy")</span>
+
+						}
+							else if (r.Id_Estado == 5 && diasRestantes >= 0 && diasRestantes <= 3)
+						{
+								<span class="badge text-bg-warning badge-pill">
+									@r.Fecha_Vencimiento.ToString("dd-MM-yyyy")
+								</span>
+							}
+							else
+							{
+								@r.Fecha_Vencimiento.ToString("dd-MM-yyyy")
+							}
+						</td>
+
 						<td>@r.Nombre</td>
 						<td>@r.Identificacion</td>
 						<td>@r.Estado</td>

@@ -266,15 +266,17 @@ namespace SC701_ProyectoFinal.Controllers
 
                 if (respuesta.IsSuccessStatusCode)
                 {
-                    var datosApi = respuesta.Content.ReadFromJsonAsync<int>().Result;
+                    var datosApi = await respuesta.Content.ReadFromJsonAsync<ReservaRequestModel>();
 
-                    if (datosApi > 0)
+                    if (!string.IsNullOrEmpty(datosApi?.Titulo))
                     {
                         return RedirectToAction("ObtenerReservas");
                     }
                 }
 
-                ViewBag.Mensaje = "No se ha registrado la información" + respuesta;
+                ViewBag.Mensaje = respuesta.StatusCode == System.Net.HttpStatusCode.BadRequest
+            ? await respuesta.Content.ReadAsStringAsync()
+            : "No se ha registrado la información";
                 ViewBag.Ejemplares = await ObtenerEjemplaresAsync();
                 ViewBag.Usuarios = await ObtenerUsuariosAsync();
                 return View(reserva);
@@ -286,7 +288,7 @@ namespace SC701_ProyectoFinal.Controllers
         {
             using (var client = _httpClientFactory.CreateClient())
             {
-                var urlApi = _configuration["Valores:UrlAPI"] + "Ejemplar/ObtenerEjemplaresDisponiblesAdmin"; //URL
+                var urlApi = _configuration["Valores:UrlAPI"] + "Ejemplar/ObtenerEjemplaresDisponiblesAdmin";
 
                 client.DefaultRequestHeaders.Authorization =
                     new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
@@ -306,7 +308,7 @@ namespace SC701_ProyectoFinal.Controllers
         {
             using (var client = _httpClientFactory.CreateClient())
             {
-                var urlApi = _configuration["Valores:UrlAPI"] + "Usuario/ListaUsuarios"; //URL
+                var urlApi = _configuration["Valores:UrlAPI"] + "Usuario/ListaUsuariosAdmin";
 
                 client.DefaultRequestHeaders.Authorization =
                     new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));

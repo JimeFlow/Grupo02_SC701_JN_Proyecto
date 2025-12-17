@@ -32,6 +32,7 @@ namespace ProyectoAPI.Services
                     await Task.Delay(delay, stoppingToken); //se ejecuta a las 00:01 cada dia
 
                 await ProcesarReservasPorVencer();
+                //await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
             }
         }
 

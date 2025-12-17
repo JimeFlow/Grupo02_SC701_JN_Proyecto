@@ -159,7 +159,7 @@ namespace ProyectoAPI.Controllers
             using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
                 var parametros = new DynamicParameters();
-                if(estado != null)
+                if (estado != null)
                 {
                     parametros.Add("EstadoFiltro", estado);
                 }
@@ -195,6 +195,7 @@ namespace ProyectoAPI.Controllers
         {
             using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
+                var helper = new Helper();
                 var sanciones = context.ExecuteScalar<int>(
         "UsuarioTieneSancionActiva",
         new { Id_Usuario = reserva.Id_Usuario },
@@ -212,16 +213,32 @@ namespace ProyectoAPI.Controllers
                 parametros.Add("@Fecha_Vencimiento", reserva.Fecha_Vencimiento);
                 parametros.Add("@Id_Usuario", reserva.Id_Usuario);
 
-                var resultado = context.Execute("RegistrarReservaPorAdmin", parametros, commandType: CommandType.StoredProcedure);
+                var resultado = context.QueryFirstOrDefault<ReservaAdminResponseModel>("RegistrarReservaPorAdmin", parametros, commandType: CommandType.StoredProcedure);
+
+                var ruta = Path.Combine(_environment.ContentRootPath, "PlantillasCorreo", "NotificacionReserva.html");
+                var html = System.IO.File.ReadAllText(ruta, UTF8Encoding.UTF8);
+
+                html = html.Replace("{{Usuario}}", reserva.Id_Usuario.ToString());
+                html = html.Replace("{{Libro}}", resultado?.Titulo);
+                html = html.Replace("{{FechaReserva}}", reserva.Fecha.ToString("F"));
+                html = html.Replace("{{FechaVencimiento}}", reserva.Fecha_Vencimiento.ToString("F"));
+
+                string? correoUsuario = resultado?.Correo;
+                if (correoUsuario != null)
+                {
+                    helper.EnviarCorreo("Confirmación de reserva exitosa", html, correoUsuario);
+                }
 
                 return Ok(resultado);
             }
+
         }
-
-
     }
 
+
 }
+
+
 
 
 

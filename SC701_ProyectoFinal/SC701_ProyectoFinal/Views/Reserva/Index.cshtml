@@ -1,4 +1,4 @@
-﻿@model IEnumerable<SC701_ProyectoFinal.Models.ReservaRequestModel>
+﻿@model IEnumerable<SC701_ProyectoFinal.Models.ReservaViewModel>
 
 
 @{
@@ -38,8 +38,8 @@
                             <img src="@r.Imagen_URL" width="50" height="70" class="rounded shadow-sm" />
                         </td>
                         <td>@r.Titulo</td>
-                        <td>@r.Fecha.ToShortDateString()</td>
-                        <td>@r.Fecha_Vencimiento.ToShortDateString()</td>
+                        <td>@r.FechaReserva.ToShortDateString()</td>
+                        <td>@r.FechaVencimiento.ToShortDateString()</td>
                         <td>
                             @if(r.Estado == "Pendiente")
                             {
@@ -77,7 +77,7 @@
                                         data-bs-toggle="modal"
                                         data-bs-target="#modalExtender"
                                         data-id="@r.Id_Movimiento"
-                                        data-fecha="@r.Fecha_Vencimiento.ToString("yyyy-MM-dd")">
+                                        data-fecha="@r.FechaVencimiento.ToString("yyyy-MM-dd")">
                                     Extender préstamo
                                 </button>
                                 }

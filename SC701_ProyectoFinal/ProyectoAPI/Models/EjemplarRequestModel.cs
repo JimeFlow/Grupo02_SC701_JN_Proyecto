@@ -9,5 +9,7 @@ namespace ProyectoAPI.Models
         public int Id_Libro { get; set; }
         public string Estado { get; set; }
         public string? Ubicacion { get; set; }
+
+        public int Cantidad { get; set; }
     }
 }

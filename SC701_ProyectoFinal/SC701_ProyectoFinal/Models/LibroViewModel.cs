@@ -2,7 +2,8 @@
 {
     public class LibroViewModel
     {
-        public int LibroId { get; set; }
+        public int Id_Libro { get; set; }
+        public int Id_Ejemplar { get; set; }
         public required string Titulo { get; set; }
         public required string Autor { get; set; }
         public required string Descripcion { get; set; }

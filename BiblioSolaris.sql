@@ -53,16 +53,6 @@ CREATE TABLE Categoria(
     Tipo VARCHAR(75) UNIQUE
 );
 
---CREATE TABLE Autor(
---    Id_Autor INT IDENTITY(1,1) PRIMARY KEY,
---    Nombre VARCHAR(100),
---    Apellidos VARCHAR(100),
---    Nacionalidad VARCHAR(50),
---    Fecha_Nacimiento DATE,
---    Id_Estado INT,
---    FOREIGN KEY (Id_Estado) REFERENCES Estado(Id_Estado)
---);
-
 
 CREATE TABLE Libro(
     Id_Libro INT IDENTITY(1,1) PRIMARY KEY,
@@ -107,48 +97,6 @@ CREATE TABLE Libro_Etiqueta(
     FOREIGN KEY (Id_Libro) REFERENCES Libro(Id_Libro),
     FOREIGN KEY (Id_Etiqueta) REFERENCES Etiqueta(Id_Etiqueta)
 );
-
-DROP TABLE Alerta;
---CREATE TABLE Alerta( --CAMBIAR A OTRA FINALIDAD
---    Id_Alerta INT IDENTITY(1,1) PRIMARY KEY,
---    Comentario VARCHAR(255),
---    Fecha DATETIME2,
---    Id_Libro INT,
---    FOREIGN KEY (Id_Libro) REFERENCES Libro(Id_Libro)
---);
-
---SE ELIMINA
---CREATE TABLE Inventario(
---    Id_Inventario INT IDENTITY(1,1) PRIMARY KEY,
---    Id_Libro INT,
---    Stock INT,
---    Id_Estado INT,
---    FOREIGN KEY(Id_Libro) REFERENCES Libro(Id_Libro),
---    FOREIGN KEY (Id_Estado) REFERENCES Estado(Id_Estado)
---);
-DROP TABLE Inventario;
-DROP TABLE Entrega;
-
---CREATE TABLE Entrega(
---    Id_Entrega INT IDENTITY(1,1) PRIMARY KEY,
---    Fecha DATETIME2,
---    Id_Libro INT,
---    Cantidad INT,
---    Id_Estado INT,
---    FOREIGN KEY(Id_Libro) REFERENCES Libro(Id_Libro),
---    FOREIGN KEY (Id_Estado) REFERENCES Estado(Id_Estado)
---);
-
-DROP TABLE Ingreso;
---CREATE TABLE Ingreso(
---    Id_Ingreso INT IDENTITY(1,1) PRIMARY KEY,
---    Fecha DATETIME2,
---    Id_Libro INT,
---    Cantidad INT,
---    Id_Estado INT,
---    FOREIGN KEY (Id_Libro) REFERENCES Libro(Id_Libro),
---    FOREIGN KEY (Id_Estado) REFERENCES Estado(Id_Estado)
---);
 
 CREATE TABLE Usuario(
     Id_Usuario INT IDENTITY(1,1) PRIMARY KEY,
@@ -229,11 +177,13 @@ ADD CONSTRAINT CK_Rating CHECK (Rating BETWEEN 1 AND 5);
 -------------------------------------------------------------------------------------------------------
 
 -- PREGUNTAS FRECUENTES - FREQUENTLY ASKED QUESTIONS
+
 CREATE TABLE FAQ (
     Id_FAQ INT IDENTITY(1,1) PRIMARY KEY,
-    Pregunta VARCHAR(255),
-    Respuesta TEXT,
-    Estado BIT -- 1 = Activa / 0 = Oculta
+    Pregunta VARCHAR(255) NOT NULL,
+    Respuesta VARCHAR(MAX) NOT NULL,
+    Estado BIT NOT NULL DEFAULT 1,
+    FechaCreacion DATETIME NOT NULL DEFAULT GETDATE()
 );
 -------------------------------------------------------------------------------------------------------
 SELECT * FROM Estado;
@@ -248,6 +198,7 @@ SELECT * FROM Estado;
    **************************************************************************************************** */
 
 -- INICIAR SESION -------------------------------------------------------------------------------------
+GO
 CREATE PROCEDURE ObtenerUsuarioPorCorreo
 	@Correo VARCHAR(75)
 AS
@@ -268,6 +219,7 @@ END
 
 
 -- REGISTRARSE -------------------------------------------------------------------------------------
+GO
 CREATE PROCEDURE RegistroUsuario
 	@Nombre VARCHAR(50),
 	@Apellidos VARCHAR(100),
@@ -328,6 +280,7 @@ BEGIN
 END
 
 -- SP PARA REGISTRAR USUARIOS (ADMIN) -------------------------------------------------------------------
+GO
 CREATE PROCEDURE RegistroUsuarioAdmin
 	@Nombre VARCHAR(50),
 	@Apellidos VARCHAR(100),
@@ -350,6 +303,7 @@ BEGIN
 END
 
 -- SP PARA LISTAR USUARIOS -------------------------------------------------------------------------------------
+GO
 CREATE PROCEDURE ListarUsuarios
 AS
 BEGIN
@@ -358,7 +312,7 @@ BEGIN
 END
 
 -- SP PARA ACTUALIZAR USUARIO -------------------------------------------------------------------------------------
-ALTER PROCEDURE ActualizarUsuarioAdmin --CAMBIO 2DO AVANCE
+CREATE PROCEDURE ActualizarUsuarioAdmin --CAMBIO 2DO AVANCE
 	@Id_Usuario INT,
 	@Nombre VARCHAR(50),
 	@Apellidos VARCHAR(100),
@@ -398,6 +352,42 @@ BEGIN
 	WHERE Id_Usuario = @Id_Usuario
 END
 
+--------SP PARA FAQ-------------------
+CREATE PROCEDURE ListarFAQActivas
+AS
+BEGIN
+    SELECT Id_FAQ, Pregunta, Respuesta
+    FROM FAQ
+    WHERE Estado = 1
+    ORDER BY Id_FAQ;
+END;
+
+CREATE PROCEDURE ListarFAQAdmin
+AS
+BEGIN
+    SELECT Id_FAQ, Pregunta, Respuesta, Estado
+    FROM FAQ
+    ORDER BY Id_FAQ;
+END;
+
+CREATE PROCEDURE CrearFAQ
+    @Pregunta VARCHAR(255),
+    @Respuesta VARCHAR(MAX)
+AS
+BEGIN
+    INSERT INTO FAQ (Pregunta, Respuesta)
+    VALUES (@Pregunta, @Respuesta);
+END;
+
+CREATE PROCEDURE CambiarEstadoFAQ
+    @Id_FAQ INT,
+    @Estado BIT
+AS
+BEGIN
+    UPDATE FAQ
+    SET Estado = @Estado
+    WHERE Id_FAQ = @Id_FAQ;
+END;
 --------------------------------------------------------------------------------------------------------
 ---------------------------------------- "OLVIDE MI CONTRASEÑA" ----------------------------------------
 --------------------------------------------------------------------------------------------------------
@@ -468,7 +458,7 @@ BEGIN
 END
 
 -- SP PARA ELIMINAR USUARIO ADMIN -------------------------------------------------------------------------------------
-ALTER PROCEDURE EliminarUsuario --CAMBIO 2DO AVANCE
+CREATE PROCEDURE EliminarUsuario --CAMBIO 2DO AVANCE
 	@Id_Usuario INT
 AS
 BEGIN
@@ -491,7 +481,7 @@ END
 
 
 -----------------------------------------LISTAR---------------------------------------------------------
-ALTER PROCEDURE ListarLibros
+CREATE PROCEDURE ListarLibros
 AS
 BEGIN
     SELECT 
@@ -508,7 +498,7 @@ BEGIN
 END;
 
 --------------------------------------------REGISTRAR----------------------------------------------
-ALTER PROCEDURE RegistrarLibro
+CREATE PROCEDURE RegistrarLibro
     @ISBN VARCHAR(20),
 	@Descripcion VARCHAR(150),
     @Titulo VARCHAR(200),
@@ -523,7 +513,7 @@ BEGIN
 END;
 
 ------------------------------------------ACTUALIZAR----------------------------------------------
-ALTER PROCEDURE ActualizarLibro
+CREATE PROCEDURE ActualizarLibro
 	@Id_Usuario INT,
     @Id_Libro INT,
     @ISBN VARCHAR(20),
@@ -552,7 +542,7 @@ BEGIN
 END;
 
 -- ELIMINAR -------------------------------------------------------------------------------------
-ALTER PROCEDURE EliminarLibro
+CREATE PROCEDURE EliminarLibro
 	@Id_Usuario INT,
     @Id_Libro INT
 AS
@@ -566,7 +556,7 @@ BEGIN
 END;
 
 -- OBTENER LIBRO X ID -------------------------------------------------------------------------------------
-ALTER PROCEDURE ObtenerLibroPorId
+CREATE PROCEDURE ObtenerLibroPorId
     @Id_Libro INT
 AS
 BEGIN
@@ -576,7 +566,7 @@ BEGIN
         Titulo,
 		Descripcion,
 		L.Id_Categoria,
-		C.Tipo
+		C.Tipo,
         Autor,
         Anio,
         Imagen_URL
@@ -622,8 +612,6 @@ BEGIN
     UPDATE Ejemplar
     SET Estado = 'Prestado'
     WHERE Id_Ejemplar = @Id_Ejemplar;
-
---AQUI ESTA
     SELECT 1 AS Resultado;
 END;
 
@@ -632,7 +620,7 @@ END;
 
 /*********************************** LISTAR LIBROS NUEVOS-> NO SOBRE EJEMPLARES */
 
-ALTER PROCEDURE ObtenerListaLibrosCliente
+CREATE PROCEDURE ObtenerListaLibrosCliente
 AS
 BEGIN
 SELECT 
@@ -653,59 +641,9 @@ GROUP BY
 ORDER BY L.Titulo;
 END
 
-
---*************************************
-
--- RESERVAR LIRBO -------------------------------------------------------------------------------------
-CREATE PROCEDURE ReservarLibro
-    @Id_Libro INT,--
-    @Fecha DATETIME,
-    @Fecha_Vencimiento DATETIME,
-    @Id_Usuario INT
-AS
-BEGIN
-    DECLARE @Id_Ejemplar INT;
-
-	SELECT TOP 1 @Id_Ejemplar = Id_Ejemplar
-	FROM Ejemplar WHERE Id_Libro = @Id_Libro 
-	AND Estado = 'Disponible' ORDER BY Id_Ejemplar;
-
-	IF @Id_Ejemplar IS NULL
-	BEGIN 
-		SELECT -1 AS Resultado
-		RETURN;
-	END
-
-    INSERT INTO Movimiento (Tipo, Fecha, Fecha_Vencimiento, Id_Estado, Id_Usuario, Id_Ejemplar)
-    VALUES ('Préstamo', @Fecha, @Fecha_Vencimiento, 4, @Id_Usuario, @Id_Ejemplar);
-
-	UPDATE Ejemplar SET Estado = 'Prestado' WHERE Id_Ejemplar = @Id_Ejemplar;
-
-    SELECT 1 AS Resultado;
-END;
-
-
-/******************************************* RESERVAS *******************************************
-
-CREATE PROCEDURE CrearReserva
-    @Id_Usuario INT,
-    @Id_Libro INT,
-    @Fecha_Reserva DATETIME,
-    @Fecha_Vencimiento DATETIME,
-    @Id_Estado INT
-AS
-BEGIN
-    INSERT INTO Movimiento (Id_Usuario, Id_Libro, Fecha, Fecha_Vencimiento, Tipo, Id_Estado)
-    VALUES (@Id_Usuario, @Id_Libro, @Fecha_Reserva, @Fecha_Vencimiento, 'Reserva', @Id_Estado);
-
-    -- Poner libro como "No disponible"
-    UPDATE Libro SET Id_Estado = 2 WHERE Id_Libro = @Id_Libro;
-END
-
-*/
-
 ---------------------------------------- OBTENER RESERVAS ----------------------------------------
-CREATE PROCEDURE ObtenerReservasUsuario
+GO
+CREATE OR ALTER PROCEDURE ObtenerReservasUsuario
     @Id_Usuario INT
 AS
 BEGIN
@@ -718,40 +656,26 @@ BEGIN
         L.Imagen_URL,
         E.Estado
     FROM Movimiento M
-    INNER JOIN Libro L ON L.Id_Libro = M.Id_Libro
+    INNER JOIN Ejemplar EJ ON EJ.Id_Ejemplar = M.Id_Ejemplar
+    INNER JOIN Libro L ON L.Id_Libro = EJ.Id_Libro
     INNER JOIN Estado E ON E.Id_Estado = M.Id_Estado
     WHERE M.Id_Usuario = @Id_Usuario
       AND M.Tipo = 'Reserva'
       AND M.Id_Estado <> 5
     ORDER BY M.Fecha DESC;
-END
-
----------------------------------------- CANCELAR RESERVA ----------------------------------------
-CREATE PROCEDURE CancelarReserva
-    @Id_Movimiento INT
-AS
-BEGIN
-
-    UPDATE Movimiento
-    SET Id_Estado = 5
-    WHERE Id_Movimiento = @Id_Movimiento;
-
-    UPDATE Libro
-    SET Id_Estado = 1
-    WHERE Id_Libro = (SELECT Id_Libro FROM Movimiento WHERE Id_Movimiento = @Id_Movimiento);
-END
+END;
+GO
 
 
 /******************************************* EJEMPLARES *******************************************/
 
-ALTER PROCEDURE ObtenerEjemplares
+CREATE PROCEDURE ObtenerEjemplares
 AS
 BEGIN
     SELECT 
         E.Id_Ejemplar,
         E.CodigoEjemplar,
         E.Estado,
-		E.Cantidad,
         E.Ubicacion,
         E.Fecha_Registro,
         E.Id_Libro,
@@ -761,7 +685,7 @@ BEGIN
 END
 
 
-ALTER PROCEDURE ObtenerEjemplarPorId
+CREATE PROCEDURE ObtenerEjemplarPorId
     @Id INT
 AS
 BEGIN
@@ -779,7 +703,7 @@ BEGIN
 END
 
 
-ALTER PROCEDURE RegistrarEjemplar
+CREATE PROCEDURE RegistrarEjemplar
     @CodigoEjemplar VARCHAR(20),
     @Id_Libro INT,
 	@Cantidad INT,
@@ -791,7 +715,7 @@ BEGIN
     VALUES (@CodigoEjemplar, @Id_Libro, @Estado, @Ubicacion, GETDATE());
 END
 
-ALTER PROCEDURE ActualizarEjemplar
+CREATE PROCEDURE ActualizarEjemplar
     @Id INT,
     @CodigoEjemplar VARCHAR(20),
 	@Cantidad INT,
@@ -833,17 +757,43 @@ END
 
 -- RESERVAS DE LIBROS 
 -- Crear reserva -------------------------------------------------------------------------------------
-CREATE PROCEDURE CrearReserva
+GO
+CREATE OR ALTER PROCEDURE CrearReserva
     @Id_Usuario INT,
     @Id_Libro INT,
     @Fecha_Reserva DATETIME2,
     @Fecha_Expiracion DATETIME2,
-    @Id_Estado INT -- Pendiente
+    @Id_Estado INT
 AS
 BEGIN
-    INSERT INTO Movimiento (Tipo, Fecha, Fecha_Vencimiento, Id_Usuario, Id_Libro, Id_Estado)
-    VALUES ('RESERVA', @Fecha_Reserva, @Fecha_Expiracion, @Id_Usuario, @Id_Libro, @Id_Estado)
-END
+    DECLARE @Id_Ejemplar INT;
+
+    -- 1. Obtener ejemplar disponible
+    SELECT TOP 1 @Id_Ejemplar = Id_Ejemplar
+    FROM Ejemplar
+    WHERE Id_Libro = @Id_Libro
+      AND Estado = 'Disponible'
+    ORDER BY Id_Ejemplar;
+
+    -- 2. Validar disponibilidad
+    IF @Id_Ejemplar IS NULL
+    BEGIN
+        SELECT -1 AS Resultado;
+        RETURN;
+    END
+
+    -- 3. Crear reserva
+    INSERT INTO Movimiento (Tipo, Fecha, Fecha_Vencimiento, Id_Usuario, Id_Ejemplar, Id_Estado)
+    VALUES ('RESERVA', @Fecha_Reserva, @Fecha_Expiracion, @Id_Usuario, @Id_Ejemplar, @Id_Estado);
+
+    -- 4. Marcar ejemplar como reservado
+    UPDATE Ejemplar
+    SET Estado = 'Reservado'
+    WHERE Id_Ejemplar = @Id_Ejemplar;
+
+    SELECT 1 AS Resultado;
+END;
+GO
 
 -- Cancelar reserva -------------------------------------------------------------------------------------
 CREATE PROCEDURE CancelarReserva
@@ -880,28 +830,57 @@ END
 
 -- COMENTARIOS Y CALIFICACIONES
 -- Agregar comentario -------------------------------------------------------------------------------------
-CREATE PROCEDURE AgregarComentario
+GO
+CREATE OR ALTER PROCEDURE AgregarComentario
     @Id_Usuario INT,
     @Id_Libro INT,
     @Comentario VARCHAR(150),
     @Rating INT
 AS
 BEGIN
-    INSERT INTO Comentario (Creacion, Comentario, Rating, Id_Libro, Id_Usuario)
-    VALUES (GETDATE(), @Comentario, @Rating, @Id_Libro, @Id_Usuario)
-END
+    DECLARE @Id_Ejemplar INT;
 
+    -- 1. Obtener un ejemplar del libro (el más reciente usado o cualquiera)
+    SELECT TOP 1 @Id_Ejemplar = E.Id_Ejemplar
+    FROM Ejemplar E
+    INNER JOIN Movimiento M ON M.Id_Ejemplar = E.Id_Ejemplar
+    WHERE E.Id_Libro = @Id_Libro
+      AND M.Id_Usuario = @Id_Usuario
+    ORDER BY M.Fecha DESC;
+
+    IF @Id_Ejemplar IS NULL
+    BEGIN
+        SELECT -1 AS Resultado;
+        RETURN;
+    END
+
+    -- 2. Insertar comentario
+    INSERT INTO Comentario (Creacion, Comentario, Rating, Id_Ejemplar, Id_Usuario)
+    VALUES (GETDATE(), @Comentario, @Rating, @Id_Ejemplar, @Id_Usuario);
+
+    SELECT 1 AS Resultado;
+END;
+GO
 -- Listar comentarios por libro -------------------------------------------------------------------------------------
-CREATE PROCEDURE ListarComentariosPorLibro
+GO
+CREATE OR ALTER PROCEDURE ListarComentariosPorLibro
     @Id_Libro INT
 AS
 BEGIN
-    SELECT C.Id_Comentario, C.Comentario, C.Rating, C.Creacion, U.Nombre, U.Apellidos
+    SELECT 
+        C.Id_Comentario,
+        C.Comentario,
+        C.Rating,
+        C.Creacion,
+        U.Nombre,
+        U.Apellidos
     FROM Comentario C
     INNER JOIN Usuario U ON C.Id_Usuario = U.Id_Usuario
-    WHERE C.Id_Libro = @Id_Libro
-END
-
+    INNER JOIN Ejemplar E ON C.Id_Ejemplar = E.Id_Ejemplar
+    WHERE E.Id_Libro = @Id_Libro
+    ORDER BY C.Creacion DESC;
+END;
+GO
 
 -- PREGUNTAS FRECUENTES
 -- Crear pregunta -------------------------------------------------------------------------------------
@@ -998,3 +977,84 @@ AS
 BEGIN
 	UPDATE Categoria SET Tipo = @Tipo WHERE Id_Categoria = @Id_Categoria
 END;
+
+------------------------------------------
+CREATE PROCEDURE ReservarLibro
+(
+    @Id_Libro INT,
+    @Id_Usuario INT,
+    @FechaInicio DATETIME,
+    @FechaFin DATETIME
+)
+AS
+BEGIN
+    DECLARE @Id_Ejemplar INT;
+
+    SELECT TOP 1 @Id_Ejemplar = Id_Ejemplar
+    FROM Ejemplar
+    WHERE Id_Libro = @Id_Libro AND Estado = 'Disponible';
+
+    IF @Id_Ejemplar IS NULL
+    BEGIN
+        SELECT -1 AS Resultado;
+        RETURN;
+    END
+
+    INSERT INTO Movimiento (Tipo, Fecha, Fecha_Vencimiento, Id_Usuario, Id_Ejemplar, Id_Estado)
+    VALUES ('RESERVA', @FechaInicio, @FechaFin, @Id_Usuario, @Id_Ejemplar, 2);
+
+    UPDATE Ejemplar SET Estado = 'Reservado' WHERE Id_Ejemplar = @Id_Ejemplar;
+
+    SELECT 1 AS Resultado;
+END
+
+
+ALTER PROCEDURE AgregarComentario
+    @Id_Usuario INT,
+    @Id_Ejemplar INT,
+    @Comentario VARCHAR(150),
+    @Rating INT
+AS
+BEGIN
+    INSERT INTO Comentario (Creacion, Comentario, Rating, Id_Ejemplar, Id_Usuario)
+    VALUES (GETDATE(), @Comentario, @Rating, @Id_Ejemplar, @Id_Usuario)
+END
+
+ALTER PROCEDURE ListarComentariosPorLibro
+    @Id_Libro INT
+AS
+BEGIN
+    SELECT 
+        C.Id_Comentario,
+        C.Comentario,
+        C.Rating,
+        C.Creacion,
+        CONCAT(U.Nombre, ' ', U.Apellidos) AS NombreUsuario
+    FROM Comentario C
+    INNER JOIN Usuario U ON C.Id_Usuario = U.Id_Usuario
+    INNER JOIN Ejemplar E ON C.Id_Ejemplar = E.Id_Ejemplar
+    WHERE E.Id_Libro = @Id_Libro
+END
+
+
+SELECT * FROM FAQ;
+EXEC CrearFAQ '¿Ejemplo?', 'Respuesta de prueba';
+EXEC ListarFAQActivas;
+
+EXEC CrearFAQ 
+    @Pregunta = '¿Horario de atención?',
+    @Respuesta = 'De lunes a viernes',
+    @Estado = 1;
+
+	SELECT * FROM Rol;
+
+	SELECT * FROM Usuario;
+
+	UPDATE Usuario
+SET Id_Rol = 1
+WHERE Id_Usuario = 1;
+
+
+SELECT name
+FROM sys.procedures
+WHERE name LIKE '%Reserva%'

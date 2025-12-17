@@ -203,50 +203,39 @@ namespace SC701_ProyectoFinal.Controllers
         [HttpGet]
         public async Task<IActionResult> Detalle(int id)
         {
-            var client = _httpClientFactory.CreateClient("ProyectoAPI");
-
-            var response = await client.GetAsync($"/api/Libro/{id}");
-            if (!response.IsSuccessStatusCode)
+            using (var client = _httpClientFactory.CreateClient())
             {
-                TempData["ErrorMessage"] = "No se puede cargar el libro.";
-                return RedirectToAction("Index", "Libro");
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
+
+                // 1. Obtener libro
+                var urlLibro = _configuration["Valores:UrlAPI"] + $"Libro/{id}";
+                var responseLibro = await client.GetAsync(urlLibro);
+
+                if (!responseLibro.IsSuccessStatusCode)
+                {
+                    TempData["ErrorMessage"] = "No se pudo cargar el libro.";
+                    return RedirectToAction("Index");
+                }
+
+                var libro = await responseLibro.Content.ReadFromJsonAsync<LibroViewModel>();
+
+                // 2. Obtener comentarios del libro
+                var urlComentarios = _configuration["Valores:UrlAPI"] + $"Comentarios/Libro/{id}";
+                var responseComentarios = await client.GetAsync(urlComentarios);
+
+                if (responseComentarios.IsSuccessStatusCode)
+                {
+                    libro.Comentarios =
+                        await responseComentarios.Content.ReadFromJsonAsync<List<ComentarioViewModel>>();
+                }
+                else
+                {
+                    libro.Comentarios = new List<ComentarioViewModel>();
+                }
+
+                return View(libro);
             }
-
-            var libro = await response.Content.ReadFromJsonAsync<LibroViewModel>();
-
-            var comentariosResponse = await client.GetAsync($"/api/Comentarios/Libro/{id}");
-            var comentarios = new List<ComentarioViewModel>();
-
-            if (comentariosResponse.IsSuccessStatusCode)
-            {
-                comentarios = await comentariosResponse.Content.ReadFromJsonAsync<List<ComentarioViewModel>>();
-            }
-
-            libro.Comentarios = comentarios;
-            return View(libro);
-        }
-
-        // Enviar comentario
-        [HttpPost]
-        public async Task<IActionResult> EnviarComentario(ComentarioModel comentario)
-        {
-            var UsuarioId = HttpContext.Session.GetInt32("UsuarioId");
-            if (UsuarioId == null)
-            {
-                return RedirectToAction("DetalleLibro", new { id = comentario.LibroId });
-            }
-
-            comentario.UsuarioId = UsuarioId.Value;
-
-            var client = _httpClientFactory.CreateClient("ProyectoAPI");
-            var response = await client.PostAsJsonAsync("/api/Comentarios/Crear", comentario);
-
-            if (response.IsSuccessStatusCode)
-                TempData["SuccessMessage"] = "Comentario enviado exitosamente.";
-            else
-                TempData["ErrorMessage"] = "Error al enviar el comentario.";
-
-            return RedirectToAction("DetalleLibro", new { id = comentario.LibroId });
         }
 
         // Obtener estados para select
@@ -286,7 +275,7 @@ namespace SC701_ProyectoFinal.Controllers
 
                 return View(new ReservaViewModel
                 {
-                    LibroId = libro.Id_Libro,
+                    Id_Libro = libro.Id_Libro,
                     Titulo = libro.Titulo,
                     FechaReserva = DateTime.Now.Date,
                     FechaVencimiento = DateTime.Now.Date
@@ -308,21 +297,22 @@ namespace SC701_ProyectoFinal.Controllers
             if (idUsuario == null)
             {
                 TempData["ErrorMessage"] = "Debe iniciar sesión para reservar un libro.";
-                return RedirectToAction("Login", "Usuario");
+                return RedirectToAction("Login", "Account");
             }
 
             using (var client = _httpClientFactory.CreateClient())
             {
-                var urlApi = _configuration["Valores:UrlAPI"] + "Libro/ReservarLibro";
+                var urlApi = _configuration["Valores:UrlAPI"] + "Reserva/Crear";
+
                 client.DefaultRequestHeaders.Authorization =
                     new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
 
-                var request = new ReservaRequestModel
+                var request = new ReservaLibroModel
                 {
-                    Id_Libro = reserva.LibroId,
+                    Id_Libro = reserva.Id_Libro,
                     Id_Usuario = idUsuario.Value,
-                    Fecha = reserva.FechaReserva,
-                    Fecha_Vencimiento = reserva.FechaVencimiento
+                    FechaReserva = reserva.FechaReserva,
+                    FechaVencimiento = reserva.FechaVencimiento
                 };
 
                 var respuesta = client.PostAsJsonAsync(urlApi, request).Result;

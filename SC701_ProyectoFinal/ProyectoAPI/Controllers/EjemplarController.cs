@@ -69,6 +69,7 @@ namespace ProyectoAPI.Controllers
                 parametros.Add("@Id_Libro", ejemplar.Id_Libro);
                 parametros.Add("@Estado", ejemplar.Estado);
                 parametros.Add("@Ubicacion", ejemplar.Ubicacion);
+                parametros.Add("@Cantidad", ejemplar.Cantidad);
 
                 context.Execute("RegistrarEjemplar", parametros);
             }

@@ -23,7 +23,7 @@
             <h5 class="card-title text-center">@Model.Titulo</h5>
 
             <form asp-action="Reservar" method="post">
-                <input type="hidden" asp-for="LibroId" />
+                <input type="hidden" asp-for="Id_Libro" />
 
                 <div class="mb-3">
                     <label asp-for="FechaReserva" class="form-label">Fecha de inicio</label>

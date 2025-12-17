@@ -43,6 +43,11 @@ namespace SC701_ProyectoFinal.Controllers
             }
         }
 
+        public IActionResult Informacion()
+        {
+            return View();
+        }
+
         public IActionResult Privacy()
         {
             return View();

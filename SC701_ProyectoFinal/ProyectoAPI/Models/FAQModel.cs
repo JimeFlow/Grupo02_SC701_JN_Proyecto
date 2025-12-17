@@ -1,6 +1,6 @@
-﻿namespace SC701_ProyectoFinal.Models
+﻿namespace ProyectoAPI.Models
 {
-    public class FAQViewModel
+    public class FAQModel
     {
         public int Id_FAQ { get; set; }
         public string Pregunta { get; set; } = string.Empty;

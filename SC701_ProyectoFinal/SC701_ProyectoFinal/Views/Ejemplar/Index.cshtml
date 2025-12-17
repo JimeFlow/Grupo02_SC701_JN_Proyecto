@@ -5,11 +5,43 @@
 }
 
 <div class="container mt-5">
-    <h2 class="text-center mb-4">Catálogo de Ejemplares</h2>
+    <h2 class="text-center mb-4">Control de Ejemplares</h2>
 
-    <div class="text-end mb-3">
-        <a asp-action="Create" class="btn btn-success">Agregar Ejemplar</a>
+    <div class="row my-3">
+        <div class="col-6">
+            <div class="text-start mb-3">
+                <form method="get" asp-action="Index">
+                    <div class="row align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Filtrar por estado</label>
+                            <select name="estado" class="form-select w-100">
+                                <option value="">Mostrar todos</option>
+                                <option value="Disponible" selected="@(ViewBag.EstadoSeleccionado == "Disponible")">
+                                    Disponible
+                                </option>
+                                <option value="Prestado" selected="@(ViewBag.EstadoSeleccionado == "Prestado")">
+                                    Prestado
+                                </option>
+                                <option value="Dañado" selected="@(ViewBag.EstadoSeleccionado == "Dañado")">
+                                    Dañado
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-2">
+                            <button class="btn btn-primary">Filtrar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="col-6">
+			<div class="text-end my-4">
+				<a asp-action="Create" class="btn btn-success">Agregar Ejemplar</a>
+			</div>
+        </div>
     </div>
+
 
     @if (Model != null && Model.Any())
     {

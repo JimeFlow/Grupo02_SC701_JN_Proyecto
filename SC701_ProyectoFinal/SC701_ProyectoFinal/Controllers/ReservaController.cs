@@ -273,6 +273,90 @@ namespace SC701_ProyectoFinal.Controllers
             return RedirectToAction("ObtenerReservas");
         }
 
+        [HttpGet]
+        public async Task<IActionResult> RegistrarReservaAdmin()
+        {
+            //cargar ejemplares y usuarios
+            ViewBag.Ejemplares = await ObtenerEjemplaresAsync();
+            ViewBag.Usuarios = await ObtenerUsuariosAsync();
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RegistrarReservaAdmin(ReservaRequestModel reserva)
+        {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Ejemplares = await ObtenerEjemplaresAsync();
+                ViewBag.Usuarios = await ObtenerUsuariosAsync();
+                return View(reserva);
+            }
+            using (var context = _httpClientFactory.CreateClient())
+            {
+                var urlApi = _configuration["Valores:UrlAPI"] + "Reserva/RegistrarReservaAdmin";
+                context.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
+                var respuesta = context.PostAsJsonAsync(urlApi, reserva).Result;
+
+                if (respuesta.IsSuccessStatusCode)
+                {
+                    var datosApi = await respuesta.Content.ReadFromJsonAsync<ReservaRequestModel>();
+
+                    if (!string.IsNullOrEmpty(datosApi?.Titulo))
+                    {
+                        return RedirectToAction("ObtenerReservas");
+                    }
+                }
+
+                ViewBag.Mensaje = respuesta.StatusCode == System.Net.HttpStatusCode.BadRequest
+            ? await respuesta.Content.ReadAsStringAsync()
+            : "No se ha registrado la información";
+                ViewBag.Ejemplares = await ObtenerEjemplaresAsync();
+                ViewBag.Usuarios = await ObtenerUsuariosAsync();
+                return View(reserva);
+            }
+        }
+
+        //OBTENER CATEGORIAS
+        private async Task<List<EjemplarModel>> ObtenerEjemplaresAsync()
+        {
+            using (var client = _httpClientFactory.CreateClient())
+            {
+                var urlApi = _configuration["Valores:UrlAPI"] + "Ejemplar/ObtenerEjemplaresDisponiblesAdmin";
+
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
+
+                var respuesta = await client.GetAsync(urlApi);
+
+                if (respuesta.IsSuccessStatusCode)
+                {
+                    return await respuesta.Content.ReadFromJsonAsync<List<EjemplarModel>>();
+                }
+
+                return new List<EjemplarModel>();
+            }
+        }
+
+        private async Task<List<UsuarioModel>> ObtenerUsuariosAsync()
+        {
+            using (var client = _httpClientFactory.CreateClient())
+            {
+                var urlApi = _configuration["Valores:UrlAPI"] + "Usuario/ListaUsuariosAdmin";
+
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
+
+                var respuesta = await client.GetAsync(urlApi);
+
+                if (respuesta.IsSuccessStatusCode)
+                {
+                    return await respuesta.Content.ReadFromJsonAsync<List<UsuarioModel>>();
+                }
+
+                return new List<UsuarioModel>();
+            }
+        }
+
     }
 
 }

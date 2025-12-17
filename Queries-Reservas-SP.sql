@@ -270,32 +270,6 @@ EXEC ObtenerListaLibrosCliente
 --*************************************
 
 -- RESERVAR LIRBO -------------------------------------------------------------------------------------
-CREATE PROCEDURE ReservarLibro
-    @Id_Libro INT,--
-    @Fecha DATETIME,
-    @Fecha_Vencimiento DATETIME,
-    @Id_Usuario INT
-AS
-BEGIN
-    DECLARE @Id_Ejemplar INT;
-
-	SELECT TOP 1 @Id_Ejemplar = Id_Ejemplar
-	FROM Ejemplar WHERE Id_Libro = @Id_Libro 
-	AND Estado = 'Disponible' ORDER BY Id_Ejemplar;
-
-	IF @Id_Ejemplar IS NULL
-	BEGIN 
-		SELECT -1 AS Resultado
-		RETURN;
-	END
-
-    INSERT INTO Movimiento (Tipo, Fecha, Fecha_Vencimiento, Id_Estado, Id_Usuario, Id_Ejemplar)
-    VALUES ('Préstamo', @Fecha, @Fecha_Vencimiento, 4, @Id_Usuario, @Id_Ejemplar);
-
-	UPDATE Ejemplar SET Estado = 'Prestado' WHERE Id_Ejemplar = @Id_Ejemplar;
-
-    SELECT 1 AS Resultado;
-END;
 
 
 
@@ -438,27 +412,6 @@ END;
 
 ---------------METODO GENERAL DE RESERVAS PARA EL ADMIN--------------------------------------------
 
-ALTER PROCEDURE ObtenerReservasAdmin
-    @EstadoFiltro INT = NULL
-AS
-BEGIN
-    SELECT 
-        M.Id_Movimiento,
-        M.Fecha,
-        M.Fecha_Vencimiento,
-        CONCAT(U.Nombre,' ',U.Apellidos) AS Nombre,
-        U.Identificacion,
-        E.Estado,
-        M.Id_Estado,
-        M.Id_Ejemplar
-    FROM Movimiento M
-    INNER JOIN Usuario U ON M.Id_Usuario = U.Id_Usuario
-    INNER JOIN Estado E ON M.Id_Estado = E.Id_Estado
-    WHERE (@EstadoFiltro IS NULL OR M.Id_Estado = @EstadoFiltro)
-    ORDER BY M.Fecha DESC;
-END;
-
-
 CREATE OR ALTER PROCEDURE ReservasPorVencerPronto
 AS
 BEGIN
@@ -583,3 +536,100 @@ BEGIN
       AND (M.Id_Estado = 4 OR M.Id_Estado = 5 OR M.Id_Estado = 7)
     ORDER BY M.Fecha DESC;
 END
+
+CREATE OR ALTER PROCEDURE RegistrarReservaPorAdmin
+	@Id_Ejemplar INT,
+    @Fecha DATETIME,
+    @Fecha_Vencimiento DATETIME,
+    @Id_Usuario INT
+AS
+BEGIN
+
+	INSERT INTO Movimiento (Tipo, Fecha, Fecha_Vencimiento, Id_Estado, Id_Usuario, Id_Ejemplar)
+    VALUES ('Préstamo', @Fecha, @Fecha_Vencimiento, 5, @Id_Usuario, @Id_Ejemplar);
+
+	UPDATE Ejemplar SET Estado = 'Prestado' WHERE Id_Ejemplar = @Id_Ejemplar;
+
+    SELECT L.Titulo, U.Correo FROM Ejemplar E INNER JOIN Libro L ON E.Id_Libro = L.Id_Libro 
+	INNER JOIN Usuario U ON U.Id_Usuario = @Id_Usuario
+	WHERE E.Id_Ejemplar = @Id_Ejemplar;
+END;
+
+
+-------------------OBTENER EJEMPLARES PARA ADMIN RESERVAR----------------------------------------------
+CREATE OR ALTER PROCEDURE ObtenerEjemplaresDisponiblesAdmin
+AS
+BEGIN
+    SELECT 
+        E.Id_Ejemplar,
+        E.CodigoEjemplar,
+        E.Estado,
+        E.Ubicacion,
+        E.Fecha_Registro,
+        E.Id_Libro,
+        L.Titulo
+    FROM Ejemplar E
+    INNER JOIN Libro L ON L.Id_Libro = E.Id_Libro
+	WHERE E.Estado = 'Disponible';
+END;
+
+------------------OBTENER USUARIOS PARA ADMIN RESERVAR, MISMO FIN --------------------------------------
+
+CREATE OR ALTER PROCEDURE ListarUsuariosAdmin
+AS
+BEGIN
+	SELECT Id_Usuario, Nombre, Apellidos, Correo, Telefono, U.Id_Rol, Estado, Identificacion, R.Tipo_Rol
+	FROM Usuario U INNER JOIN Rol R ON U.Id_Rol = R.Id_Rol WHERE U.Id_Rol = 2
+END
+
+-----------------------------RESERVAS-------------------------------------------------------------------
+
+CREATE OR ALTER PROCEDURE ObtenerReservasAdmin
+    @EstadoFiltro INT = NULL
+AS
+BEGIN
+    SELECT 
+        M.Id_Movimiento,
+        M.Fecha,
+        M.Fecha_Vencimiento,
+        CONCAT(U.Nombre,' ',U.Apellidos) AS Nombre,
+        U.Identificacion,
+        E.Estado,
+        M.Id_Estado,
+        M.Id_Ejemplar
+    FROM Movimiento M
+    INNER JOIN Usuario U ON M.Id_Usuario = U.Id_Usuario
+    INNER JOIN Estado E ON M.Id_Estado = E.Id_Estado
+    WHERE (@EstadoFiltro IS NULL OR M.Id_Estado = @EstadoFiltro)
+	ORDER BY M.Id_Movimiento DESC;
+END;
+
+-------------------------------------NUEVO RESERVAS LIBROS--------------------------------------------
+
+CREATE OR ALTER PROCEDURE ReservarLibro
+    @Id_Libro INT,--
+    @Fecha DATETIME,
+    @Fecha_Vencimiento DATETIME,
+    @Id_Usuario INT
+AS
+BEGIN
+    DECLARE @Id_Ejemplar INT;
+	DECLARE @Titulo VARCHAR(200);
+
+	SELECT TOP 1 @Id_Ejemplar = E.Id_Ejemplar, @Titulo = L.Titulo
+	FROM Ejemplar E INNER JOIN Libro L ON E.Id_Libro = L.Id_Libro WHERE E.Id_Libro = @Id_Libro 
+	AND Estado = 'Disponible' ORDER BY Id_Ejemplar;
+
+	IF @Id_Ejemplar IS NULL
+	BEGIN 
+		SELECT -1 AS Resultado, NULL AS Titulo
+		RETURN;
+	END
+
+    INSERT INTO Movimiento (Tipo, Fecha, Fecha_Vencimiento, Id_Estado, Id_Usuario, Id_Ejemplar)
+    VALUES ('Préstamo', @Fecha, @Fecha_Vencimiento, 4, @Id_Usuario, @Id_Ejemplar);
+
+	UPDATE Ejemplar SET Estado = 'Prestado' WHERE Id_Ejemplar = @Id_Ejemplar;
+
+    SELECT 1 AS Resultado, @Titulo AS Titulo;
+END;

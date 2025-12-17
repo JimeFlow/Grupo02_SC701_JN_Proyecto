@@ -218,7 +218,7 @@ namespace ProyectoAPI.Controllers
                 var ruta = Path.Combine(_environment.ContentRootPath, "PlantillasCorreo", "NotificacionReserva.html");
                 var html = System.IO.File.ReadAllText(ruta, UTF8Encoding.UTF8);
 
-                html = html.Replace("{{Usuario}}", reserva.Id_Usuario.ToString());
+                html = html.Replace("{{Usuario}}", resultado?.Nombre);
                 html = html.Replace("{{Libro}}", resultado?.Titulo);
                 html = html.Replace("{{FechaReserva}}", reserva.Fecha.ToString("F"));
                 html = html.Replace("{{FechaVencimiento}}", reserva.Fecha_Vencimiento.ToString("F"));

@@ -550,7 +550,7 @@ BEGIN
 
 	UPDATE Ejemplar SET Estado = 'Prestado' WHERE Id_Ejemplar = @Id_Ejemplar;
 
-    SELECT L.Titulo, U.Correo FROM Ejemplar E INNER JOIN Libro L ON E.Id_Libro = L.Id_Libro 
+    SELECT L.Titulo, U.Correo, U.Nombre FROM Ejemplar E INNER JOIN Libro L ON E.Id_Libro = L.Id_Libro 
 	INNER JOIN Usuario U ON U.Id_Usuario = @Id_Usuario
 	WHERE E.Id_Ejemplar = @Id_Ejemplar;
 END;

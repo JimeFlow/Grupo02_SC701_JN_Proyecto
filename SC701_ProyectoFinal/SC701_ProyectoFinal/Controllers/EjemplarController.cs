@@ -21,7 +21,7 @@ namespace SC701_ProyectoFinal.Controllers
         }
 
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string estado)
         {
             using (var client = _httpClientFactory.CreateClient())
             {
@@ -31,14 +31,24 @@ namespace SC701_ProyectoFinal.Controllers
 
                 var respuesta = await client.GetAsync(urlApi);
 
-                if (respuesta.IsSuccessStatusCode)
+                if (!respuesta.IsSuccessStatusCode)
                 {
-                    var datos = await respuesta.Content.ReadFromJsonAsync<List<EjemplarModel>>();
-                    return View(datos);
+                    ViewBag.Mensaje = "No se encontraron ejemplares";
+                    return View(new List<EjemplarModel>());
                 }
 
-                ViewBag.Mensaje = "No se encontraron ejemplares";
-                return View(new List<EjemplarModel>());
+                var datos = await respuesta.Content.ReadFromJsonAsync<List<EjemplarModel>>();
+
+                if (!string.IsNullOrEmpty(estado))
+                {
+                    datos = datos
+                .Where(e => e.Estado == estado)
+                .ToList();
+                }
+
+                ViewBag.EstadoSeleccionado = estado;
+                return View(datos);
+
             }
         }
 

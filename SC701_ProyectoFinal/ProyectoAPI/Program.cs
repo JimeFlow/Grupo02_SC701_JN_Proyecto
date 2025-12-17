@@ -11,6 +11,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHostedService<SancionCleanUpService>();
+builder.Services.AddHostedService<RecordatorioExpiracionService>();
 string key = builder.Configuration["Valores:KeyJWT"]!;
 
 builder.Services.AddAuthentication("Bearer")

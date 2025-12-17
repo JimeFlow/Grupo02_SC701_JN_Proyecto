@@ -8,6 +8,8 @@
 
         public string Nombre { get; set; } = string.Empty;
         public string Identificacion { get; set; } = string.Empty;
+        public bool TieneSancionActiva { get; set; }
+        public string Correo { get; set; } = string.Empty;
 
         public string Estado { get; set; } = string.Empty;
         public int Id_Estado { get; set; }

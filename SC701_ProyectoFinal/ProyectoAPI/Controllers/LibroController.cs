@@ -153,6 +153,7 @@ namespace ProyectoAPI.Controllers
 
             using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
+                string nombreUsuario = HttpContext.User.FindFirst("nombre")?.Value ?? "";
                 var helper = new Helper();
                 var sanciones = context.ExecuteScalar<int>(
         "UsuarioTieneSancionActiva",
@@ -172,18 +173,18 @@ namespace ProyectoAPI.Controllers
                 parametros.Add("@Fecha_Vencimiento", request.FechaVencimiento);
                 parametros.Add("@Id_Usuario", request.Id_Usuario);
 
-                var result = context.QueryFirstOrDefault<int>("ReservarLibro", parametros, commandType: CommandType.StoredProcedure);
+                var result = context.QueryFirstOrDefault<ReservaResponseModel>("ReservarLibro", parametros, commandType: CommandType.StoredProcedure);
 
-                if (result == -1)
+                if (result.Resultado == -1)
                     return BadRequest(new { mensaje = "El libro no está disponible para reservar." });
 
                 var ruta = Path.Combine(_environment.ContentRootPath, "PlantillasCorreo", "NotificacionReserva.html");
                 var html = System.IO.File.ReadAllText(ruta, UTF8Encoding.UTF8);
 
-                html = html.Replace("{{Usuario}}", request.Id_Usuario.ToString());
-                html = html.Replace("{{Libro}}", request.Id_Libro.ToString());
-                html = html.Replace("{{FechaReserva}}", request.FechaReserva.ToString("F"));
-                html = html.Replace("{{FechaVencimiento}}", request.FechaVencimiento.ToString("F"));
+                html = html.Replace("{{Usuario}}", nombreUsuario);
+                html = html.Replace("{{Libro}}", result.Titulo); //nombre
+                html = html.Replace("{{FechaReserva}}", request.Fecha.ToString("F"));
+                html = html.Replace("{{FechaVencimiento}}", request.Fecha_Vencimiento.ToString("F"));
 
                 string? correoUsuario = HttpContext.User.FindFirst("correo")?.Value;
                 if( correoUsuario != null)

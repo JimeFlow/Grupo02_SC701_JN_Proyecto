@@ -136,6 +136,19 @@ namespace ProyectoAPI.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("ListaUsuariosAdmin")]
+        public IActionResult ListarUsuariosAdmin()
+        {
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
+            {
+                var parametros = new DynamicParameters();
+
+                var resultado = context.Query<DatosUsuarioResponseModel>("ListarUsuariosAdmin", parametros);
+                return Ok(resultado);
+            }
+        }
+
         #region METODOS PRIVADOS
         private string GenerarContrasena()
         {

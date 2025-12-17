@@ -201,6 +201,7 @@ SELECT * FROM Estado;
 -- INSERTS TABLA ESTADO
 INSERT INTO Estado (Estado)
 VALUES ('Activo'), ('Inactivo'), ('Disponible'), ('Pendiente'), ('Reservado'),('En Proceso'), ('Completado');
+SELECT * FROM Estado;
 -------------------------------------------------------------------------------------------------------
 
 /* ****************************************************************************************************

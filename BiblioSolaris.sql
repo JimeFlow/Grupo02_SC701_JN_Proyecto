@@ -180,8 +180,6 @@ INSERT INTO Rol(Tipo_Rol) VALUES
 ('Administrador'), ('Cliente');
 -------------------------------------------------------------------------------------------------------
 
--------------------------------------------------------------------------------------------------------
-
 -- ALTER TABLE - VALIDAR QUE RATING ESTE ENTRE 1 Y 5
 ALTER TABLE Comentario
 ADD CONSTRAINT CK_Rating CHECK (Rating BETWEEN 1 AND 5);
@@ -767,9 +765,10 @@ AS
 BEGIN
     DELETE FROM Ejemplar WHERE Id_Ejemplar = @Id;
 END
+
 /* ****************************************************************************************************
    ******************************************** ESTADOS SP *********************************************
-   **************************************************************************************************** */---------------------------------ESTADOS SP-----------------------------------------------------------
+   **************************************************************************************************** */
 CREATE PROCEDURE ObtenerEstados
 AS
 BEGIN
@@ -823,7 +822,7 @@ BEGIN
 END;
 GO
 
--- Cancelar reserva -------------------------------------------------------------------------------------
+-- Cancelar reserva ------------------------------------------------------------------------------------- PENDIENTE
 CREATE PROCEDURE CancelarReserva
     @Id_Movimiento INT,
     @Id_Estado INT -- Cancelada
@@ -834,7 +833,7 @@ BEGIN
     WHERE Id_Movimiento = @Id_Movimiento AND Tipo = 'RESERVA'
 END
 
--- Expirar reserva -------------------------------------------------------------------------------------
+-- Expirar reserva ------------------------------------------------------------------------------------- PENDIENTE
 CREATE PROCEDURE ExpirarReserva
 AS
 BEGIN
@@ -861,7 +860,7 @@ END
 GO
 CREATE OR ALTER PROCEDURE AgregarComentario
     @Id_Usuario INT,
-    @Id_Libro INT,
+    @Id_Ejemplar INT,
     @Comentario VARCHAR(150),
     @Rating INT
 AS
@@ -942,10 +941,11 @@ SELECT TOP 1 * FROM Libro;
 --------------------------------------------------------------------------------------------------------
 
 
-/*
-	************************************REPORTES Y OBTENCION DE DATOS RELEVANTES************************
-*/
 
+/* ****************************************************************************************************
+   *********************************** REPORTES DE DATOS RELEVANTES ***********************************
+   **************************************************************************************************** */
+-- SP OBTENER RESERVAS ACTIVAS -------------------------------------------------------------------------------------
 CREATE PROCEDURE ObtenerReservasActivas
 AS
 BEGIN
@@ -956,7 +956,8 @@ BEGIN
 END;
 --EXEC ObtenerReservasActivas;
 
-CREATE PROCEDURE ObtenerLibrosConMasCantidadMovimientos
+-- SP OBTENER LIBROS DEL TOP 5 -------------------------------------------------------------------------------------
+CREATE PROCEDURE ObtenerLibrosConMasCantidadMovimientos 
 AS
 BEGIN
     SELECT TOP 5
@@ -973,7 +974,22 @@ END;
 
 EXEC ObtenerLibrosConMasCantidadMovimientos;
 
--------------------------------USUARIOS CON MÁS SANCIONES--------------------------------------------------
+-- SP OBTENER USUARIOS CON MÁS SANCIONES -------------------------------------------------------------------------------------
+CREATE PROCEDURE ObtenerUsuariosConMasSanciones
+AS
+BEGIN
+    SELECT 
+        U.Id_Usuario,
+        CONCAT(U.Nombre, ' ', U.Apellidos) AS Usuario,
+        COUNT(S.Id_Sancion) AS TotalSanciones,
+        MIN(S.Fecha_Finalizacion) AS ProximaFechaFin
+    FROM Sancion S
+    INNER JOIN Movimiento M ON S.Id_Movimiento = M.Id_Movimiento
+    INNER JOIN Usuario U ON M.Id_Usuario = U.Id_Usuario
+    WHERE S.Estado = 1
+    GROUP BY U.Id_Usuario, U.Nombre, U.Apellidos
+    ORDER BY TotalSanciones DESC;
+END;
 
 
 -------------------------------TEMAS DE BITACORAS/AUDITLOGS------------------------------------------------

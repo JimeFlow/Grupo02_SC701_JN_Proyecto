@@ -29,9 +29,10 @@ namespace ProyectoAPI.Services
                 var delay = proximaEjecucion - ahora;
 
                 if (delay.TotalMilliseconds > 0)
-                    await Task.Delay(delay, stoppingToken);
+                    await Task.Delay(delay, stoppingToken); //se ejecuta a las 00:01 cada dia
 
                 await ProcesarReservasPorVencer();
+                //await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
             }
         }
 

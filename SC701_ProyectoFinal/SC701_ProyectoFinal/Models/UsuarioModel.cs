@@ -14,5 +14,6 @@
         public string Tipo_Rol { get; set; } = string.Empty;
         public string Token { get; set; } = string.Empty;
         public string ConfirmarContrasena { get; set; } = string.Empty;
+        public string NombreCompleto => $"{Identificacion} - {Nombre} {Apellidos}";
     }
 }

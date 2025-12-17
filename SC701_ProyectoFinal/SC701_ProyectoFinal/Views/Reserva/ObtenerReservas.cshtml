@@ -1,25 +1,38 @@
 ﻿@model IEnumerable<SC701_ProyectoFinal.Models.ReservaListadoViewModel>
 
 
+
 <div class="container mt-4">
 	<h2 class="fw-bold text-primary">
 		<i class="bi bi-people-fill"></i> Gestión de Reservas
 	</h2>
-	<form method="get" asp-action="ObtenerReservas" class="mb-5">
-		<div class="row">
-			<div class="col-md-4">
-				<select name="estado" class="form-control">
-					<option value="">-- Mostrar todos --</option>
-					<option value="4">Pendientes</option>
-					<option value="5">Reservadas</option>
-					<option value="7">Completadas</option>
-				</select>
-			</div>
-			<div class="col-md-2">
-				<button class="btn btn-primary">Filtrar</button>
+	<div class="row my-3">
+		<div class="col-6">
+			<div class="text-start mb-3">
+				<form method="get" asp-action="ObtenerReservas" class="mb-5">
+					<div class="row">
+						<div class="col-md-4">
+							<select name="estado" class="form-control">
+								<option value="">-- Mostrar todos --</option>
+								<option value="4">Pendientes</option>
+								<option value="5">Reservadas</option>
+								<option value="7">Completadas</option>
+							</select>
+						</div>
+						<div class="col-md-2">
+							<button class="btn btn-primary">Filtrar</button>
+						</div>
+					</div>
+				</form>
 			</div>
 		</div>
-	</form>
+		<div class="col-6">
+			<div class="text-end mb-3">
+				<a asp-action="RegistrarReservaAdmin" asp-controller="Reserva" class="btn btn-success">Registrar reserva</a>
+			</div>
+		</div>
+	</div>
+	
 
 	<!-- TABLA DE RESERVAS -->
 	<div class="table-responsive shadow-sm rounded">
@@ -38,10 +51,34 @@
 			<tbody>
 				@foreach (var r in Model)
 				{
+					
+					DateTime hoy = DateTime.Now.Date;
+					DateTime vencimiento = r.Fecha_Vencimiento.Date;
+					int diasRestantes = (vencimiento - hoy).Days;
+
+
 					<tr>
 						<td>@r.Id_Movimiento</td>
-						<td>@r.Fecha.ToString("yyyy-MM-dd")</td>
-						<td>@r.Fecha_Vencimiento.ToString("yyyy-MM-dd")</td>
+						<td>@r.Fecha.ToString("dd-MM-yyyy")</td>
+						<td>
+							@if (r.Id_Estado == 5 && vencimiento < hoy)
+							{
+								<span class="badge text-bg-danger badge-pill">
+							@r.Fecha_Vencimiento.ToString("dd-MM-yyyy")</span>
+
+						}
+							else if (r.Id_Estado == 5 && diasRestantes >= 0 && diasRestantes <= 3)
+						{
+								<span class="badge text-bg-warning badge-pill">
+									@r.Fecha_Vencimiento.ToString("dd-MM-yyyy")
+								</span>
+							}
+							else
+							{
+								@r.Fecha_Vencimiento.ToString("dd-MM-yyyy")
+							}
+						</td>
+
 						<td>@r.Nombre</td>
 						<td>@r.Identificacion</td>
 						<td>@r.Estado</td>

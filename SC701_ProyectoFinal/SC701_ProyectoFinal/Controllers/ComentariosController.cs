@@ -16,23 +16,27 @@ namespace SC701_ProyectoFinal.Controllers
             _configuration = configuration;
         }
 
-        // POST: Agregar comentario
         [HttpPost]
         public async Task<IActionResult> Crear(
-      int idLibro,
-      int idEjemplar,
-      string comentario,
-      int rating)
+     int Id_Ejemplar,
+     int Id_Libro,
+     string Comentario,
+     int Rating)
         {
             var body = new
             {
                 Id_Usuario = HttpContext.Session.GetInt32("Id_Usuario"),
-                Id_Ejemplar = idEjemplar,
-                Comentario = comentario,
-                Rating = rating
+                Id_Ejemplar = Id_Ejemplar,
+                Comentario = Comentario,
+                Rating = Rating
             };
 
             var client = _httpClientFactory.CreateClient("ProyectoAPI");
+
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue(
+                    "Bearer",
+                    HttpContext.Session.GetString("Token"));
 
             var response = await client.PostAsJsonAsync("Comentarios/Crear", body);
 
@@ -45,7 +49,7 @@ namespace SC701_ProyectoFinal.Controllers
                 TempData["ErrorComentario"] = "No se pudo agregar el comentario";
             }
 
-            return RedirectToAction("Detalle", "Libro", new { id = idLibro });
+            return RedirectToAction("Detalle", "Libro", new { id = Id_Libro });
         }
 
     }

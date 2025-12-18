@@ -1,9 +1,23 @@
-﻿@{
+﻿@model SC701_ProyectoFinal.Models.InformacionViewModel
+
+@{
     ViewData["Title"] = "Información";
-    Layout = "~/Views/Shared/_LayoutExterno.cshtml";
+
+    var rol = Context.Session.GetInt32("Id_Rol");
+
+    Layout = rol == null
+    ?"~/Views/Shared/_LayoutExterno.cshtml"
+    : "~/Views/Shared/_LayoutInterno.cshtml";
 }
 
 <div class="container my-5">
+
+    @if (TempData["MensajeExito"] != null)
+    {
+        <div class="alert alert-success text-center mb-4">
+            @TempData["MensajeExito"]
+        </div>
+    }
 
     <!-- TÍTULO -->
     <div class="text-center mb-5">
@@ -19,10 +33,7 @@
             <div class="card shadow-sm">
                 <div class="card-body">
                     <p class="mb-0 text-center">
-                        Nuestra biblioteca es un espacio diseñado para apoyar el aprendizaje,
-                        la investigación y el crecimiento académico de los usuarios.
-                        A través de este sistema digital, se facilita el acceso a los
-                        recursos bibliográficos y la gestión eficiente de libros y reservas.
+                        @Model.Texto
                     </p>
                 </div>
             </div>
@@ -81,14 +92,24 @@
             <div class="card shadow-sm border-start border-4 border-primary">
                 <div class="card-body">
                     <h5 class="fw-bold">⏰ Horario de atención</h5>
-                    <p class="mb-0">
-                        Lunes a Viernes: 8:00 a.m. – 6:00 p.m.<br />
-                        Sábados: 8:00 a.m. – 12:00 m.d.<br />
-                        Domingos y feriados: Cerrado
-                    </p>
+                    <p class="mb-0">@Html.Raw(Model.Horario.Replace("\n", "<br/>"))</p>
                 </div>
             </div>
         </div>
     </div>
+
+    @if (Context.Session.GetInt32("Id_Rol") == 1)
+    {
+        <div class="text-end mt-4">
+            <a asp-controller="Home"
+               asp-action="EditarInformacion"
+               class="btn btn-outline-warning">
+                <i class="bi bi-pencil-square me-1"></i>
+                Editar información
+            </a>
+        </div>
+    }
+
+
 
 </div>

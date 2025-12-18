@@ -1,0 +1,79 @@
+﻿@model SC701_ProyectoFinal.Models.InformacionViewModel
+
+@{
+    ViewData["Title"] = "Editar Información";
+    Layout = "~/Views/Shared/_LayoutInterno.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-warning text-dark">
+            <h4 class="mb-0">
+                <i class="bi bi-pencil-square me-2"></i>
+                Editar información institucional
+            </h4>
+        </div>
+
+        <div class="card-body">
+
+            <form asp-action="EditarInformacion" method="post">
+
+                <!-- TÍTULO -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Título</label>
+                    <input asp-for="Titulo" class="form-control" />
+                </div>
+
+                <!-- SUBTÍTULO -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Subtítulo</label>
+                    <input asp-for="Subtitulo" class="form-control" />
+                </div>
+
+                <!-- TEXTO PRINCIPAL -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Descripción institucional</label>
+                    <textarea asp-for="Texto" class="form-control" rows="4"></textarea>
+                </div>
+
+                <!-- MISIÓN -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Misión</label>
+                    <textarea asp-for="Mision" class="form-control" rows="3"></textarea>
+                </div>
+
+                <!-- VISIÓN -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Visión</label>
+                    <textarea asp-for="Vision" class="form-control" rows="3"></textarea>
+                </div>
+
+                <!-- SERVICIOS -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Servicios (uno por línea)</label>
+                    <textarea asp-for="Servicios" class="form-control" rows="4"></textarea>
+                </div>
+
+                <!-- HORARIO -->
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Horario de atención</label>
+                    <textarea asp-for="Horario" class="form-control" rows="3"></textarea>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a asp-action="Informacion"
+                       asp-controller="Home"
+                       class="btn btn-secondary">
+                        Cancelar
+                    </a>
+
+                    <button type="submit" class="btn btn-warning">
+                        Guardar cambios
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>

@@ -30,7 +30,6 @@ namespace ProyectoAPI.Controllers
         {
             using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
-                var helper = new Helper();
                 var parametros = new DynamicParameters();
                 parametros.Add("Id_Libro", reserva.Id_Libro);
                 parametros.Add("Id_Usuario", reserva.Id_Usuario);
@@ -38,30 +37,15 @@ namespace ProyectoAPI.Controllers
                 parametros.Add("FechaFin", reserva.FechaVencimiento);
 
 
-                var resultado = context.Execute("ActualizarUsuarioAdmin", parametros);
-                if (resultado > 0)
-                {
-                    int consecutivoUsuario = int.TryParse(HttpContext.User.FindFirst("id")?.Value, out var id) ? id
-             : 0;
-                    string? nombreUsuario = HttpContext.User.FindFirst("nombre")?.Value;
-                    string? correoUsuario = HttpContext.User.FindFirst("correo")?.Value;
-                    if (nombreUsuario != null && correoUsuario != null)
-                    {
-                        //Enviar Correo
-                        var ruta = Path.Combine(_environment.ContentRootPath, "PlantillasCorreo", "NotificacionReserva.html");
-                        var html = System.IO.File.ReadAllText(ruta, UTF8Encoding.UTF8);
+                var resultado = context.QueryFirstOrDefault<int>(
+            "ReservarLibro",
+            parametros,
+            commandType: CommandType.StoredProcedure
+        );
 
-                        html = html.Replace("{{Usuario}}", nombreUsuario);
-                        html = html.Replace("{{Libro}}", reserva.Titulo);
-                        html = html.Replace("{{FechaReserva}}", reserva.FechaReserva.ToString("dd/MM/yyyy"));
-                        html = html.Replace("{{FechaVencimiento}}", reserva.FechaVencimiento.ToShortDateString());
+                if (resultado == -1)
+                    return BadRequest("No hay ejemplares disponibles.");
 
-                        helper.EnviarCorreo("Confirmación de Reserva de Libro", html, correoUsuario);
-                        return Ok(resultado);
-                    }
-
-
-                }
                 return Ok(resultado);
             }
 
@@ -164,7 +148,11 @@ namespace ProyectoAPI.Controllers
                     parametros.Add("EstadoFiltro", estado);
                 }
 
-                var resultado = context.Query<ReservaResponseModel>("ObtenerReservasAdmin", parametros);
+                var resultado = context.Query<ReservaResponseModel>(
+                    "ObtenerReservasActivas",
+                    parametros,
+                    commandType: CommandType.StoredProcedure
+                    );
                 return Ok(resultado);
             }
         }
@@ -179,7 +167,7 @@ namespace ProyectoAPI.Controllers
                 var parametros = new DynamicParameters();
                 parametros.Add("@Id_Usuario", idUsuario);
 
-                var resultado = context.Query<dynamic>( //id_Libro
+                var resultado = context.Query<dynamic>( 
                     "ObtenerReservasUsuario",
                     parametros,
                     commandType: CommandType.StoredProcedure

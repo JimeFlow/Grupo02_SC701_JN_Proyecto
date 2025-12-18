@@ -1,0 +1,92 @@
+﻿@model IEnumerable<SC701_ProyectoFinal.Models.ContactoViewModel>
+@{
+    ViewData["Title"] = "Bandeja de Consultas";
+    Layout = "~/Views/Shared/_LayoutInterno.cshtml";
+}
+
+<div class="container mt-4">
+
+    <div class="card shadow border-0">
+        <div class="card-header bg-dark text-white" d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="bi bi-chat-dots-fill me-2"></i>
+                Bandeja de Consultas
+            </h5>
+            <span class="badge bg-light text-dark">
+                @Model.Count() mensajes
+            </span>
+        </div>
+
+        <div class="card-body p-0">
+
+            @if (!Model.Any())
+            {
+                <div class="p-4 text-center text-muted">
+                    <i class="bi bi-envelope-open fs-2 d-block mb-2"></i>
+                    No hay consultas registradas.
+                </div>
+            }
+            else
+            {
+                <div class="list-group list-group-flush">
+
+                            @foreach (var c in Model)
+                            {
+                        <div class="list-group-item @(c.Respondido ? "" : "bg-light")">
+                            <div class="d-flex justify-content-between align-items-start">
+
+                                <div class="me-3 w-100">
+                                    <div class="d-flex justify-content-between">
+                                        <h6 class="mb-1">
+                                            @c.Asunto
+                                        </h6>
+                                        <small class="text-muted">
+                                            @c.FechaCreacion.ToShortDateString()
+                                        </small>
+                                    </div>
+
+                                    <p class="mb-1 text-muted">
+                                        <strong>@c.Nombre</strong> – @c.Correo
+                                    </p>
+
+                                    <p class="mb-2">
+                                        @c.Mensaje
+                                    </p>
+
+                                    @if (!c.Respondido)
+                                    {
+                                        <form asp-action="Responder" method="post" class="mt-2">
+                                            <input type="hidden" name="idContacto" value="@c.Id_Contacto" />
+
+                                            <div class="input-group">
+                                                <input name="respuesta"
+                                                       class="form-control"
+                                                       placeholder="Escriba la respuesta..."
+                                                       required />
+                                                <button class="btn btn-success" type="submit">
+                                                    <i class="bi bi-send"></i>
+                                                </button>
+                                            </div>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <div class="mt-2">
+                                            <span class="badge bg-success">
+                                                Respondido
+                                            </span>
+                                        </div>
+                                    }
+                                </div>
+
+                            </div>
+                        </div>
+                    }
+
+                </div>
+            }
+
+        </div>
+    </div>
+
+</div>

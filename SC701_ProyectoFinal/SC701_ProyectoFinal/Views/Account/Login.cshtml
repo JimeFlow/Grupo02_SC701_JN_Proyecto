@@ -10,7 +10,7 @@
             <!-- Imagen lateral -->
             <div class="col-lg-6 px-0">
                 <div class="sticky-top vh-lg-100 py-9">
-                    <div class="bg-holder" style="background-image:url(/lib/img/signin.jpg);"></div>
+                    <div class="bg-holder" style="background-image:url(/lib/img/loginhome.png);"></div>
                 </div>
             </div>
 
@@ -19,7 +19,15 @@
                 <div class="row h-100 align-items-center justify-content-center">
                     <div class="col-sm-8 col-md-6 col-lg-10 col-xl-8">
                         <h3 class="display-4 fs-7">Bienvenido</h3>
-                        <h6 class="text-danger mt-3">Accede con tus credenciales institucionales</h6>                        
+                        <h6 class="text-danger mt-3">Accede con tus credenciales institucionales</h6>
+
+                        @if (TempData["RegistroExitoso"] != null)
+                        {
+                            <div class="alert alert-success text-center mt-3">
+                                <i class="bi bi-check-circle-fill me-2"></i>
+                                @TempData["RegistroExitoso"]
+                            </div>
+                        }
 
                         <form id="FormInicioSesion" asp-action="Login" asp-controller="Account" class="mt-5">
                             <div class="mb-3">

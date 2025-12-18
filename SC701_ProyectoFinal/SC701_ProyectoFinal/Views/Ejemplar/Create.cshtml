@@ -47,6 +47,11 @@
                     <a asp-action="Index" class="btn btn-secondary px-4">Volver</a>
                 </div>
 
+                <div class="mb-3">
+                    <label asp-for="Cantidad" class="form-label fw-bold">Cantidad</label>
+                    <input asp-for="Cantidad" type="number" class="form-control" min="1" value="1" />
+                </div>
+
             </form>
 
         </div>

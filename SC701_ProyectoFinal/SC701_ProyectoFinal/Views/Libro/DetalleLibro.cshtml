@@ -9,9 +9,9 @@
 
 <div>
     <p class="text-center">
-        @if (!string.IsNullOrEmpty(Model.Imagen))
+        @if (!string.IsNullOrEmpty(Model.Imagen_URL))
         {
-            <img src="@Model.Imagen" alt="Portada" width="50" height="70" class="rounded shadow-sm" />
+            <img src="@Model.Imagen_URL" alt="Portada" width="150" class="rounded shadow-sm" />
         }
         else
         {
@@ -20,16 +20,22 @@
     </p>
     <p><strong>Autor:</strong> @Model.Autor || <strong>Año:</strong> @Model.AnioPublicacion  || <strong>ISBN:</strong> @Model.ISBN</p>
     <p><strong>Descripción:</strong> @Model.Descripcion</p>
-    <p><strong>Estado:</strong> @Model.Estado</p>
 </div>
 
 <hr />
 
 @* Boton de Reserva *@
-<form asp-action="Reservar" method="post">
-    <input type="hidden" name="idLibro" value="@Model.LibroId" />
-    <button type="submit" class="btn btn-primary">Reservar</button>
+
+<form asp-controller="Reserva"
+      asp-action="CrearReserva"
+      method="post">
+    <input type="hidden" name="LibroId" value="@Model.Id_Libro" />
+    <input type="hidden" name="Id_Ejemplar" value="@Model.Id_Ejemplar" />
+    <button type="submit" class="btn btn-primary">
+        Reservar
+    </button>
 </form>
+
 
 <hr />
 
@@ -46,37 +52,28 @@
         @TempData["ErrorComentario"]
     </div>
 }
+<form asp-action="Crear" asp-controller="Comentarios" method="post">
+    <input type="hidden" name="idLibro" value="@Model.Id_Libro" />
 
-<form asp-action="AgregarComentario" method="post" asp-controller="Libro">
-    <input type="hidden" name="idLibro" value="@Model.LibroId" />
     <div class="form-group">
-        <label for="comentario">Comentario:</label>
-        <textarea class="form-control" id="comentario" name="comentario" rows="3" required></textarea>
+        <label>Comentario:</label>
+        <textarea class="form-control" name="comentario" required></textarea>
     </div>
+
     <div class="form-group">
-        <label for="calificacion">Calificación:</label>
-        <select class="form-control" id="calificacion" name="calificacion" required>
-            <option value="">Seleccione una calificación</option>
+        <label>Calificación:</label>
+        <select class="form-control" name="rating" required>
+            <option value="">Seleccione</option>
             @for (int i = 1; i <= 5; i++)
             {
                 <option value="@i">@i</option>
             }
         </select>
     </div>
-    @* Rating por estrellas
-    <div class="form-group">
-        <label for="Rating" class="form-label">Calificación</label>
-        <select name="Rating" class="form-select" required>
-            <option value="1">★☆☆☆☆</option>
-            <option value="2">★★☆☆☆</option>
-            <option value="3">★★★☆☆</option>
-            <option value="4">★★★★☆</option>
-            <option value="5">★★★★★</option>
-        </select>
-    </div> *@ 
 
-    <input type="hidden" name="LibroId" value="@Model.LibroId"/>
-    <button type="submit" class="btn btn-success">Agregar Comentario</button>
+    <button type="submit" class="btn btn-success mt-2">
+        Agregar Comentario
+    </button>
 </form>
 
 <hr />

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Mail;
@@ -79,7 +80,10 @@ namespace ProyectoAPI.Controllers
                 parametros.Add("@Contrasena", hashPassword);
                 parametros.Add("@Telefono", user.Telefono);
 
-                var resultado = context.QueryFirst<int>("RegistroUsuario", parametros);
+                var resultado = context.QueryFirst<int>("RegistroUsuario", 
+                    parametros,
+                    commandType: CommandType.StoredProcedure
+                    );
                 if (resultado == 0) return BadRequest("El correo o el número de teléfono ya existe");
 
                 return Ok("Usuario registrado con éxito");
@@ -144,6 +148,7 @@ namespace ProyectoAPI.Controllers
             using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
                 string hashPassword = BCrypt.Net.BCrypt.HashPassword(usuario.Contrasena);
+
                 var parametros = new DynamicParameters();
                 parametros.Add("Id_Usuario", usuario.Id_Usuario);
                 parametros.Add("Contrasena", hashPassword);

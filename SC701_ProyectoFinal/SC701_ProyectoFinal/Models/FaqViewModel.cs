@@ -1,8 +1,11 @@
 ﻿namespace SC701_ProyectoFinal.Models
 {
-    public class FaqViewModel
+    public class FAQViewModel
     {
-        public string? Question { get; set; }
-        public string? Answer { get; set; }
+        public int Id_FAQ { get; set; }
+        public string Pregunta { get; set; } = string.Empty;
+        public string Respuesta { get; set; } = string.Empty;
+        public bool Estado { get; set; }
+        public DateTime FechaCreacion { get; set; }
     }
 }

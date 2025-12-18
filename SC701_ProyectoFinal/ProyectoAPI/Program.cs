@@ -38,7 +38,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();//
 app.UseExceptionHandler("/api/Error/RegistrarError");
 app.UseAuthentication();
 

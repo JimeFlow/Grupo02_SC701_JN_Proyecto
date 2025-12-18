@@ -1,2 +1,7 @@
-/* prettier-ignore */
-/*# sourceMappingURL=user.css.map */
+.dropdown-menu {
+    display: none;
+}
+
+    .dropdown-menu.show {
+        display: block;
+    }

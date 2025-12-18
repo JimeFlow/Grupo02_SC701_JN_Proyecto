@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using System.Data;
+using Dapper;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -27,7 +28,11 @@ namespace ProyectoAPI.Controllers
                 parametros.Add("@MensajeError", exception?.Error.Message);
                 parametros.Add("@OrigenError", exception?.Path);
 
-                context.Execute("RegistrarError", parametros);
+                context.Execute(
+                    "RegistrarError",
+                    parametros,
+                    commandType: CommandType.StoredProcedure
+                    );
             }
 
             return StatusCode(500, "Se presentó una excepción en nuestro servicio");

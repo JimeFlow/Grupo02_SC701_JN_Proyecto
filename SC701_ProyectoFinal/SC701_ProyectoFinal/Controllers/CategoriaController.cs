@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Net.Http;
+using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Mvc;
 using SC701_ProyectoFinal.Models;
 using static System.Net.WebRequestMethods;
@@ -89,6 +90,29 @@ namespace SC701_ProyectoFinal.Controllers
 
                 ViewBag.Mensaje = "No se ha actualizado la información" + respuesta;
                 return RedirectToAction("Index",categoria);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
+        {
+            using (var client = _http.CreateClient())
+            {
+                var urlApi = _configuration["Valores:UrlAPI"] + $"Categoria/{id}";
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
+
+                var response = await client.DeleteAsync(urlApi);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var mensaje = await response.Content.ReadAsStringAsync();
+                    TempData["Error"] = mensaje;
+                    return RedirectToAction("Index");
+                }
+
+                TempData["Success"] = "Categoría eliminada correctamente.";
+                return RedirectToAction("Index");
             }
         }
     }

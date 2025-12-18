@@ -21,6 +21,12 @@ body {
   margin-bottom: 60px;
 }
 
+.bg-holder {
+    min-height: 60vh;
+    background-size: cover;
+    background-position: center;
+} 
+
 #ConfirmPasswordMsg {
     font-size: 0.875rem;
     margin-top: 4px;

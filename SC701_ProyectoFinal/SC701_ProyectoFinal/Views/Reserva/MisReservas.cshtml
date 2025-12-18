@@ -35,7 +35,7 @@ else
         {
             <tr class="align-middle text-center">
             <td>
-		                <img src="@r.Imagen" width="50" height="70" class="rounded shadow-sm"/>
+		                <img src="@r.Imagen_URL" width="50" height="70" class="rounded shadow-sm"/>
             </td>
                 <td>@r.Titulo</td>
                 <td>@r.FechaReserva.ToShortDateString()</td>
@@ -45,19 +45,19 @@ else
                 </td>
                         
              <td>
-                   <a asp-controller="Libro"
-                    asp-action="Detalle"
-                    asp-route-id="@r.LibroId"
-                    class="btn btn-info btn-sm me-1">
-                    Ver libro
-             </a>
 
+                            <a asp-controller="Libro"
+                               asp-action="Detalle"
+                               asp-route-id="@r.Id_Libro"
+                               class="btn btn-info btn-sm me-1">
+                                Ver libro
+                            </a>
 
         
         @if (r.Estado != "Cancelada")
         {
                     <a asp-action="CancelarReserva" 
-                     asp-route-id="@r.Id" 
+                     asp-route-id="@r.Id_Movimiento" 
                      class="btn btn-danger btn-sm">
                      Cancelar
 							</a>

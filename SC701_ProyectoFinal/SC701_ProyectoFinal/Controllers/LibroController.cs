@@ -290,7 +290,7 @@ namespace SC701_ProyectoFinal.Controllers
 
         // POST: Confirmar reserva
         [HttpPost]
-        public IActionResult Reservar(ReservaViewModel reserva) 
+        public IActionResult Reservar(ReservaViewModel reserva) //NO LLEGA ID LIBRO
         {
             if (!ModelState.IsValid)
                 return View(reserva);
@@ -300,22 +300,21 @@ namespace SC701_ProyectoFinal.Controllers
             if (idUsuario == null)
             {
                 TempData["ErrorMessage"] = "Debe iniciar sesión para reservar un libro.";
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction("Login", "Usuario");
             }
 
             using (var client = _httpClientFactory.CreateClient())
             {
-                var urlApi = _configuration["Valores:UrlAPI"] + "Reserva/Crear";
-
+                var urlApi = _configuration["Valores:UrlAPI"] + "Libro/ReservarLibro";
                 client.DefaultRequestHeaders.Authorization =
                     new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
 
-                var request = new ReservaLibroModel
+                var request = new ReservaRequestModel
                 {
                     Id_Libro = reserva.Id_Libro,
                     Id_Usuario = idUsuario.Value,
-                    FechaReserva = reserva.FechaReserva,
-                    FechaVencimiento = reserva.FechaVencimiento
+                    Fecha = reserva.FechaReserva,
+                    Fecha_Vencimiento = reserva.FechaVencimiento
                 };
 
                 var respuesta = client.PostAsJsonAsync(urlApi, request).Result;

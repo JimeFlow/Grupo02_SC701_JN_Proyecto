@@ -94,6 +94,21 @@ namespace ProyectoAPI.Controllers
             }            
         }
 
+        [HttpGet]
+        [Route("ObtenerSancionesActivas")]
+        public IActionResult ObtenerSancionesActivas()
+        {
+            using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
+            {
+                var resultado = context.Query<UsuariosSancion>(
+                    "ObtenerUsuariosConSancionActiva",
+                    commandType: CommandType.StoredProcedure
+                );
+
+                return Ok(resultado);
+            }
+        }
+
 
 
     }

@@ -23,19 +23,10 @@ namespace SC701_ProyectoFinal.Controllers
             {
                 var IdUsuario = HttpContext.Session.GetInt32("Id_Usuario");
 
-                if (IdUsuario == null)
-                {
-                    return RedirectToAction("Login", "Account");
-                }
-
-                // Validar sanción
                 var urlSancion = _configuration["Valores:UrlAPI"] + "Sancion/UsuarioTieneSancion";
-                context.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
-
+                context.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
                 var respSancion = context.GetAsync(urlSancion).Result;
                 bool tieneSancion = false;
-
                 if (respSancion.IsSuccessStatusCode)
                 {
                     var numero = respSancion.Content.ReadAsStringAsync().Result;
@@ -43,37 +34,22 @@ namespace SC701_ProyectoFinal.Controllers
                     {
                         tieneSancion = result > 0;
                     }
-                }
 
+                }
                 ViewBag.tieneSancion = tieneSancion;
 
-                // Obtener reservas del usuario
-                var urlApi = _configuration["Valores:UrlAPI"] +
-                             "Reserva/ObtenerReservas?Id_Usuario=" + IdUsuario;
 
+                var urlApi = _configuration["Valores:UrlAPI"] + "Reserva/ObtenerReservas?Id_Usuario=" + IdUsuario;
                 var respuesta = context.GetAsync(urlApi).Result;
 
                 if (respuesta.IsSuccessStatusCode)
                 {
-                    var datosApi =
-                        respuesta.Content.ReadFromJsonAsync<List<ReservaLibroModel>>().Result;
-
-                    var reservasView = datosApi.Select(r => new ReservaViewModel
-                    {
-                        Id_Movimiento = r.Id_Movimiento,
-                        Id_Libro = r.Id_Libro,
-                        Titulo = r.Titulo,
-                        Imagen_URL = r.Imagen_URL,
-                        FechaReserva = r.FechaReserva,
-                        FechaVencimiento = r.FechaVencimiento,
-                        Estado = r.Estado
-                    }).ToList();
-
-                    return View(reservasView);
+                    var datosApi = respuesta.Content.ReadFromJsonAsync<List<ReservaRequestModel>>().Result;
+                    return View(datosApi);
                 }
 
-                ViewBag.Mensaje = "No tienes reservas registradas";
-                return View(new List<ReservaViewModel>());
+                ViewBag.Mensaje = "No hay reservas registradas";
+                return View(new List<ReservaRequestModel>());
             }
         }
 
@@ -203,7 +179,7 @@ namespace SC701_ProyectoFinal.Controllers
         }
 
         [HttpPost]
-        public IActionResult ExtenderPlazoPrestamo(ReservaLibroModel reserva)
+        public IActionResult ExtenderPlazoPrestamo(ReservaRequestModel reserva)
         {
             using (var context = _httpClientFactory.CreateClient())
             {

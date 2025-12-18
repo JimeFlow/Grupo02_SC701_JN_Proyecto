@@ -135,6 +135,14 @@ CREATE TABLE Error(
     FechaHora DATETIME
 );
 
+CREATE TABLE ErrorSistema (
+    Id_Error INT IDENTITY PRIMARY KEY,
+    Modulo VARCHAR(100),
+    MensajeError VARCHAR(500),
+    Fecha DATETIME,
+    Id_Usuario INT NULL
+);
+
 /* ===================== 3. DATOS BASE ===================== */
 
 INSERT INTO Rol(Tipo_Rol) VALUES ('Administrador'), ('Cliente');
@@ -915,9 +923,8 @@ BEGIN
     INNER JOIN Usuario U ON M.Id_Usuario = U.Id_Usuario
     INNER JOIN Estado E ON M.Id_Estado = E.Id_Estado
     WHERE (@EstadoFiltro IS NULL OR M.Id_Estado = @EstadoFiltro)
- ORDER BY M.Id_Movimiento DESC;
+	ORDER BY M.Id_Movimiento DESC;
 END;
-
 -------------------------------------NUEVO RESERVAS LIBROS--------------------------------------------
 
 CREATE OR ALTER PROCEDURE ReservarLibro
@@ -961,4 +968,48 @@ BEGIN
 END;
 GO
 
+----------------------------------PROCEDIMIENTO ERROR-------------------
 
+CREATE PROCEDURE RegistrarError
+@Modulo VARCHAR(100),
+@MensajeError VARCHAR(500),
+@Fecha DATETIME,
+@Id_Usuario INT =NULL
+
+AS 
+BEGIN
+	INSERT INTO ErrorSistema
+	(
+	Modulo,
+	MensajeError,
+	Fecha,
+	Id_Usuario
+)
+
+VALUES 
+	(
+	@Modulo,
+	@MensajeError,
+	@Fecha,
+	@Id_Usuario
+
+	)
+
+END
+GO
+
+------------------------------LISTAR ROLES----------------------------------------
+CREATE PROCEDURE ListarRoles
+AS
+BEGIN
+	SELECT Id_Rol, Tipo_Rol
+	FROM Rol 
+END
+
+
+
+SELECT *
+FROM Rol;
+
+DELETE FROM Rol
+WHERE Id_Rol IN(3,4);

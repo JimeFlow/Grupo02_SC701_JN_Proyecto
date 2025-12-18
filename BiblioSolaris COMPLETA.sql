@@ -244,15 +244,17 @@ BEGIN
         Id_Libro,
         ISBN,
         Titulo,
-        Descripcion,
+		Descripcion,
+		L.Id_Categoria,
+		C.Tipo AS Tipo,
         Autor,
         Anio,
-        Imagen_URL,
-        Id_Categoria
-    FROM Libro
+        Imagen_URL
+    FROM Libro L INNER JOIN Categoria C ON L.Id_Categoria = C.Id_Categoria
     WHERE Id_Libro = @Id;
 END
 GO
+EXEC ObtenerLibroPorId 2;
 
 CREATE OR ALTER PROCEDURE EliminarLibro
 (
@@ -378,56 +380,32 @@ USE BiblioSolaris;
 GO
 
 CREATE OR ALTER PROCEDURE ReservarLibro
-(
-    @Id_Libro INT,
-    @Id_Usuario INT,
-    @FechaInicio DATETIME,
-    @FechaFin DATETIME
-)
+    @Id_Libro INT,--
+    @Fecha DATETIME,
+    @Fecha_Vencimiento DATETIME,
+    @Id_Usuario INT
 AS
 BEGIN
-    SET NOCOUNT ON;
-
     DECLARE @Id_Ejemplar INT;
+	DECLARE @Titulo VARCHAR(200);
 
-    SELECT TOP 1 @Id_Ejemplar = Id_Ejemplar
-    FROM Ejemplar
-    WHERE Id_Libro = @Id_Libro
-      AND Estado = 'Disponible'
-    ORDER BY Id_Ejemplar;
+	SELECT TOP 1 @Id_Ejemplar = E.Id_Ejemplar, @Titulo = L.Titulo
+	FROM Ejemplar E INNER JOIN Libro L ON E.Id_Libro = L.Id_Libro WHERE E.Id_Libro = @Id_Libro 
+	AND Estado = 'Disponible' ORDER BY Id_Ejemplar;
 
-    IF @Id_Ejemplar IS NULL
-    BEGIN
-        SELECT -1;
-        RETURN;
-    END
+	IF @Id_Ejemplar IS NULL
+	BEGIN 
+		SELECT -1 AS Resultado, NULL AS Titulo
+		RETURN;
+	END
 
-    INSERT INTO Movimiento
-    (
-        Tipo,
-        Fecha,
-        Fecha_Vencimiento,
-        Id_Usuario,
-        Id_Ejemplar,
-        Id_Estado
-    )
-    VALUES
-    (
-        'Préstamo',
-        @FechaInicio,
-        @FechaFin,
-        @Id_Usuario,
-        @Id_Ejemplar,
-        4
-    );
+    INSERT INTO Movimiento (Tipo, Fecha, Fecha_Vencimiento, Id_Estado, Id_Usuario, Id_Ejemplar)
+    VALUES ('Préstamo', @Fecha, @Fecha_Vencimiento, 4, @Id_Usuario, @Id_Ejemplar);
 
-    UPDATE Ejemplar
-    SET Estado = 'Prestado'
-    WHERE Id_Ejemplar = @Id_Ejemplar;
+	UPDATE Ejemplar SET Estado = 'Prestado' WHERE Id_Ejemplar = @Id_Ejemplar;
 
-    SELECT 1;
+    SELECT 1 AS Resultado, @Titulo AS Titulo;
 END;
-GO
 ----
 CREATE OR ALTER PROCEDURE ObtenerReservasUsuario
 @Id_Usuario INT

@@ -179,7 +179,7 @@ namespace SC701_ProyectoFinal.Controllers
         }
 
         [HttpPost]
-        public IActionResult ExtenderPlazoPrestamo(ReservaLibroModel reserva)
+        public IActionResult ExtenderPlazoPrestamo(ReservaRequestModel reserva)
         {
             using (var context = _httpClientFactory.CreateClient())
             {

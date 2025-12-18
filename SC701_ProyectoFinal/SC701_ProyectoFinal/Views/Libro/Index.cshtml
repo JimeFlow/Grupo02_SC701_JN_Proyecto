@@ -145,9 +145,9 @@
                                         </a>
 
                                         <!-- Reservar -->
-                                        <a asp-controller="Reserva"
-                                           asp-action="CrearReserva"
-                                           asp-route-libroId="@libro.Id_Libro"
+                                        <a asp-controller="Libro"
+                                           asp-action="Reservar"
+                                           asp-route-id="@libro.Id_Libro"
                                            class="btn btn-success btn-sm">
                                             Reservar
                                         </a>

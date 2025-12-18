@@ -30,23 +30,46 @@ namespace ProyectoAPI.Controllers
         {
             using (var context = new SqlConnection(_configuration["ConnectionStrings:BDConnection"]))
             {
+                string nombreUsuario = HttpContext.User.FindFirst("nombre")?.Value ?? "";
+                var helper = new Helper();
+                var sanciones = context.ExecuteScalar<int>(
+        "UsuarioTieneSancionActiva",
+        new { Id_Usuario = reserva.Id_Usuario },
+        commandType: CommandType.StoredProcedure
+    );
+
+                if (sanciones > 0)
+                {
+                    return BadRequest("El usuario tiene una sanción activa y no puede realizar préstamos.");
+                }
+
                 var parametros = new DynamicParameters();
-                parametros.Add("Id_Libro", reserva.Id_Libro);
-                parametros.Add("Id_Usuario", reserva.Id_Usuario);
-                parametros.Add("FechaInicio", reserva.FechaReserva);
-                parametros.Add("FechaFin", reserva.FechaVencimiento);
 
+                parametros.Add("@Id_Libro", reserva.Id_Libro);
+                parametros.Add("@Fecha", reserva.Fecha);
+                parametros.Add("@Fecha_Vencimiento", reserva.Fecha_Vencimiento);
+                parametros.Add("@Id_Usuario", reserva.Id_Usuario);
 
-                var resultado = context.QueryFirstOrDefault<int>(
-            "ReservarLibro",
-            parametros,
-            commandType: CommandType.StoredProcedure
-        );
+                var result = context.QueryFirstOrDefault<ReservaResponseModel>("ReservarLibro", parametros, commandType: CommandType.StoredProcedure);
 
-                if (resultado == -1)
-                    return BadRequest("No hay ejemplares disponibles.");
+                if (result.Resultado == -1)
+                    return BadRequest(new { mensaje = "El libro no está disponible para reservar." });
 
-                return Ok(resultado);
+                var ruta = Path.Combine(_environment.ContentRootPath, "PlantillasCorreo", "NotificacionReserva.html");
+                var html = System.IO.File.ReadAllText(ruta, UTF8Encoding.UTF8);
+
+                html = html.Replace("{{Usuario}}", nombreUsuario);
+                html = html.Replace("{{Libro}}", result.Titulo); //nombre
+                html = html.Replace("{{FechaReserva}}", reserva.Fecha.ToString("F"));
+                html = html.Replace("{{FechaVencimiento}}", reserva.Fecha_Vencimiento.ToString("F"));
+
+                string? correoUsuario = HttpContext.User.FindFirst("correo")?.Value;
+                if (correoUsuario != null)
+                {
+                    helper.EnviarCorreo("Confirmación de reserva exitosa", html, correoUsuario);
+                }
+
+                return Ok(new { mensaje = "Libro reservado correctamente." });
             }
 
         }

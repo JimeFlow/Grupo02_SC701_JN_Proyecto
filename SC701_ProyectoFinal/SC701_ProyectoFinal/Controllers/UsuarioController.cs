@@ -33,7 +33,7 @@ namespace SC701_ProyectoFinal.Controllers
                     return View(datosApi);
                 }
 
-                ViewBag.Mensaje = "No hay productos registrados";
+                ViewBag.Mensaje = "No hay usuarios registrados";
                 return View(new List<UsuarioModel>());
             }
         }
@@ -76,6 +76,31 @@ namespace SC701_ProyectoFinal.Controllers
             }
         }
         #endregion
+
+        #region Obtener Sanciones activas de usuarios
+
+        [HttpGet]
+        public IActionResult ObtenerSancionesActivas()
+        {
+            using (var context = _http.CreateClient())
+            {
+                var urlApi = _configuration["Valores:UrlAPI"] + "Sancion/ObtenerSancionesActivas";
+                context.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", HttpContext.Session.GetString("Token"));
+                var respuesta = context.GetAsync(urlApi).Result;
+
+                if (respuesta.IsSuccessStatusCode)
+                {
+                    var datosApi = respuesta.Content.ReadFromJsonAsync<List<UsuariosSancion>>().Result;
+                    return View(datosApi);
+                }
+
+                ViewBag.Mensaje = "No hay sanciones registrados";
+                return View(new List<UsuariosSancion>());
+            }
+        }
+
+        #endregion
+
 
         #region ActualizarUsuario
 

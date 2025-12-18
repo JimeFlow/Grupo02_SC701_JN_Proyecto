@@ -6,7 +6,7 @@ using System.Data.SqlClient;
 namespace ProyectoAPI.Controllers
 {
     [ApiController]
-    [Route ("api/[controller]")]
+    [Route("api/[controller]")]
     public class ReportesController : Controller
     {
         private readonly IConfiguration _configuration;
@@ -40,4 +40,6 @@ namespace ProyectoAPI.Controllers
             return Ok(datos);
 
         }
+    }
+
 }

@@ -949,3 +949,16 @@ BEGIN
 END;
 
 
+----------------------ACTUALIZAR CONTRASEÑA--------------------
+CREATE PROCEDURE ActualizarContrasena
+    @Id_Usuario INT,
+    @Contrasena VARCHAR(255)
+AS
+BEGIN
+    UPDATE Usuario
+    SET Contrasena = @Contrasena
+    WHERE Id_Usuario = @Id_Usuario;
+END;
+GO
+
+

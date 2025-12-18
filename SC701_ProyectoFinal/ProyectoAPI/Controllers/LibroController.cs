@@ -183,8 +183,8 @@ namespace ProyectoAPI.Controllers
 
                 html = html.Replace("{{Usuario}}", nombreUsuario);
                 html = html.Replace("{{Libro}}", result.Titulo); //nombre
-                html = html.Replace("{{FechaReserva}}", request.Fecha.ToString("F"));
-                html = html.Replace("{{FechaVencimiento}}", request.Fecha_Vencimiento.ToString("F"));
+                html = html.Replace("{{FechaReserva}}", request.FechaReserva.ToString("F"));
+                html = html.Replace("{{FechaVencimiento}}", request.FechaVencimiento.ToString("F"));
 
                 string? correoUsuario = HttpContext.User.FindFirst("correo")?.Value;
                 if( correoUsuario != null)

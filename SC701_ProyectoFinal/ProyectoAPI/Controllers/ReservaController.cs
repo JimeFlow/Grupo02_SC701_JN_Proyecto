@@ -149,7 +149,7 @@ namespace ProyectoAPI.Controllers
                 }
 
                 var resultado = context.Query<ReservaResponseModel>(
-                    "ObtenerReservasActivas",
+                    "ObtenerReservasAdmin",
                     parametros,
                     commandType: CommandType.StoredProcedure
                     );

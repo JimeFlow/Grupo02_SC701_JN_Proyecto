@@ -1,61 +1,76 @@
-﻿@model IEnumerable<SC701_ProyectoFinal.Models.ContactoViewModel>
+﻿@model List<SC701_ProyectoFinal.Models.ContactoViewModel>
+
 @{
     ViewData["Title"] = "Mis Consultas";
     Layout = "~/Views/Shared/_LayoutInterno.cshtml";
 }
 
 <div class="container mt-4">
-
-    <div class="card shadow border-0">
-        <div class="card-header bg-dark text-white">
-            <h5 class="mb-0">
-                <i class="bi bi-chat-left-text-fill me-2"></i>
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">
+                <i class="bi bi-chat-dots-fill me-2"></i>
                 Mis Consultas
-            </h5>
+            </h4>
         </div>
 
         <div class="card-body">
 
             @if (!Model.Any())
             {
-                <div class="alert alert-info text-center">
-                    No has enviado consultas aún.
+                <div class="alert alert-info mb-0">
+                    Aún no has enviado consultas.
                 </div>
             }
             else
             {
-                @foreach (var c in Model)
-                {
-                    <div class="border rounded p-3 mb-3">
-                        <h6>@c.Asunto</h6>
-
-                        <small class="text-muted">
-                            Enviado: @c.FechaCreacion.ToShortDateString()
-                        </small>
-
-                        <p class="mt-2">
-                            <strong>Tu mensaje:</strong><br />
-                            @c.Mensaje
-                        </p>
-
-                        @if (c.Respondido)
-                        {
-                            <div class="alert alert-success mt-3">
-                                <strong>Respuesta:</strong><br />
-                                @c.Respuesta
-                            </div>
-                        }
-                        else
-                        {
-                            <span class="badge bg-warning text-dark">
-                                Pendiente de respuesta
-                            </span>
-                        }
-                    </div>
-                }
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Asunto</th>
+                                <th>Mensaje</th>
+                                <th>Respuesta</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.Asunto</td>
+                                    <td>@item.Mensaje</td>
+                                    <td>
+                                        @if (string.IsNullOrEmpty(item.Respuesta))
+                                        {
+                                            <span class="text-muted">Pendiente</span>
+                                        }
+                                        else
+                                        {
+                                            @item.Respuesta
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (string.IsNullOrEmpty(item.Respuesta))
+                                        {
+                                            <span class="badge bg-warning text-dark">
+                                                Pendiente
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-success">
+                                                Respondido
+                                            </span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             }
 
         </div>
     </div>
-
 </div>

@@ -1,7 +1,12 @@
 ﻿@model SC701_ProyectoFinal.Models.ContactoViewModel
 @{
     ViewData["Title"] = "Contacto";
-    Layout = "~/Views/Shared/_LayoutInterno.cshtml";
+
+    var rol = Context.Session.GetInt32("Id_Rol");
+
+    Layout = rol == null
+        ? "~/Views/Shared/_LayoutExterno.cshtml"
+        : "~/Views/Shared/_LayoutInterno.cshtml";
 }
 
 <div class="container mt-5">
@@ -10,7 +15,7 @@
 
             <div class="card shadow-lg border-0">
                 <div class="card-header bg-dark text-white">
-                    <h4 class="mb-0">
+                    <h4 class="mb-0 text-white">
                         <i class="bi bi-envelope-fill me-2"></i>
                         Contáctanos
                     </h4>
@@ -18,58 +23,76 @@
 
                 <div class="card-body">
 
-                    <p class="text-muted mb-4">
-                        ¿Tienes alguna duda o consulta sobre el uso de la biblioteca?
-                        Escríbenos y un administrador te responderá lo antes posible.
-                    </p>
-
-                    @if (TempData["MensajeExito"] != null)
+                    @if (rol != null) // logueado (admin o usuario)
                     {
-                        <div class="alert alert-success">
-                            @TempData["MensajeExito"]
-                        </div>
-                    }
+                        <p class="text-muted mb-4">
+                            ¿Tienes alguna duda o consulta sobre el uso de la biblioteca?
+                            Escríbenos y un administrador te responderá lo antes posible.
+                        </p>
 
-                    @if (ViewBag.Error != null)
-                    {
-                        <div class="alert alert-danger">@ViewBag.Error</div>
-                    }
-
-                    <form asp-action="Enviar" method="post">
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Nombre</label>
-                                <input asp-for="Nombre" class="form-control" required />
+                        @if (TempData["MensajeExito"] != null)
+                        {
+                            <div class="alert alert-success">
+                                @TempData["MensajeExito"]
                             </div>
 
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Correo electrónico</label>
-                                <input asp-for="Correo" type="email" class="form-control" required />
+                            @* limpia la bandera *@
+                            TempData.Remove("DesdeEnvio");
+                        }
+
+                        @if (ViewBag.Error != null)
+                        {
+                            <div class="alert alert-danger">@ViewBag.Error</div>
+                        }
+
+                        <form asp-action="Enviar" method="post">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Nombre</label>
+                                    <input asp-for="Nombre" class="form-control" required />
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Correo electrónico</label>
+                                    <input asp-for="Correo" type="email" class="form-control" required />
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Asunto</label>
-                            <input asp-for="Asunto" class="form-control" required />
-                        </div>
+                            <div class="mb-3">
+                                <label class="form-label">Asunto</label>
+                                <input asp-for="Asunto" class="form-control" required />
+                            </div>
 
-                        <div class="mb-4">
-                            <label class="form-label">Mensaje</label>
-                            <textarea asp-for="Mensaje"
-                                      class="form-control"
-                                      rows="5"
-                                      required></textarea>
-                        </div>
+                            <div class="mb-4">
+                                <label class="form-label">Mensaje</label>
+                                <textarea asp-for="Mensaje" class="form-control" rows="5" required></textarea>
+                            </div>
 
-                        <div class="text-end">
-                            <button type="submit" class="btn btn-primary px-4">
-                                <i class="bi bi-send me-1"></i>
-                                Enviar mensaje
-                            </button>
-                        </div>
+                            <div class="text-end">
+                                <button type="submit" class="btn btn-primary px-4">
+                                    <i class="bi bi-send me-1"></i>
+                                    Enviar mensaje
+                                </button>
+                            </div>
+                        </form>
 
-                    </form>
+                        <hr class="my-4" />
+                    }
+
+                    <div class="row text-muted">
+                        <div class="col-md-6 mb-2">
+                            📧 <strong>Correo:</strong> biblioteca@bibliosolaris.com
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            📞 <strong>Teléfono:</strong> +506 2222-3333
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            🕒 <strong>Horario:</strong> L–V 8:00 a.m. – 6:00 p.m. y Sábados 8:00 a.m. – 12:00 m.m.
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            📍 <strong>Ubicación:</strong> Cartago, Costa Rica
+                        </div>
+                    </div>
 
                 </div>
             </div>

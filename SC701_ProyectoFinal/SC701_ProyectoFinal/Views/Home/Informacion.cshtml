@@ -1,44 +1,94 @@
 ﻿@{
     ViewData["Title"] = "Información";
-    Layout = "~/Views/Shared/_LayoutInterno.cshtml";
+    Layout = "~/Views/Shared/_LayoutExterno.cshtml";
 }
 
-<div class="container mt-4">
-    <h2 class="text-primary mb-4">Información de la Biblioteca</h2>
+<div class="container my-5">
 
-    <p>
-        Nuestra biblioteca es un espacio diseñado para apoyar el aprendizaje,
-        la investigación y el crecimiento académico de nuestros usuarios.
-        A través de este sistema digital, buscamos facilitar el acceso a los
-        recursos bibliográficos y optimizar la gestión de libros y reservas.
-    </p>
+    <!-- TÍTULO -->
+    <div class="text-center mb-5">
+        <h2 class="fw-bold">Biblioteca Digital</h2>
+        <p class="text-muted">
+            Plataforma para la gestión y consulta de recursos bibliográficos
+        </p>
+    </div>
 
-    <h4 class="mt-4">Misión</h4>
-    <p>
-        Brindar acceso organizado y confiable a los recursos bibliográficos,
-        apoyando la educación mediante herramientas digitales.
-    </p>
+    <!-- DESCRIPCIÓN -->
+    <div class="row mb-5">
+        <div class="col-md-10 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <p class="mb-0 text-center">
+                        Nuestra biblioteca es un espacio diseñado para apoyar el aprendizaje,
+                        la investigación y el crecimiento académico de los usuarios.
+                        A través de este sistema digital, se facilita el acceso a los
+                        recursos bibliográficos y la gestión eficiente de libros y reservas.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <h4 class="mt-4">Visión</h4>
-    <p>
-        Ser una biblioteca moderna y accesible, que integre herramientas
-        tecnológicas para mejorar la experiencia de los usuarios y la gestión
-        eficiente de la información.
-    </p>
+    <!-- MISIÓN / VISIÓN -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-6">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="fw-bold">🎯 Misión</h5>
+                    <p>
+                        Brindar acceso organizado y confiable a los recursos bibliográficos,
+                        apoyando la educación mediante herramientas digitales.
+                    </p>
+                </div>
+            </div>
+        </div>
 
-    <h4 class="mt-4">Servicios</h4>
-    <ul>
-        <li>Consulta de libros</li>
-        <li>Reservas y préstamos</li>
-        <li>Gestión de usuarios</li>
-        <li>Comentarios y calificaciones</li>
-        <li>Preguntas frecuentes</li>
-    </ul>
+        <div class="col-md-6">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="fw-bold">👁️ Visión</h5>
+                    <p>
+                        Ser una biblioteca moderna y accesible, que integre herramientas
+                        tecnológicas para mejorar la experiencia de los usuarios y la gestión
+                        eficiente de la información.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <h4 class="mt-4">⏰ Horario de atención</h4>
-    <p>
-        Lunes a Viernes: 8:00 a.m. – 6:00 p.m.<br />
-        Sábados: 8:00 a.m. – 12:00 m.d.<br />
-        Domingos y feriados: Cerrado
-    </p>
+    <!-- SERVICIOS -->
+    <div class="row mb-5">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">📚 Servicios disponibles</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Consulta de libros</li>
+                        <li class="list-group-item">Reservas y préstamos</li>
+                        <li class="list-group-item">Gestión de usuarios</li>
+                        <li class="list-group-item">Comentarios y calificaciones</li>
+                        <li class="list-group-item">Preguntas frecuentes</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HORARIO -->
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow-sm border-start border-4 border-primary">
+                <div class="card-body">
+                    <h5 class="fw-bold">⏰ Horario de atención</h5>
+                    <p class="mb-0">
+                        Lunes a Viernes: 8:00 a.m. – 6:00 p.m.<br />
+                        Sábados: 8:00 a.m. – 12:00 m.d.<br />
+                        Domingos y feriados: Cerrado
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>

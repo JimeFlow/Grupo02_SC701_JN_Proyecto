@@ -18,11 +18,11 @@ namespace SC701_ProyectoFinal.Controllers
         // GET: Contacto
         public IActionResult Index()
         {
-            var rol =HttpContext.Session.GetInt32("Id_Rol");
 
-            if(rol == 1)
-            { 
-                return RedirectToAction("Admin");
+            if (TempData["DesdeEnvio"] == null)
+            {
+                TempData.Remove("MensajeExito");
+                TempData.Remove("Error");
             }
 
             return View();
@@ -42,7 +42,9 @@ namespace SC701_ProyectoFinal.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                TempData["MensajeExito"] = "Mensaje enviado correctamente. Pronto nos comunicaremos contigo.";
+                TempData["MensajeExito"] =
+                    "Respuesta enviada correctamente. Pronto alguien se comunicará contigo.";
+                TempData["DesdeEnvio"] = true; // 👈 bandera
                 return RedirectToAction("Index");
             }
 

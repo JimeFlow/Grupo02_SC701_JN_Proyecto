@@ -16,7 +16,7 @@
 
         public string? Respuesta { get; set; }
 
-        public bool Estado { get; set; } // true = pendiente, false = atendido
+        public bool Estado { get; set; } 
 
         public string Asunto { get; set; } = string.Empty;
 

@@ -3,14 +3,16 @@
     ViewData["Title"] = "Iniciar sesión"; 
     Layout = "~/Views/Shared/_LayoutExterno.cshtml";
 }
-
 <section class="py-0">
     <div class="container-fluid">
         <div class="row">
+
             <!-- Imagen lateral -->
             <div class="col-lg-6 px-0">
                 <div class="sticky-top vh-lg-100 py-9">
-                    <div class="bg-holder" style="background-image:url(/lib/img/loginhome.png);"></div>
+                    <div class="bg-holder"
+                         style="background-image:url('@Url.Content("~/lib/img/signin.jpg")');">
+                    </div>
                 </div>
             </div>
 
@@ -18,69 +20,52 @@
             <div class="col-lg-6 py-6">
                 <div class="row h-100 align-items-center justify-content-center">
                     <div class="col-sm-8 col-md-6 col-lg-10 col-xl-8">
-                        <h3 class="display-4 fs-7">Bienvenido</h3>
-                        <h6 class="text-danger mt-3">Accede con tus credenciales institucionales</h6>
+
+                        <h3 class="fw-bold mb-3">Bienvenido a la Biblioteca</h3>
+                        <P class="text-muted mb-4">
+                            Iniciá sesión con tus credenciales institucionales
+                        </P>
 
                         @if (TempData["RegistroExitoso"] != null)
                         {
                             <div class="alert alert-success text-center mt-3">
-                                <i class="bi bi-check-circle-fill me-2"></i>
                                 @TempData["RegistroExitoso"]
                             </div>
                         }
 
-                        <form id="FormInicioSesion" asp-action="Login" asp-controller="Account" class="mt-5">
+                        <form asp-action="Login" asp-controller="Account" class="mt-5">
+
                             <div class="mb-3">
                                 <label asp-for="Correo" class="form-label">Correo</label>
-                                <input name="correo" asp-for="Correo" class="form-control bg-light" placeholder="Correo electrónico" />
+                                <input asp-for="Correo" class="form-control bg-light" />
                             </div>
 
-                            <div class="mb-0">
+                            <div class="mb-3">
                                 <label asp-for="Contrasena" class="form-label">Contraseña</label>
-                                <input name="contrasena" asp-for="Contrasena" class="form-control bg-light" type="password" placeholder="Contraseña" />                                
-                            </div>                            
-
-                            <div class="mb-3 d-grid">
-                                <button class="btn btn-dark mt-3" type="submit">Iniciar sesión</button>
+                                <input asp-for="Contrasena" type="password" class="form-control bg-light" />
                             </div>
 
-                            <div class="text-danger">
-                                @Html.ValidationSummary()
+                            <div class="d-grid mb-3">
+                                <button class="btn btn-dark btn-lg w-100">Iniciar sesión</button>
                             </div>
+
+                            @Html.ValidationSummary("", new { @class = "text-danger" })
                         </form>
-                        <div class="mb-0 text-center">
-                            <a class="btn btn-link" asp-action="RecuperarAcceso" asp-controller="Account">¿Olvidó su contraseña?</a>
-                        </div>
-                        @if (ViewBag.Mensaje != null)
-                        {
-                            <div class="alert alert-warning text-center">
-                                @ViewBag.Mensaje
-                            </div>
-                        }
 
-                        @* HAY QUE REVISAR SI IMPLEMENTAREMOS LOGIN CON GOOGLE *@
-
-                        @* <div class="mb-3 w-100 position-relative text-center mt-4">
-                            <hr class="text-body-secondary text-opacity-25" />
-                            <div class="absolute-centered px-3 font-secondary fs-10 text-body-tertiary">o inicia sesión con</div>
+                        <div class="text-center">
+                            <a asp-action="RecuperarAcceso" asp-controller="Account">
+                                ¿Olvidó su contraseña?
+                            </a>
                         </div>
 
-                        <div class="row gx-2">
-                            <div class="col-6 d-grid">
-                                <a class="btn btn-outline-danger btn-sm mt-2" href="#"><span class="fab fa-google-plus-g me-2"></span> Google</a>
-                            </div>
-                            <div class="col-6 d-grid">
-                                <a class="btn btn-outline-primary btn-sm mt-2" href="#"><span class="fab fa-facebook me-2"></span> Facebook</a>
-                            </div>
-                        </div> *@
                     </div>
                 </div>
             </div>
-        </div>
+    </div>
     </div>
 </section>
 
+
 @section Scripts {
     <script src="~/js/InicioSesion.js" asp-append-version="true"></script>
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

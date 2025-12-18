@@ -957,7 +957,7 @@ END;
 
 
 ----------------------ACTUALIZAR CONTRASEÑA--------------------
-CREATE PROCEDURE ActualizarContrasena
+CREATE OR ALTER PROCEDURE ActualizarContrasena
     @Id_Usuario INT,
     @Contrasena VARCHAR(255)
 AS
@@ -1007,9 +1007,3 @@ BEGIN
 END
 
 
-
-SELECT *
-FROM Rol;
-
-DELETE FROM Rol
-WHERE Id_Rol IN(3,4);

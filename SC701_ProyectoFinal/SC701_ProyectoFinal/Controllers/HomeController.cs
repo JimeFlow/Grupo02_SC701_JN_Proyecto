@@ -1,13 +1,13 @@
 using System.Diagnostics;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SC701_ProyectoFinal.Models;
 using static System.Net.WebRequestMethods;
 
 namespace SC701_ProyectoFinal.Controllers
 {
-    [Seguridad]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -20,7 +20,7 @@ namespace SC701_ProyectoFinal.Controllers
             _http = http;
             _configuration = configuration;
         }
-
+        [Seguridad]
         public IActionResult Index() 
         {
             using (var client = _http.CreateClient())
@@ -44,6 +44,12 @@ namespace SC701_ProyectoFinal.Controllers
         }
 
         public IActionResult Informacion()
+        {
+            return View();
+        
+        }
+
+        public IActionResult Terminos()
         {
             return View();
         }

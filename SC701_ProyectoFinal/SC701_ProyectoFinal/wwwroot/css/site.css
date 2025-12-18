@@ -17,15 +17,17 @@ html {
   min-height: 100%;
 }
 
-body {
-  margin-bottom: 60px;
-}
 
 .bg-holder {
-    min-height: 60vh;
+    min-height: 65vh;
     background-size: cover;
     background-position: center;
-} 
+}
+
+.navbar {
+    position: relative;
+    z-index: 1050;
+}
 
 #ConfirmPasswordMsg {
     font-size: 0.875rem;
@@ -51,3 +53,15 @@ body {
 #eyeIcon {
     font-size: 1.1rem;
 }
+
+
+
+.login-image-wrapper {
+    height: 85vh; 
+}
+
+    .login-image-wrapper .bg-holder {
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+    }

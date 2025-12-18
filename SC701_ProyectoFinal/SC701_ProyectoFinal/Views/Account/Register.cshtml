@@ -10,13 +10,12 @@
             <div class="col-lg-6 px-0">
                 <div class="sticky-top vh-lg-100 py-9">
                     <div class="bg-holder"
-                         style="background-image:url('@Url.Content("~/lib/img/signup.jpg")');"
+                         style="background-image:url('@Url.Content("~/lib/img/signup.webp")');"
                          data-zanim-trigger="scroll"
                          data-zanim-lg='{"animation":"zoom-out-slide-right","delay":0.4}'>
                     </div>
                 </div>
             </div>
-
             <div class="col-lg-6 py-6">
                 <div class="row h-100 align-items-center justify-content-center">
                     <div class="col-sm-8 col-md-6 col-lg-10 col-xl-8"
@@ -24,7 +23,7 @@
                          data-zanim-trigger="scroll">
 
                         <h3 class="display-4 fs-7">Registrate para ser parte de nuestra familia.</h3>
-                        <h6 class="text-danger mt-3">Hecho para las personas que les gusta aprender.</h6>
+                        <p class="text-muted mb-4">Hecho para las personas que les gusta aprender y crecer.</p>
 
                         @if (ViewBag.Mensaje != null)
                         {
@@ -80,11 +79,14 @@
 
                             <div class="row mb-4 align-items-center">
                                 <div class="col-auto d-grid">
-                                    <button class="btn btn-dark" type="submit">Crear una cuenta</button>
+                                    <button class="btn btn-dark btn-lg w-100" type="submit">Crear una cuenta</button>
                                 </div>
                                 <div class="col-sm">
                                     <p class="fs-10 text-body mb-0 font-secondary mt-2 mt-lg-0">
-                                        Registrandote aceptas nuestros <a class="text-black" href="#!">términos y condiciones.</a>
+                                        Registrandote aceptas nuestros
+                                        <a asp-controller="Home" asp-action="Terminos" class="text-black">
+                                            términos y condiciones
+                                        </a>.
                                     </p>
                                 </div>
                             </div>
@@ -93,7 +95,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 </section>

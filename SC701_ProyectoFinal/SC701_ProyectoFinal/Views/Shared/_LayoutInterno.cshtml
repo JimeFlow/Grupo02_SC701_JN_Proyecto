@@ -63,73 +63,108 @@
 
 					<!-- Información -->
 					<li class="nav-item">
-						<a class="nav-link" asp-controller="Home" asp-action="Informacion">Información</a>
+						<a class="nav-link" href='@Url.Action("Informacion", "Home")'>Información</a>
 					</li>
 
 					<!-- Servicios (Admin y Usuario) -->
-
 					@if (id_Rol == 1)
 					{
-						<li class="nav-item">
-							<a class="nav-link" asp-controller="Libro" asp-action="Index">Libros</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" asp-controller="Ejemplar" asp-action="Index">Ejemplares</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" asp-controller="Categoria" asp-action="Index">Categorías</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" asp-controller="Reserva" asp-action="ObtenerReservas">Reservas</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" asp-controller="Usuario" asp-action="Index">Usuarios</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" asp-controller="Contacto" asp-action="Admin">Consultas</a>
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle"
+							   href="#"
+							   id="navbarGestion"
+							   role="button"
+							   data-bs-toggle="dropdown"
+							   aria-expanded="false">
+								Gestión
+							</a>
+
+							<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarGestion">
+
+								<li><hr class="dropdown-divider" /></li>
+
+								<li>
+									<a class="dropdown-item" asp-controller="Libro" asp-action="Index">
+										Libros
+									</a>
+								</li>
+								<li>
+									<a class="dropdown-item" asp-controller="Ejemplar" asp-action="Index">
+										Ejemplares
+									</a>
+								</li>
+								<li>
+									<a class="dropdown-item" asp-controller="Categoria" asp-action="Index">
+										Categorías
+									</a>
+								</li>
+								<li>
+									<a class="dropdown-item" asp-controller="Reserva" asp-action="ObtenerReservas">
+										Reservas
+									</a>
+								</li>
+								<li>
+									<a class="dropdown-item" asp-controller="Usuario" asp-action="Index">
+										Usuarios
+									</a>
+								</li>
+
+								<li><hr class="dropdown-divider" /></li>
+
+								<li>
+									<a class="dropdown-item" asp-controller="Contacto" asp-action="Admin">
+										Consultas
+									</a>
+								</li>
+							</ul>
 						</li>
 					}
 
 					@if (id_Rol == 2)
 					{
-						<li class="nav-item">
-							<a class="nav-link" asp-controller="Libro" asp-action="Index">Catálogo</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" asp-controller="Reserva" asp-action="Index">Mis reservaciones</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" asp-controller="Contacto" asp-action="MisConsultas">Mis consultas</a>
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle"
+							   href="#"
+							   id="navbarServicios"
+							   role="button"
+							   data-bs-toggle="dropdown"
+							   aria-expanded="false">
+								Servicios
+							</a>
+
+							<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarServicios">
+
+								<li>
+									<a class="dropdown-item" asp-controller="Libro" asp-action="Index">
+										Catálogo
+									</a>
+								</li>
+
+								<li>
+									<a class="dropdown-item" asp-controller="Reserva" asp-action="Index">
+										Mis reservaciones
+									</a>
+								</li>
+
+								<li>
+									<a class="dropdown-item" asp-controller="Contacto" asp-action="MisConsultas">
+										Mis consultas
+									</a>
+								</li>
+
+								<li><hr class="dropdown-divider" /></li>
+
+								<li> <a class="dropdown-item" asp-controller="Contacto" asp-action="Index"> 
+									Contacto </a> </li>
+
+								<li>
+									<a class="dropdown-item" asp-controller="FAQ" asp-action="Index">
+										Preguntas Frecuentes
+									</a>
+								</li>
+							</ul>
 						</li>
 					}
-
-
-
-
-					<!-- Ayuda -->
-					<li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle"
-						   href="#"
-						   id="navbarAyuda"
-						   role="button"
-						   data-bs-toggle="dropdown"
-						   aria-expanded="false">
-							Ayuda
-						</a>
-
-						<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarAyuda">
-							<li>
-								<a class="dropdown-item" asp-controller="Contacto" asp-action="Index">
-									Contacto
-								</a>
-							</li>
-							<li>
-								<a class="dropdown-item" asp-controller="FAQ" asp-action="Index">
-									Preguntas Frecuentes
-								</a>
-							</li>
-						</ul>
-					</li>
 
 					<!-- Usuario -->
 					<li class="nav-item navbar-dropdown dropdown-user dropdown">

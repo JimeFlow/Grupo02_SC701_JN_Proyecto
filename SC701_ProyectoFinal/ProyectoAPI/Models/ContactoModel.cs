@@ -8,6 +8,8 @@
         public string Asunto { get; set; } = string.Empty;
         public string Mensaje { get; set; } = string.Empty;
         public DateTime FechaEnvio { get; set; }
+
+        public string? Respuesta { get; set; }
         public bool Estado { get; set; } 
     }
 }

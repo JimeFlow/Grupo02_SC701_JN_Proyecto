@@ -29,4 +29,5 @@
 ---
 
 ## Diagrama Entidad - Relación de la Biblioteca Solaris
-<img width="1304" height="789" alt="Diagrama ER - BiblioSolaris" src="https://github.com/user-attachments/assets/86a25e05-e6a3-4afd-b5cc-9c36fe3b8d79" />
+<img width="943" height="2000" alt="Diagrama Entidad - Relación" src="https://github.com/user-attachments/assets/e1d7e8bc-9f5a-4736-8550-824558831994" />
+
